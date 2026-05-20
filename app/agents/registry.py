@@ -119,7 +119,7 @@ def load_agent_prompt(agent: AgentDefinition) -> str:
     path = AGENT_DEFINITIONS_DIR / agent.prompt_filename()
     if not path.exists():
         logger.warning("agent_prompt_missing | id={} path={}", agent.id, path)
-        return f"Sos el asistente '{agent.name}' de Fidemar S.A."
+        return f"Sos el asistente '{agent.name}' de esta instancia de Cortex."
     mtime = path.stat().st_mtime
     cached = _prompt_cache.get(agent.id)
     if cached and cached[0] == mtime:

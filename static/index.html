@@ -1947,7 +1947,7 @@ const Icon = {
 function pickConvIcon(title) {
   const t = (title || '').toLowerCase();
   if (/valvula|valve|reductora|compuerta|mariposa|esferica|globo/.test(t))         return 'Valve';
-  if (/sensor|nivel|presion|caudal|transmisor|nivelco|banner|turck/.test(t))        return 'Sensor';
+  if (/sensor|nivel|presion|caudal|transmisor|detector|medidor/.test(t))        return 'Sensor';
   if (/actuador|wrench|herramient|repuesto|junta|kit/.test(t))                      return 'Wrench';
   if (/norma|api |ansi|din|iso |awwa|nfpa|ul\/fm|catalog/.test(t))                  return 'Book';
   if (/imagen|foto|adjunto/.test(t))                                                return 'Image';
@@ -2234,7 +2234,7 @@ function SystemTab({ adminToken, onSaved }) {
               <textarea
                 ref={newRuleRef}
                 rows={2}
-                placeholder='Nueva regla (ej: "Siempre priorizá BERMAD en válvulas de control" · "Respondé en inglés técnico"). Enter para añadir.'
+                placeholder='Nueva regla (ej: "Siempre priorizá la marca X" · "Respondé en inglés técnico"). Enter para añadir.'
                 value={newRule}
                 onChange={e => setNewRule(e.target.value)}
                 onKeyDown={handleNewKeyDown}
@@ -2462,7 +2462,7 @@ function AdminChatTab({ adminToken, onSaved }) {
         <textarea
           ref={textRef}
           rows={2}
-          placeholder="Escribile al agente… (ej: 'Quiero que siempre priorices BERMAD' · 'Contame qué sabés de tu configuración')"
+          placeholder="Escribile al agente… (ej: 'Quiero que siempre priorices la marca X' · 'Contame qué sabés de tu configuración')"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -3359,9 +3359,9 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     setToast('✓ Conversación exportada como .txt');
   }
   const SUGGESTED_PROMPTS = [
-    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué válvulas BERMAD tienen disponibles?' },
-    { icon: 'Sensor', cat: 'Sensores',             text: 'Sensores de nivel NIVELCO para tanque de 6m' },
-    { icon: 'Wrench', cat: 'Selección',            text: 'Actuador neumático NUTORK para válvula DN150' },
+    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué productos del catálogo tenés para [aplicación]?' },
+    { icon: 'Sensor', cat: 'Sensores',             text: 'Recomendá un producto para [caso de uso]' },
+    { icon: 'Wrench', cat: 'Selección',            text: 'Ayudame a elegir el producto adecuado para [requisito técnico]' },
     { icon: 'Book',   cat: 'Normativas',           text: '¿Qué norma aplica para válvulas API 600?' },
     { icon: 'Valve',  cat: 'Comparativa',          text: '¿Diferencia entre válvula de bola y compuerta?' },
     { icon: 'Wrench', cat: 'Recomendación',        text: 'Válvula para fluido corrosivo a 80°C — ¿qué recomendás?' },

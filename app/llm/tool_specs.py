@@ -17,16 +17,16 @@ CATALOG_TOOL = {
         "+ el total real de coincidencias. "
         "Para ver más allá de los primeros 200, pasar `offset: 200`, `offset: 400`, etc. "
         "Llamar múltiples veces con diferentes términos para búsquedas exhaustivas. "
-        "Usar términos técnicos: marca (NUTORK, BERMAD, NIVELCO...), tipo de componente "
-        "(valvula, actuador, sensor, manometro...), tamaño (DN100, 2 pulgadas, 1/2...), "
-        "material (acero, SS316...), norma (API, ANSI, DIN...) o código de producto."
+        "Usar términos técnicos del dominio del cliente: marca, tipo de producto, "
+        "tamaño, material, norma técnica o código de producto. "
+        "Personalizar esta descripción al vocabulario real del catálogo del cliente."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "Términos de búsqueda. Ejemplos: 'NUTORK actuador electrico', 'BERMAD control hidraulico'",
+                "description": "Términos de búsqueda separados por espacios.",
             },
             "offset": {
                 "type": "integer",
