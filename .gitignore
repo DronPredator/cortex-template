@@ -1,0 +1,65 @@
+# ─── Secretos y configuración local ───────────────────────
+.env
+.env.*
+!.env.example
+*.tmp
+*.swp
+
+# ─── Datos generados en runtime (NUNCA commitear) ─────────
+users.json
+agents.json
+conversations_log.jsonl
+audit_log.jsonl
+memory.json
+runtime_config.json
+system_prompt_custom.txt
+
+# ─── Backups (locales) ────────────────────────────────────
+backups/
+
+# ─── Archivos generados por el agente ─────────────────────
+static/datasheets/*.pdf
+static/documents/*.docx
+static/documents/*.xlsx
+static/documents/*.pptx
+!static/datasheets/.gitkeep
+!static/documents/.gitkeep
+
+# ─── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# ─── NSSM artefactos (descargados por install_service.bat) ─
+nssm.exe
+nssm/
+nssm.zip
+
+# ─── Backups manuales del código ──────────────────────────
+*.backup
+main.py.backup
+
+# ─── Sistema operativo ────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDEs / editores ──────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*~
+.claude/

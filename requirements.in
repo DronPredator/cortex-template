@@ -1,0 +1,46 @@
+# Source of truth para dependencias.
+# Para regenerar requirements.txt (lock file con pins exactos):
+#   pip install pip-tools
+#   pip-compile requirements.in -o requirements.txt
+#
+# Para sincronizar el entorno con el lock:
+#   pip-sync requirements.txt
+
+# Web framework
+fastapi
+uvicorn[standard]
+
+# LLM providers
+anthropic>=0.49.0
+google-genai>=2.0.0
+
+# Búsqueda web
+tavily-python
+
+# Catálogo + scraping
+pandas
+beautifulsoup4>=4.12
+
+# Generadores de documentos
+reportlab>=4.0
+pypdf>=4.0
+python-docx>=1.1
+python-pptx>=0.6.21
+openpyxl>=3.1
+
+# Auth + config
+python-jose[cryptography]
+python-dotenv
+python-multipart
+pydantic>=2.0
+
+# Observabilidad / robustez
+loguru
+tenacity
+
+# Seguridad
+slowapi  # rate limiting para FastAPI
+
+# Tests
+pytest
+httpx

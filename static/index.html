@@ -1,0 +1,3713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Company Cortex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/marked@12/marked.min.js"></script>
+  <style>
+    :root {
+      /* ── Brand ───────────────────────────────────────────── */
+      --brand:         #1a4ea0;
+      --brand-deep:    #143d80;
+      --brand-darker:  #0f2f63;
+      --brand-soft:    #2a64bc;
+      --brand-tint-2:  rgba(26, 78, 160, 0.04);
+      --brand-tint-6:  rgba(26, 78, 160, 0.08);
+      --brand-tint-12: rgba(26, 78, 160, 0.12);
+      --brand-tint-20: rgba(26, 78, 160, 0.20);
+
+      /* ── Surfaces (Apple-style warm-neutral) ─────────────── */
+      --bg:            #fbfbfd;
+      --bg-elev-1:     #ffffff;
+      --bg-sidebar:    rgba(252, 252, 254, 0.78);
+      --bg-input:      #ffffff;
+      --bg-hover:      rgba(0, 0, 0, 0.035);
+      --bg-active:     rgba(26, 78, 160, 0.08);
+
+      /* ── Borders ─────────────────────────────────────────── */
+      --border:        rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.14);
+      --border-subtle: rgba(0, 0, 0, 0.05);
+
+      /* ── Text ────────────────────────────────────────────── */
+      --text-1:        #1d1d1f;
+      --text-2:        #515154;
+      --text-3:        #86868b;
+      --text-inverse:  #ffffff;
+
+      /* ── Status ──────────────────────────────────────────── */
+      --success:       #34c759;
+      --warning:       #ff9500;
+      --warn:          #ff9500;
+      --danger:        #d63b3b;
+      --neutral:       #86868b;
+
+      /* ── Typography ──────────────────────────────────────── */
+      --font-logo:    "Montserrat", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-ui:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, "Helvetica Neue", sans-serif;
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+      --font-mono:    "SF Mono", "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      /* ── Radii ───────────────────────────────────────────── */
+      --r-sm:   8px;
+      --r:      12px;
+      --r-lg:   16px;
+      --r-xl:   22px;
+      --r-pill: 999px;
+
+      /* ── Shadows ─────────────────────────────────────────── */
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.03);
+      --shadow:    0 4px 16px -4px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 20px 48px -16px rgba(0,0,0,0.22), 0 8px 16px -8px rgba(0,0,0,0.08);
+
+      /* ── Motion ──────────────────────────────────────────── */
+      --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --d-fast: 140ms;
+      --d:      220ms;
+      --d-slow: 360ms;
+
+      /* ── Layout ──────────────────────────────────────────── */
+      --topbar-h:  56px;
+      --sidebar-w: 280px;
+
+      /* ── Legacy aliases (compat con admin panel y otros) ─── */
+      --blue:        var(--brand);
+      --blue-dk:     var(--brand-deep);
+      --blue-lt:     var(--brand-tint-12);
+      --blue-mid:    var(--brand-soft);
+      --surface:     var(--bg-elev-1);
+      --surface2:    var(--bg-hover);
+      --border-lt:   var(--border-subtle);
+      --text:        var(--text-1);
+      --text-muted:  var(--text-2);
+      --user-bg:     var(--brand);
+      --user-text:   var(--text-inverse);
+      --mono:        var(--font-mono);
+      --sans:        var(--font-ui);
+    }
+
+    [data-theme="dark"] {
+      --bg:            #1a1a1c;
+      --bg-elev-1:     #232326;
+      --bg-sidebar:    rgba(24, 24, 27, 0.78);
+      --bg-input:      #2c2c2f;
+      --bg-hover:      rgba(255,255,255,0.06);
+      --bg-active:     rgba(26, 78, 160, 0.25);
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --border-subtle: rgba(255,255,255,0.06);
+      --text-1:        #f5f5f7;
+      --text-2:        #b1b1b6;
+      --text-3:        #86868b;
+      --brand:         #4a86d8;
+      --brand-soft:    #5a96e4;
+      --brand-deep:    #1a4ea0;
+    }
+
+    * { box-sizing: border-box; }
+    html, body, #root { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.005em;
+    }
+    button { font-family: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; }
+    input, textarea { font-family: inherit; }
+    ::selection { background: var(--brand-tint-20); }
+    /* ────────────────────────────────────────────────────────── */
+    /*  Sigue tu CSS legacy (login, mensajes, composer, admin)   */
+    /*  Las nuevas clases del shell van arriba.                  */
+    /* ────────────────────────────────────────────────────────── */
+
+    /* ── Login (Apple-style) ───────────────────────────────────── */
+    .login-wrap {
+      display: grid; place-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 70% 20%, rgba(26, 78, 160, 0.10) 0%, transparent 40%),
+        radial-gradient(circle at 30% 80%, rgba(42, 100, 188, 0.08) 0%, transparent 40%),
+        var(--bg);
+    }
+    .login-card {
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 40px 36px;
+      width: 100%; max-width: 380px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-mark {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.20) 0%, transparent 50%),
+        linear-gradient(155deg, var(--brand-soft) 0%, var(--brand) 50%, var(--brand-deep) 100%);
+      color: white;
+      display: grid; place-items: center;
+      margin: 0 auto 18px;
+      box-shadow:
+        0 8px 20px -6px rgba(26,78,160,0.40),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .login-logo {
+      font-family: var(--font-logo);
+      font-weight: 800;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+    }
+    .login-cortex {
+      font-family: var(--font-logo);
+      font-weight: 300;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      color: var(--text-3);
+      margin-left: 4px;
+    }
+    .login-logo-wrap {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 2px;
+      margin: 0 0 4px;
+    }
+    .login-tagline {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 24px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .login-divider { display: none; }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      font-size: 14px;
+      outline: none;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .field input:focus {
+      border-color: var(--brand-soft);
+      box-shadow: 0 0 0 4px var(--brand-tint-12);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--brand);
+      color: white;
+      border: 0;
+      border-radius: var(--r);
+      font-size: 14px; font-weight: 600;
+      letter-spacing: -0.005em;
+      margin-top: 6px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(20, 61, 128, 0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .btn-primary:hover { background: var(--brand-deep); transform: translateY(-0.5px); }
+    .btn-primary:active { transform: translateY(0.5px); }
+    .btn-primary:disabled { background: var(--bg-hover); color: var(--text-3); cursor: not-allowed; box-shadow: none; transform: none; }
+    .error-msg { font-size: 12.5px; color: var(--danger); text-align: center; margin-top: 12px; }
+    .login-footer { text-align: center; font-size: 11px; color: var(--text-3); margin-top: 22px; }
+
+    /* ── App shell (grid: topbar / sidebar + main) ─────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-rows: var(--topbar-h) minmax(0, 1fr);
+      grid-template-areas:
+        "topbar topbar"
+        "sidebar main";
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .app[data-sidebar="collapsed"] { grid-template-columns: 0 1fr; }
+    .app[data-sidebar="collapsed"] .sidebar { transform: translateX(-100%); pointer-events: none; }
+
+    /* ── Topbar ─────────────────────────────────────────────────── */
+    .topbar {
+      grid-area: topbar;
+      background: var(--brand);
+      color: var(--text-inverse);
+      display: flex; align-items: center;
+      padding: 0 12px 0 8px;
+      gap: 8px;
+      position: relative; z-index: 10;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+    }
+    .topbar-icon-btn {
+      width: 36px; height: 36px;
+      color: inherit;
+      border-radius: var(--r-sm);
+      display: grid; place-items: center;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .topbar-icon-btn:hover { background: rgba(255,255,255,0.12); }
+    .topbar-icon-btn:active { background: rgba(255,255,255,0.20); }
+
+    .brand {
+      display: flex; align-items: baseline; gap: 6px;
+      margin-left: 4px;
+    }
+    .brand-logo {
+      font-family: var(--font-logo);
+      font-weight: 800; font-size: 20px;
+      letter-spacing: -0.015em;
+      color: white;
+    }
+    .brand-cortex {
+      font-family: var(--font-logo);
+      font-weight: 300; font-size: 17px;
+      letter-spacing: -0.005em;
+      color: rgba(255,255,255,0.72);
+    }
+    .brand-divider {
+      width: 1px; height: 16px;
+      background: rgba(255,255,255,0.30);
+      display: inline-block;
+    }
+    .brand-tagline {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.82);
+      text-transform: uppercase;
+    }
+    .topbar-spacer { flex: 1; }
+
+    .topbar-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 12px 5px 5px;
+      border-radius: var(--r-pill);
+      background: rgba(255,255,255,0.12);
+      font-size: 13px; font-weight: 500;
+      color: white;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .topbar-user:hover { background: rgba(255,255,255,0.20); }
+    .avatar-mini {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.10));
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 600; color: white;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.20);
+    }
+    .btn-salir {
+      color: rgba(255,255,255,0.95);
+      padding: 7px 14px;
+      border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 500;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .btn-salir:hover { background: rgba(255,255,255,0.14); }
+
+    /* ── Sidebar ──────────────────────────────────────────────── */
+    .sidebar {
+      grid-area: sidebar;
+      background: var(--bg-sidebar);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transition: transform var(--d) var(--ease-out);
+      min-width: 0;
+    }
+    .sidebar-top { padding: 14px 12px 8px; }
+
+    /* ── Agent selector ────────────────────────────────────────── */
+    .agent-selector {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .agent-selector-btn {
+      width: 100%;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 8px 10px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      color: var(--text-1);
+      cursor: pointer;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .agent-selector-btn:hover { border-color: var(--brand-soft); background: var(--brand-tint-08, rgba(26,78,160,0.06)); }
+    .agent-selector-btn .agent-icon { font-size: 16px; line-height: 1; }
+    .agent-selector-btn .agent-name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .agent-selector-btn .agent-chevron { color: var(--text-3); font-size: 10px; }
+    .agent-selector-menu {
+      position: absolute;
+      top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--bg-elev-2, var(--bg-elev-1));
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      z-index: 10;
+      max-height: 280px; overflow-y: auto;
+      padding: 4px;
+    }
+    .agent-option {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .agent-option:hover { background: var(--brand-tint-12); }
+    .agent-option.active { background: var(--brand-tint-12); }
+    .agent-option .agent-icon { font-size: 18px; line-height: 1.2; }
+    .agent-option-text { min-width: 0; flex: 1; }
+    .agent-option-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .agent-option-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; line-height: 1.4; }
+    .agent-option .check { color: var(--brand); font-size: 14px; }
+
+    .new-consult-btn {
+      width: 100%;
+      background: var(--brand);
+      color: white;
+      padding: 11px 14px;
+      border-radius: var(--r);
+      font-size: 14px; font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 10px; justify-content: center;
+      box-shadow:
+        0 1px 2px rgba(20, 61, 128, 0.25),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .new-consult-btn:hover { background: var(--brand-deep); transform: translateY(-0.5px); }
+    .new-consult-btn:active { transform: translateY(0.5px); }
+    .new-consult-btn .pencil-icon { color: rgba(255,255,255,0.85); display: grid; place-items: center; }
+
+    .sidebar-search {
+      margin: 10px 12px 0;
+      position: relative;
+    }
+    .sidebar-search input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--bg-elev-1);
+      padding: 8px 10px 8px 32px;
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      color: var(--text-1);
+      outline: none;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .sidebar-search input::placeholder { color: var(--text-3); }
+    .sidebar-search input:focus {
+      border-color: var(--brand-soft);
+      box-shadow: 0 0 0 4px var(--brand-tint-12);
+    }
+    .sidebar-search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      display: grid; place-items: center;
+    }
+
+    .conv-section {
+      flex: 1; overflow-y: auto; padding: 12px 8px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) transparent;
+    }
+    .conv-section::-webkit-scrollbar { width: 6px; }
+    .conv-section::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .conv-section::-webkit-scrollbar-track { background: transparent; }
+
+    .conv-group { margin-bottom: 4px; }
+    .conv-group-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--text-3);
+      padding: 12px 10px 4px;
+    }
+    .conv-group-label.first { padding-top: 4px; }
+
+    .conv-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px;
+      border-radius: var(--r-sm);
+      font-size: 13.5px;
+      color: var(--text-2);
+      width: 100%; text-align: left;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+      transition: background var(--d-fast) var(--ease-out), color var(--d-fast) var(--ease-out);
+      letter-spacing: -0.005em;
+      cursor: pointer;
+    }
+    .conv-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .conv-item.active { background: var(--bg-active); color: var(--brand); font-weight: 600; }
+    .conv-item-icon {
+      color: var(--text-3);
+      flex-shrink: 0;
+      display: grid; place-items: center;
+    }
+    .conv-item.active .conv-item-icon { color: var(--brand); }
+    .conv-item-text {
+      flex: 1; overflow: hidden; text-overflow: ellipsis;
+      font-size: 13.5px;
+    }
+    .conv-item-delete {
+      background: none; border: 0; color: var(--text-3); cursor: pointer;
+      width: 22px; height: 22px;
+      border-radius: 4px; display: grid; place-items: center;
+      opacity: 0; transition: opacity 120ms ease-out, color 120ms ease-out;
+      flex-shrink: 0;
+    }
+    .conv-item:hover .conv-item-delete { opacity: 0.65; }
+    .conv-item-delete:hover { opacity: 1 !important; color: var(--danger); background: rgba(214, 59, 59, 0.08); }
+    .conv-empty { font-size: 12px; color: var(--text-3); padding: 12px 10px; text-align: center; }
+
+    /* ── Main + chat scroll ────────────────────────────────────── */
+    .main {
+      grid-area: main;
+      display: flex; flex-direction: column;
+      min-width: 0; min-height: 0;
+      height: 100%;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .chat-scroll {
+      flex: 1; overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      min-height: 0;
+    }
+    .chat-scroll::-webkit-scrollbar { width: 8px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 28px 32px 32px;
+      overflow-x: hidden;
+    }
+
+    /* ── Chat header (sticky bar dentro de .main) ─────────────── */
+    .chat-header {
+      padding: 14px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      display: flex; align-items: center; gap: 12px;
+      min-height: var(--topbar-h);
+      position: sticky; top: 0; z-index: 4;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    .chat-title {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: -0.01em;
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--text-1);
+    }
+    .chat-header-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .icon-btn-ghost {
+      width: 32px; height: 32px;
+      color: var(--text-3);
+      border-radius: var(--r-sm);
+      display: grid; place-items: center;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .icon-btn-ghost:hover { background: var(--bg-hover); color: var(--text-1); }
+
+    /* ── Mobile/responsive sidebar ─────────────────────────────── */
+    @media (max-width: 720px) {
+      .app { grid-template-columns: 0 1fr; }
+      .app:not([data-sidebar="open"]) .sidebar { transform: translateX(-100%); pointer-events: none; }
+      .sidebar {
+        position: absolute; top: var(--topbar-h);
+        left: 0; bottom: 0; width: var(--sidebar-w);
+        z-index: 5;
+        box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+      }
+      .chat-inner { padding: 18px 16px 24px; }
+      .chat-header { padding: 12px 16px; }
+    }
+
+    /* ── Mensajes wrapper ──────────────────────────────────────── */
+    .main-area { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .messages-area {
+      display: flex; flex-direction: column;
+      gap: 22px;
+      padding: 6px 0 0;
+    }
+
+    /* ── Welcome (Apple-style) ─────────────────────────────────── */
+    .welcome {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 36px 0 32px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+    }
+    .welcome-mark {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.20) 0%, transparent 50%),
+        linear-gradient(155deg, var(--brand-soft) 0%, var(--brand) 50%, var(--brand-deep) 100%);
+      color: white;
+      display: grid; place-items: center;
+      margin-bottom: 22px;
+      box-shadow:
+        0 12px 28px -8px rgba(26,78,160,0.42),
+        0 4px 8px -2px rgba(26,78,160,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+      animation: floatIn 720ms var(--ease-out) both;
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.92); }
+      to   { opacity: 1; transform: none; }
+    }
+    .welcome-title {
+      font-family: var(--font-display);
+      font-size: 44px; font-weight: 600;
+      letter-spacing: -0.035em;
+      margin: 0 0 6px;
+      color: var(--text-1);
+      line-height: 1.05;
+      animation: fadeUp 540ms var(--ease-out) 60ms both;
+    }
+    .welcome-subtitle {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text-2);
+      margin: 0 0 28px;
+      animation: fadeUp 540ms var(--ease-out) 120ms both;
+    }
+    .welcome-subtitle b { color: var(--brand); font-weight: 600; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+      max-width: 680px;
+      animation: fadeUp 600ms var(--ease-out) 200ms both;
+    }
+    @media (max-width: 600px) { .prompt-grid { grid-template-columns: 1fr; } }
+    .prompt-card {
+      text-align: left;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 13px 14px;
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer;
+      transition: all var(--d) var(--ease-out);
+    }
+    .prompt-card:hover {
+      border-color: var(--brand-tint-20);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    .prompt-card:active { transform: translateY(0); }
+    .prompt-card-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--r-sm);
+      background: var(--brand-tint-6);
+      color: var(--brand);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .prompt-card-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+    .prompt-card-cat {
+      display: block;
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+    .prompt-card-text {
+      display: block;
+      font-size: 13.5px; line-height: 1.4;
+      color: var(--text-1);
+      font-weight: 500;
+      letter-spacing: -0.005em;
+    }
+
+    /* ── Messages ──────────────────────────────────────────────── */
+    .message-row { display: flex; margin-bottom: 0; }
+    .message-row.user { justify-content: flex-end; }
+    .message-block { max-width: 80%; min-width: 0; }
+    .message-row.user .message-block { display: flex; flex-direction: column; align-items: flex-end; }
+    .message-row.assistant .message-block { width: 100%; max-width: 100%; }
+
+    .message-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 6px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .message-row.user .message-meta { text-align: right; }
+
+    .user-bubble {
+      background: var(--brand);
+      color: white;
+      padding: 11px 16px;
+      border-radius: 20px 20px 6px 20px;
+      font-size: 14.5px;
+      line-height: 1.45;
+      letter-spacing: -0.005em;
+      word-break: break-word;
+      box-shadow:
+        0 1px 2px rgba(20,61,128,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .user-bubble img,
+    .msg-img { max-width: 280px; border-radius: 10px; display: block; margin-bottom: 8px; }
+
+    /* Assistant card — open, no border (Apple-style) */
+    .assistant-card { padding: 4px 0 0; }
+    .assistant-card p {
+      margin: 0 0 14px;
+      font-size: 15px; line-height: 1.6;
+      color: var(--text-1);
+      letter-spacing: -0.005em;
+    }
+    .assistant-card p:last-child { margin-bottom: 12px; }
+    .assistant-card a {
+      color: var(--brand);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--brand-tint-20);
+      transition: border-color var(--d-fast) var(--ease-out);
+    }
+    .assistant-card a:hover { border-bottom-color: currentColor; }
+    .assistant-card strong { color: var(--text-1); font-weight: 600; }
+    .assistant-card h1, .assistant-card h2, .assistant-card h3 {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 600;
+      letter-spacing: -0.018em;
+      color: var(--text-1);
+      margin: 24px 0 10px;
+    }
+    .assistant-card h1:first-child,
+    .assistant-card h2:first-child,
+    .assistant-card h3:first-child { margin-top: 6px; }
+    .assistant-card ul, .assistant-card ol { margin: 6px 0 18px; padding: 0; list-style: none; }
+    .assistant-card ul li {
+      position: relative;
+      padding: 5px 0 5px 22px;
+      font-size: 14.5px; line-height: 1.5;
+      color: var(--text-1);
+    }
+    .assistant-card ul li::before {
+      content: "";
+      position: absolute;
+      left: 6px; top: 13px;
+      width: 5px; height: 5px;
+      background: var(--brand);
+      border-radius: 50%;
+    }
+    .assistant-card ol { counter-reset: olc; }
+    .assistant-card ol li { position: relative; padding: 5px 0 5px 22px; counter-increment: olc; font-size: 14.5px; line-height: 1.5; color: var(--text-1); }
+    .assistant-card ol li::before {
+      content: counter(olc) ".";
+      position: absolute; left: 0; top: 5px;
+      color: var(--brand);
+      font-weight: 600;
+      font-size: 13.5px;
+    }
+    .assistant-card code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: var(--bg-hover);
+      color: var(--brand-deep);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .assistant-card pre {
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: var(--r-sm);
+      overflow-x: auto;
+      margin: 8px 0 14px;
+      font-size: 12.5px; line-height: 1.5;
+    }
+    .assistant-card pre code { background: none; padding: 0; color: var(--text-1); }
+    /* Narración del agente: blockquote + italic, sutil, tipo "pensamiento en voz alta" */
+    .assistant-card blockquote {
+      margin: 6px 0;
+      padding: 4px 0 4px 12px;
+      border-left: 2px solid var(--brand-tint-20);
+      color: var(--text-3);
+      font-size: 13px;
+      line-height: 1.45;
+      background: transparent;
+    }
+    .assistant-card blockquote p { margin: 0; color: var(--text-3); font-size: 13px; }
+    .assistant-card blockquote em,
+    .assistant-card blockquote i { color: var(--text-3); font-style: italic; }
+    .assistant-card table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--bg-elev-1);
+      box-shadow: var(--shadow-xs);
+      font-size: 13.5px;
+    }
+    .assistant-card th {
+      background: var(--bg-elev-1);
+      color: var(--text-3);
+      text-align: left; font-weight: 600;
+      padding: 11px 14px;
+      font-size: 11.5px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .assistant-card td {
+      padding: 13px 14px;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-1);
+    }
+    .assistant-card tr:hover td { background: var(--brand-tint-2); }
+    .assistant-card hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 16px 0; }
+
+    /* Tabla con botón "Copiar" */
+    .assistant-card .table-wrap {
+      position: relative;
+      margin: 14px 0 20px;
+    }
+    .assistant-card .table-wrap > table {
+      margin: 0;
+    }
+    .table-copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      z-index: 2;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px;
+      font-size: 11.5px; font-weight: 600;
+      color: var(--text-2);
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      box-shadow: var(--shadow-xs);
+      opacity: 0;
+      transition: opacity var(--d) var(--ease-out), background var(--d-fast), color var(--d-fast), border-color var(--d-fast);
+    }
+    .assistant-card .table-wrap:hover .table-copy-btn,
+    .table-copy-btn:focus-visible {
+      opacity: 1;
+    }
+    .table-copy-btn:hover {
+      color: var(--brand);
+      border-color: var(--brand-tint-20);
+      background: var(--brand-tint-6);
+    }
+    .table-copy-btn.is-ok {
+      opacity: 1;
+      color: var(--success);
+      border-color: rgba(52,199,89,0.4);
+      background: rgba(52,199,89,0.10);
+    }
+    .table-copy-btn.is-err {
+      opacity: 1;
+      color: var(--danger);
+      border-color: rgba(214,59,59,0.4);
+      background: rgba(214,59,59,0.10);
+    }
+    .table-copy-icon { font-size: 13px; line-height: 1; }
+    @media (max-width: 720px) {
+      .table-copy-btn { opacity: 1; }
+    }
+
+    /* Streaming cursor */
+    .streaming-cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--brand);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Message actions (Regenerate / 👍 / 👎) bajo cada respuesta */
+    .msg-actions {
+      display: flex; align-items: center; gap: 2px;
+      margin: 6px 0 0;
+    }
+    .msg-action-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-3);
+      padding: 6px 10px;
+      border-radius: var(--r-sm);
+      font-size: 12.5px; font-weight: 500;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .msg-action-btn:hover { color: var(--text-1); background: var(--bg-hover); }
+    .msg-action-btn.active { color: var(--brand); }
+    .msg-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Thinking indicator (Apple-style) ─────────────────────── */
+    .thinking-wrap { align-self: flex-start; width: 100%; max-width: 100%; }
+    .thinking-details {
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .thinking-summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      cursor: pointer; user-select: none;
+      font-size: 12.5px; font-weight: 500;
+      color: var(--text-2);
+      list-style: none;
+    }
+    .thinking-summary::-webkit-details-marker { display: none; }
+    .thinking-summary:hover { background: var(--bg-hover); }
+    .thinking-spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .thinking-check { color: var(--success); font-size: 13px; flex-shrink: 0; }
+    .thinking-chevron { margin-left: auto; font-size: 10px; color: var(--text-3); transition: transform var(--d) var(--ease-out); }
+    details[open] .thinking-chevron { transform: rotate(180deg); }
+    .thinking-steps {
+      padding: 8px 14px 12px;
+      display: flex; flex-direction: column; gap: 6px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .thinking-step {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 12.5px; color: var(--text-2);
+      line-height: 1.45;
+    }
+    .thinking-step.active { color: var(--brand); }
+    .thinking-step-query {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: var(--brand-tint-6);
+      color: var(--brand-deep);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .thinking-step-count { color: var(--success); font-weight: 600; margin-left: 4px; }
+    .thinking-dots { display: inline-flex; gap: 3px; margin-left: 4px; }
+    .thinking-dots span { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: bounce .9s infinite; }
+    .thinking-dots span:nth-child(2) { animation-delay: .15s; } .thinking-dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+    /* Working chip — siempre visible mientras loading=true */
+    .working-chip {
+      position: sticky; top: 8px;
+      align-self: center;
+      z-index: 5;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--r-pill);
+      padding: 6px 14px 6px 10px;
+      font-size: 12.5px; color: var(--text-2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      animation: chipPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes chipPulse {
+      0%, 100% { box-shadow: 0 2px 12px rgba(26,78,160,0.10); }
+      50%      { box-shadow: 0 4px 18px rgba(26,78,160,0.22); }
+    }
+    .working-chip .thinking-spinner {
+      width: 12px; height: 12px; border-width: 1.5px;
+    }
+    .working-chip-label {
+      font-weight: 500; color: var(--text-1);
+    }
+    .working-chip-sub {
+      color: var(--text-3); font-size: 11.5px;
+    }
+    .working-chip-tier {
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 7px; border-radius: 999px;
+      background: var(--brand-tint-12); color: var(--brand-deep);
+    }
+    .working-chip-tier.tier-pro    { background: rgba(214,59,59,0.12);  color: var(--danger); }
+    .working-chip-tier.tier-flash  { background: rgba(26,78,160,0.12);  color: var(--brand-deep); }
+    .working-chip-tier.tier-lite   { background: rgba(52,199,89,0.14);  color: #1f7c3e; }
+    .working-chip-tier.tier-manual { background: var(--bg-hover);       color: var(--text-2); }
+
+    /* Spinner dentro del botón send cuando está cargando */
+    .composer-send.is-loading {
+      pointer-events: none;
+    }
+    .composer-send-spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      opacity: 0.85;
+    }
+
+    /* Progress bar (cuando todavía no llegan thinking steps) */
+    .progress-bar {
+      align-self: flex-start;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; max-width: 100%;
+    }
+    .progress-bar-label {
+      font-size: 12px; color: var(--text-2); font-weight: 500;
+      flex-shrink: 0;
+    }
+    .progress-bar-track {
+      flex: 1; height: 4px; background: var(--bg-hover); border-radius: 2px;
+      overflow: hidden; position: relative;
+    }
+    .progress-bar-fill {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 35%; background: var(--brand);
+      border-radius: 2px; animation: progressSlide 1.4s ease-in-out infinite;
+    }
+    @keyframes progressSlide { 0% { left: -35%; } 100% { left: 100%; } }
+
+    /* ── Composer (Apple-style pill) ──────────────────────────── */
+    .composer-wrap {
+      background: var(--bg);
+      padding: 12px 32px 18px;
+      flex-shrink: 0;
+    }
+    @media (max-width: 720px) {
+      .composer-wrap { padding: 10px 16px 14px; }
+    }
+    .composer-attachment-preview {
+      max-width: 780px;
+      margin: 0 auto 8px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+    }
+    .composer-attachment-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+    .composer-attachment-doc-icon {
+      width: 48px; height: 48px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--brand-tint-12); font-size: 22px;
+    }
+    .composer-attachment-name {
+      font-size: 12px; color: var(--text-2);
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .composer-attachment-remove {
+      width: 24px; height: 24px;
+      border-radius: 4px; display: grid; place-items: center;
+      color: var(--text-3);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .composer-attachment-remove:hover { color: var(--danger); background: rgba(214,59,59,0.08); }
+
+    .composer {
+      max-width: 780px;
+      margin: 0 auto;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 8px 8px 8px 14px;
+      display: flex; align-items: flex-end; gap: 6px;
+      box-shadow: var(--shadow);
+      transition: all var(--d) var(--ease-out);
+    }
+    .composer:focus-within {
+      border-color: var(--brand-soft);
+      box-shadow: 0 0 0 4px var(--brand-tint-12), var(--shadow);
+    }
+    .composer-tools {
+      display: flex; align-items: center; gap: 2px;
+      padding-bottom: 5px;
+    }
+    .composer-icon-btn {
+      width: 34px; height: 34px;
+      color: var(--text-3);
+      border-radius: var(--r-sm);
+      display: grid; place-items: center;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .composer-icon-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+    .composer-icon-btn.active,
+    .composer-icon-btn.recording { color: var(--brand); background: var(--brand-tint-6); }
+    .composer-icon-btn.recording { animation: pulse-rec 1s infinite; }
+    @keyframes pulse-rec { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+    .composer-input {
+      flex: 1;
+      border: 0; outline: 0;
+      background: transparent;
+      resize: none;
+      font-size: 15px;
+      color: var(--text-1);
+      padding: 9px 4px;
+      min-height: 24px;
+      max-height: 160px;
+      line-height: 1.5;
+      letter-spacing: -0.005em;
+    }
+    .composer-input::placeholder { color: var(--text-3); }
+    .composer-send {
+      background: var(--brand);
+      color: white;
+      height: 38px; min-width: 38px;
+      border-radius: var(--r);
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow:
+        0 1px 2px rgba(20,61,128,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.16);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .composer-send:hover { background: var(--brand-deep); }
+    .composer-send:active { transform: translateY(1px); }
+    .composer-send:disabled {
+      background: var(--bg-hover);
+      color: var(--text-3);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .composer-hint {
+      max-width: 780px;
+      margin: 8px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-3);
+      position: relative;
+    }
+    .composer-hint-text { text-align: center; }
+    .powered-by {
+      position: absolute;
+      right: 0;
+      font-size: 9.5px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--text-3);
+      opacity: 0.55;
+      user-select: none;
+      transition: opacity var(--d-fast) var(--ease-out);
+    }
+    .powered-by:hover { opacity: 0.85; }
+    .powered-by b {
+      font-weight: 600;
+      color: var(--text-2, var(--text-3));
+      letter-spacing: 0;
+    }
+    @media (max-width: 720px) {
+      .powered-by {
+        position: static;
+        font-size: 9px;
+      }
+    }
+
+    /* Legacy aliases para .input-bar/.input-row/.btn-send/.btn-icon-input
+       — mantienen comportamiento si alguna parte vieja sigue usándolas */
+    .input-bar     { padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .input-row     { display: flex; gap: 8px; align-items: flex-end; }
+    .input-image-preview { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--bg-elev-1); border-radius: var(--r-sm); border: 1px solid var(--border); }
+    .input-image-thumb   { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+    .input-image-name    { font-size: 12px; color: var(--text-2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-remove-img      { color: var(--text-3); font-size: 18px; }
+    .btn-remove-img:hover{ color: var(--danger); }
+    .btn-icon-input      { background: var(--bg-elev-1); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text-3); cursor: pointer; padding: 9px 11px; font-size: 18px; transition: all var(--d-fast) var(--ease-out); align-self: flex-end; }
+    .btn-icon-input:hover{ color: var(--brand); background: var(--brand-tint-6); }
+    .btn-icon-input.recording { color: var(--danger); animation: pulse-rec 1s infinite; }
+    .btn-send            { background: var(--brand); color: #fff; border: 0; border-radius: var(--r); padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; align-self: flex-end; }
+    .btn-send:hover      { background: var(--brand-deep); }
+    .btn-send:disabled   { background: var(--bg-hover); color: var(--text-3); cursor: not-allowed; }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /*  Admin (Apple-style)                                          */
+    /* ════════════════════════════════════════════════════════════ */
+
+    /* Small login modal (admin auth) */
+    .modal-sm-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: grid; place-items: center;
+      z-index: 200; padding: 20px;
+      animation: fadeIn 200ms var(--ease-out);
+    }
+    .modal-sm {
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 28px 24px;
+      width: 100%; max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 320ms var(--ease-out);
+    }
+    .modal-sm-title {
+      font-size: 17px; font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+      margin-bottom: 6px;
+    }
+    .modal-sm-sub {
+      font-size: 12.5px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .modal-sm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+    /* Generic medium modal (settings, confirmations) */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: grid; place-items: center;
+      z-index: 250; padding: 20px;
+      animation: fadeIn 200ms var(--ease-out);
+    }
+    .modal-card {
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 24px 16px;
+      width: 100%; max-width: 600px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 320ms var(--ease-out);
+    }
+    .modal-title {
+      font-size: 17px; font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 12.5px;
+      color: var(--text-3);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Admin full workspace (slide-in from right) */
+    .admin-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 200;
+      display: flex; align-items: stretch; justify-content: flex-end;
+      animation: fadeIn 200ms var(--ease-out);
+    }
+    .admin-panel {
+      display: flex; flex-direction: column;
+      width: min(100%, 980px);
+      height: 100%;
+      background: var(--bg);
+      box-shadow: var(--shadow-lg);
+      animation: slideInRight 360ms var(--ease-out);
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(20px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .admin-header {
+      display: flex; align-items: center;
+      padding: 0 24px;
+      height: 60px;
+      background: var(--bg-elev-1);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 14px;
+    }
+    .admin-header-title {
+      font-size: 16px; font-weight: 600;
+      letter-spacing: -0.018em;
+      color: var(--text-1);
+    }
+    .admin-badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 9px;
+      background: var(--brand-tint-12);
+      color: var(--brand);
+      border-radius: var(--r-pill);
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .admin-header-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+    /* Tab nav — Apple-style underline */
+    .admin-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: var(--bg-elev-1);
+      padding: 0 12px;
+    }
+    .admin-tab {
+      padding: 14px 18px;
+      font-size: 13.5px; font-weight: 500;
+      letter-spacing: -0.005em;
+      color: var(--text-2);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all var(--d-fast) var(--ease-out);
+      user-select: none;
+    }
+    .admin-tab:hover { color: var(--text-1); }
+    .admin-tab.active {
+      color: var(--brand);
+      border-bottom-color: var(--brand);
+      font-weight: 600;
+    }
+
+    /* Tab content */
+    .admin-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); }
+    .tab-pane {
+      flex: 1; overflow-y: auto;
+      padding: 24px 28px 28px;
+      display: flex; flex-direction: column;
+      gap: 18px;
+      max-width: 880px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .tab-pane::-webkit-scrollbar { width: 6px; }
+    .tab-pane::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+    /* Sistema tab — prompt block (read-only base) + editor */
+    .prompt-block {
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--bg-elev-1);
+    }
+    .prompt-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer; user-select: none;
+      transition: background var(--d-fast) var(--ease-out);
+    }
+    .prompt-block-header:hover { background: var(--bg-hover); }
+    .prompt-block-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .prompt-block-badge {
+      font-size: 10.5px; font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-base   { background: var(--brand-tint-12); color: var(--brand); }
+    .badge-custom { background: rgba(255, 149, 0, 0.14); color: var(--warning); }
+    .badge-active { background: rgba(52, 199, 89, 0.14); color: var(--success); }
+    .prompt-block-body {
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-2);
+      white-space: pre-wrap;
+      background: var(--bg);
+      max-height: 320px;
+      overflow-y: auto;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .prompt-block-body::-webkit-scrollbar { width: 4px; }
+    .prompt-block-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    .custom-editor {
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--bg-elev-1);
+    }
+    .custom-editor textarea {
+      width: 100%;
+      min-height: 180px;
+      background: transparent;
+      border: 0;
+      color: var(--text-1);
+      font-size: 13px;
+      padding: 14px 16px;
+      resize: vertical;
+      outline: none;
+      font-family: var(--font-mono);
+      line-height: 1.7;
+    }
+    .custom-editor-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg);
+      border-top: 1px solid var(--border-subtle);
+      gap: 12px;
+    }
+    .custom-editor-hint { font-size: 11.5px; color: var(--text-3); flex: 1; }
+
+    /* Buttons compartidos */
+    .btn-blue {
+      padding: 9px 18px;
+      background: var(--brand);
+      color: white;
+      border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(20, 61, 128, 0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .btn-blue:hover { background: var(--brand-deep); transform: translateY(-0.5px); }
+    .btn-blue:active { transform: translateY(0.5px); }
+    .btn-blue:disabled { background: var(--bg-hover); color: var(--text-3); cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn-ghost {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-2);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-1); background: var(--bg-hover); }
+    .btn-danger {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid rgba(214, 59, 59, 0.4);
+      border-radius: var(--r-sm);
+      color: var(--danger);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .btn-danger:hover { background: rgba(214, 59, 59, 0.08); border-color: var(--danger); }
+    .admin-save-btn {
+      padding: 9px 18px;
+      background: var(--brand);
+      color: white;
+      border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(20, 61, 128, 0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .admin-save-btn:hover { background: var(--brand-deep); }
+    .admin-save-btn:disabled { background: var(--bg-hover); color: var(--text-3); cursor: not-allowed; box-shadow: none; }
+
+    /* Memoria tab */
+    .memory-meta {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+    }
+    .memory-meta-label { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
+    .memory-meta-value { font-size: 13.5px; font-weight: 600; color: var(--text-1); letter-spacing: -0.005em; }
+    .memory-content {
+      flex: 1;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px 22px;
+      overflow-y: auto;
+    }
+    .memory-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .memory-empty-icon { font-size: 44px; }
+    .memory-empty-text {
+      font-size: 14px;
+      color: var(--text-2);
+      max-width: 340px;
+      line-height: 1.55;
+      letter-spacing: -0.005em;
+    }
+    .memory-content .md-render p { margin: 0 0 8px; font-size: 14px; line-height: 1.55; color: var(--text-1); }
+    .memory-content .md-render ul { margin: 6px 0 12px; padding-left: 20px; }
+    .memory-content .md-render li { margin-bottom: 4px; font-size: 13.5px; color: var(--text-1); line-height: 1.5; }
+    .memory-content .md-render h2 {
+      color: var(--text-1);
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 600;
+      margin: 16px 0 8px;
+      letter-spacing: -0.018em;
+    }
+    .memory-content .md-render h2:first-child { margin-top: 4px; }
+    .memory-content .md-render strong { color: var(--brand); font-weight: 600; }
+
+    /* Admin chat tab */
+    .admin-chat-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+    .admin-chat-msgs {
+      flex: 1; overflow-y: auto;
+      padding: 22px 26px;
+      display: flex; flex-direction: column;
+      gap: 16px;
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .admin-chat-msgs::-webkit-scrollbar { width: 5px; }
+    .admin-chat-msgs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .admin-msg { max-width: 82%; display: flex; flex-direction: column; gap: 4px; }
+    .admin-msg.user { align-self: flex-end; align-items: flex-end; }
+    .admin-msg.assistant { align-self: flex-start; align-items: flex-start; width: 100%; max-width: 100%; }
+    .admin-msg-role {
+      font-size: 11px; font-weight: 500;
+      color: var(--text-3);
+      letter-spacing: 0.01em;
+    }
+    .admin-msg.user .admin-msg-role { color: var(--brand); }
+    .admin-msg-bubble {
+      padding: 10px 14px;
+      border-radius: 18px 18px 6px 18px;
+      font-size: 14px; line-height: 1.5;
+      letter-spacing: -0.005em;
+      word-break: break-word;
+    }
+    .admin-msg.user .admin-msg-bubble {
+      background: var(--brand);
+      color: white;
+      box-shadow: 0 1px 2px rgba(20,61,128,0.18), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .admin-msg.assistant .admin-msg-bubble {
+      background: transparent;
+      color: var(--text-1);
+      padding: 4px 0 0;
+      border-radius: 0;
+    }
+    .admin-msg-bubble p { margin: 0 0 8px; }
+    .admin-msg-bubble p:last-child { margin: 0; }
+    .admin-msg-bubble strong { font-weight: 600; }
+    .admin-msg-bubble ul { margin: 6px 0 10px; padding-left: 20px; }
+    .admin-msg-bubble li { margin-bottom: 3px; }
+    .admin-msg-bubble code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--bg-hover);
+      color: var(--brand-deep);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .behavior-saved-banner {
+      align-self: center;
+      background: rgba(52, 199, 89, 0.10);
+      border: 1px solid rgba(52, 199, 89, 0.30);
+      border-radius: var(--r-sm);
+      padding: 8px 14px;
+      font-size: 12.5px; font-weight: 500;
+      color: var(--success);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .admin-thinking {
+      align-self: flex-start;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 12.5px; color: var(--text-2);
+    }
+    .admin-chat-input {
+      display: flex; gap: 8px;
+      padding: 14px 26px;
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .admin-chat-input textarea {
+      flex: 1;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      font-size: 13.5px;
+      padding: 10px 14px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 120px;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .admin-chat-input textarea:focus {
+      border-color: var(--brand-soft);
+      box-shadow: 0 0 0 4px var(--brand-tint-12);
+    }
+
+    /* Rule cards (admin Sistema tab) */
+    .rules-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .rules-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .rules-count { font-size: 11.5px; color: var(--text-3); }
+    .rule-card {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .rule-card:hover {
+      border-color: var(--brand-tint-20);
+      box-shadow: var(--shadow-sm);
+    }
+    .rule-number {
+      flex-shrink: 0;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--brand-tint-12);
+      color: var(--brand);
+      font-size: 11.5px; font-weight: 600;
+      display: grid; place-items: center;
+    }
+    .rule-text { flex: 1; font-size: 13.5px; color: var(--text-1); line-height: 1.5; word-break: break-word; }
+    .rule-delete {
+      flex-shrink: 0;
+      width: 24px; height: 24px;
+      color: var(--text-3);
+      border-radius: 4px;
+      display: grid; place-items: center;
+      font-size: 16px;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .rule-delete:hover { background: rgba(214, 59, 59, 0.08); color: var(--danger); }
+    .rule-empty {
+      padding: 24px;
+      text-align: center;
+      background: var(--bg-elev-1);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--r);
+      font-size: 13px; color: var(--text-3);
+      line-height: 1.5;
+    }
+    .rule-input-wrap { display: flex; gap: 8px; margin-top: 10px; align-items: flex-start; }
+    .rule-input-wrap textarea {
+      flex: 1;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      font-size: 13.5px;
+      padding: 10px 12px;
+      resize: none; outline: none;
+      line-height: 1.5;
+      min-height: 42px; max-height: 120px;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .rule-input-wrap textarea:focus {
+      border-color: var(--brand-soft);
+      box-shadow: 0 0 0 4px var(--brand-tint-12);
+    }
+    .btn-add-rule {
+      padding: 10px 18px;
+      background: var(--brand);
+      color: white;
+      border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      align-self: stretch;
+      box-shadow: 0 1px 2px rgba(20, 61, 128, 0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .btn-add-rule:hover { background: var(--brand-deep); }
+    .btn-add-rule:disabled { background: var(--bg-hover); color: var(--text-3); cursor: not-allowed; box-shadow: none; }
+    .mode-toggle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-2);
+      cursor: pointer; user-select: none;
+      margin-top: 14px;
+    }
+    .mode-toggle:hover { color: var(--text-1); }
+    .mode-toggle input { cursor: pointer; }
+
+    /* Toast (Apple-style notification) */
+    .toast {
+      position: fixed; bottom: 22px; right: 22px;
+      background: var(--text-1);
+      color: var(--bg);
+      padding: 11px 18px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 500;
+      letter-spacing: -0.005em;
+      box-shadow: var(--shadow-lg);
+      z-index: 300;
+      animation: fadeInUp 250ms var(--ease-out);
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Settings modal (toggle row) */
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-label { font-size: 14px; font-weight: 500; color: var(--text-1); letter-spacing: -0.005em; }
+    .setting-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .toggle-track {
+      width: 44px; height: 26px;
+      background: rgba(120, 120, 128, 0.3);
+      border-radius: var(--r-pill);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--d) var(--ease-out);
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .toggle-track::after {
+      content: "";
+      position: absolute;
+      left: 2px; top: 2px;
+      width: 22px; height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform var(--d) var(--ease-out);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.04);
+    }
+    .toggle-track[data-on="true"] { background: var(--success); }
+    .toggle-track[data-on="true"]::after { transform: translateX(18px); }
+
+    /* ── Mobile responsive (≤ 720px) ──────────────────────────── */
+    @media (max-width: 720px) {
+      .topbar { padding: 0 8px; gap: 4px; }
+      .brand-tagline { display: none; }
+      .topbar-user { padding: 5px 10px 5px 5px; font-size: 12px; max-width: 100px; }
+      .topbar-user span:not(.avatar-mini) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .btn-salir { padding: 7px 10px; font-size: 12px; }
+
+      .chat-inner { padding: 18px 14px 24px; }
+      .chat-header { padding: 12px 14px; }
+
+      .welcome { padding: 24px 0 24px; }
+      .welcome-title { font-size: 34px; }
+      .welcome-subtitle { font-size: 18px; margin-bottom: 22px; }
+      .prompt-grid { grid-template-columns: 1fr; }
+
+      .message-block { max-width: 88%; }
+      .composer-wrap { padding: 10px 14px 14px; }
+      .composer-hint { display: none; }
+
+      .admin-panel { width: 100%; }
+      .admin-header { padding: 0 16px; gap: 10px; }
+      .admin-header-title { font-size: 14px; }
+      .admin-tabs { padding: 0 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .admin-tab { padding: 12px 14px; font-size: 12.5px; white-space: nowrap; }
+      .tab-pane { padding: 18px 16px 24px; }
+      .admin-chat-msgs { padding: 16px; }
+      .admin-chat-input { padding: 12px 16px; }
+    }
+
+    /* Backdrop clickeable para sidebar mobile (off-canvas) */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: var(--topbar-h) 0 0 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 4;
+      cursor: pointer;
+      animation: fadeIn 200ms var(--ease-out);
+    }
+    @media (max-width: 720px) {
+      .app[data-sidebar="open"] .sidebar-backdrop { display: block; }
+      .app[data-sidebar="open"] .sidebar { z-index: 5; }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+const STORAGE_KEY = 'demo_company_chats';
+const HAS_SPEECH  = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+function md(text) {
+  const html = marked.parse(text || '', { breaks: true, gfm: true });
+  // Abrir todos los links externos en nueva pestaña, con rel seguro
+  const safeHtml = html.replace(/<a\s+href=/gi, '<a target="_blank" rel="noopener noreferrer" href=');
+  return { __html: safeHtml };
+}
+
+/* ── AssistantMd: renderiza markdown + agrega botón "Copiar tabla" en cada <table>. ── */
+function AssistantMd({ content }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const tables = root.querySelectorAll('table');
+    tables.forEach(table => {
+      // Saltar si ya está envuelta
+      if (table.parentElement?.classList?.contains('table-wrap')) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'table-copy-btn';
+      btn.title = 'Copiar tabla al portapapeles';
+      btn.innerHTML = '<span class="table-copy-icon">⧉</span><span class="table-copy-label">Copiar tabla</span>';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        copyTableToClipboard(table, btn);
+      });
+      // Reemplazar la tabla por wrap(btn + table)
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(btn);
+      wrap.appendChild(table);
+    });
+  });
+  return <span ref={ref} dangerouslySetInnerHTML={md(content)} />;
+}
+
+function copyTableToClipboard(table, btn) {
+  // TSV: pega limpio en Excel / Google Sheets
+  const rows = Array.from(table.querySelectorAll('tr'));
+  const tsv  = rows.map(tr =>
+    Array.from(tr.querySelectorAll('th, td'))
+      .map(c => (c.textContent || '').replace(/\s+/g, ' ').trim())
+      .join('\t')
+  ).join('\n');
+  // HTML: pega con formato en Word / Outlook
+  const html = '<meta charset="utf-8">' + table.outerHTML;
+  const flash = (ok) => {
+    const label = btn.querySelector('.table-copy-label');
+    const icon  = btn.querySelector('.table-copy-icon');
+    if (label) label.textContent = ok ? 'Copiada' : 'Error';
+    if (icon)  icon.textContent  = ok ? '✓' : '✗';
+    btn.classList.add(ok ? 'is-ok' : 'is-err');
+    setTimeout(() => {
+      if (label) label.textContent = 'Copiar tabla';
+      if (icon)  icon.textContent  = '⧉';
+      btn.classList.remove('is-ok', 'is-err');
+    }, 1600);
+  };
+  try {
+    if (window.ClipboardItem && navigator.clipboard?.write) {
+      const item = new ClipboardItem({
+        'text/plain': new Blob([tsv],  { type: 'text/plain' }),
+        'text/html':  new Blob([html], { type: 'text/html'  }),
+      });
+      navigator.clipboard.write([item]).then(() => flash(true)).catch(() => {
+        navigator.clipboard.writeText(tsv).then(() => flash(true)).catch(() => flash(false));
+      });
+    } else {
+      navigator.clipboard.writeText(tsv).then(() => flash(true)).catch(() => flash(false));
+    }
+  } catch {
+    flash(false);
+  }
+}
+function getToken()    { return localStorage.getItem('demo_company_token'); }
+function setToken(t)   { localStorage.setItem('demo_company_token', t); }
+function clearToken()  { localStorage.removeItem('demo_company_token'); }
+function getUsername() { return localStorage.getItem('demo_company_user') || ''; }
+function setUsername(u){ localStorage.setItem('demo_company_user', u); }
+function clearUsername(){ localStorage.removeItem('demo_company_user'); }
+function getAdminTok() { return sessionStorage.getItem('demo_company_admin_token'); }
+function setAdminTok(t){ sessionStorage.setItem('demo_company_admin_token', t); }
+function clearAdminTok(){ sessionStorage.removeItem('demo_company_admin_token'); }
+function genId()       { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function chatsKey(user) { return user ? `demo_company_chats_${user}` : STORAGE_KEY; }
+function loadChats(user) { try { return JSON.parse(localStorage.getItem(chatsKey(user)) || '[]'); } catch { return []; } }
+function saveChats(c, user) { try { localStorage.setItem(chatsKey(user), JSON.stringify(c)); } catch {} }
+
+function convTitle(msgs) {
+  const first = msgs.find(m => m.role === 'user');
+  if (!first) return 'Nueva consulta';
+  const text = typeof first.content === 'string' ? first.content : (first.content.find(b => b.type === 'text')?.text || 'Imagen adjunta');
+  return text.slice(0, 45) + (text.length > 45 ? '…' : '');
+}
+function formatDate(iso) {
+  const d = new Date(iso), now = new Date();
+  const td = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yd = new Date(td - 86400000);
+  const cd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (cd.getTime() === td.getTime()) return 'Hoy';
+  if (cd.getTime() === yd.getTime()) return 'Ayer';
+  return d.toLocaleDateString('es-UY', { day: 'numeric', month: 'short' });
+}
+function groupByDate(chats) {
+  const groups = {};
+  chats.forEach(c => { const l = formatDate(c.date); if (!groups[l]) groups[l] = []; groups[l].push(c); });
+  return groups;
+}
+
+/* ── Icon library (SVG inline, stroke = currentColor) ── */
+const Icon = {
+  Menu:     (p={}) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" {...p}><line x1="3" y1="6"  x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+  Settings: (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  Edit:     (p={}) => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  Search:   (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  Message:  (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>,
+  Image:    (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+  Link:     (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
+  Paperclip:(p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
+  Doc:      (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>,
+  Mic:      (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>,
+  ArrowUp:  (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" {...p}><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>,
+  Valve:    (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="M12 7v-3M12 20v-3"/></svg>,
+  Wrench:   (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14.7 6.3a4 4 0 0 0 5 5l-3.4 3.4 4.4 4.4a2 2 0 1 1-2.8 2.8l-4.4-4.4-3.4 3.4a4 4 0 0 0-5-5"/></svg>,
+  Sensor:   (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.48m-8.48 0a6 6 0 0 1 0-8.48m11.31-2.83a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>,
+  Book:     (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+  Refresh:  (p={}) => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+  ThumbUp:  (p={}) => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
+  ThumbDown:(p={}) => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>,
+  Share:    (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
+  Download: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+  X:        (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  Info:     (p={}) => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
+  Moon:     (p={}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
+  Sun:      (p={}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>,
+};
+
+/* Heurística simple: elegí un icono según el título de la conversación */
+function pickConvIcon(title) {
+  const t = (title || '').toLowerCase();
+  if (/valvula|valve|reductora|compuerta|mariposa|esferica|globo/.test(t))         return 'Valve';
+  if (/sensor|nivel|presion|caudal|transmisor|nivelco|banner|turck/.test(t))        return 'Sensor';
+  if (/actuador|wrench|herramient|repuesto|junta|kit/.test(t))                      return 'Wrench';
+  if (/norma|api |ansi|din|iso |awwa|nfpa|ul\/fm|catalog/.test(t))                  return 'Book';
+  if (/imagen|foto|adjunto/.test(t))                                                return 'Image';
+  if (/http|link|enlace|url/.test(t))                                               return 'Link';
+  return 'Message';
+}
+
+
+async function readSSE(res, onEvent) {
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      try { onEvent(JSON.parse(line.slice(6))); } catch {}
+    }
+  }
+}
+
+/* ── Working chip — siempre visible mientras el agente trabaja ── */
+function WorkingChip({ steps, isStreaming, activeModel }) {
+  let sub = 'Procesando consulta';
+  const last = steps[steps.length - 1];
+  if (last) {
+    const labelsByTool = {
+      catalog_search:           last.status === 'done' ? 'Catálogo consultado' : 'Buscando en catálogo',
+      verify_pdf_url:           last.status === 'done' ? 'PDF verificado'      : 'Verificando PDF',
+      fetch_product_data:       last.status === 'done' ? 'Página scrapeada'    : 'Scrapeando página',
+      generate_datasheet_pdf:   last.status === 'done' ? 'Ficha PDF generada'  : 'Generando ficha PDF',
+      generate_word_document:   last.status === 'done' ? 'Word generado'       : 'Generando Word',
+      generate_excel_spreadsheet:last.status === 'done' ? 'Excel generado'     : 'Generando Excel',
+      web_search:               last.status === 'done' ? 'Búsqueda web lista'  : 'Buscando en la web',
+    };
+    sub = labelsByTool[last.tool] || sub;
+  } else if (isStreaming) {
+    sub = 'Redactando respuesta';
+  }
+  // Mostrar tier de modelo si está auto-seleccionado
+  let modelBadge = null;
+  if (activeModel?.source?.startsWith('auto:')) {
+    const tier = activeModel.source.split(':')[1];
+    const tierLabel = { pro: 'Pro', flash: 'Flash', lite: 'Lite' }[tier] || tier;
+    modelBadge = <span className={`working-chip-tier tier-${tier}`}>{tierLabel}</span>;
+  } else if (activeModel?.source === 'manual') {
+    modelBadge = <span className="working-chip-tier tier-manual">Manual</span>;
+  }
+  return (
+    <div className="working-chip" role="status" aria-live="polite">
+      <span className="thinking-spinner" />
+      <span className="working-chip-label">Trabajando</span>
+      {modelBadge}
+      <span className="working-chip-sub">· {sub}</span>
+    </div>
+  );
+}
+
+/* ── Thinking indicator ── */
+function ThinkingIndicator({ steps, loading }) {
+  const allDone = steps.length > 0 && steps.every(s => s.status === 'done');
+  const label   = loading && !allDone ? 'Razonando…' : allDone ? 'Razonamiento completado' : 'Procesando…';
+  return (
+    <div className="thinking-wrap">
+      <details open={loading}>
+        <summary className="thinking-summary">
+          {loading && !allDone ? <span className="thinking-spinner"/> : <span className="thinking-check">✓</span>}
+          <span>{label}</span>
+          <span className="thinking-chevron">▲</span>
+        </summary>
+        <div className="thinking-steps">
+          {steps.length === 0 && loading && (
+            <div className="thinking-step active">
+              <span>⟳</span>
+              <span>Analizando consulta<span className="thinking-dots"><span/><span/><span/></span></span>
+            </div>
+          )}
+          {steps.map((s, i) => {
+            const tool = s.tool;
+            const isCatalog = tool === 'catalog_search';
+            const isVerify  = tool === 'verify_pdf_url';
+            const isFetch   = tool === 'fetch_product_data';
+            const isGenPdf  = tool === 'generate_datasheet_pdf';
+            const isGenWord = tool === 'generate_word_document';
+            const isGenXlsx = tool === 'generate_excel_spreadsheet';
+            const isWeb     = tool === 'web_search';
+            let icon = '🌐';
+            if (isCatalog) icon = '📋';
+            else if (isVerify) icon = '📄';
+            else if (isFetch) icon = '📥';
+            else if (isGenPdf) icon = '✨';
+            else if (isGenWord) icon = '📝';
+            else if (isGenXlsx) icon = '📊';
+            const labels = {
+              true: {
+                catalog_search:       'Encontré en catálogo',
+                verify_pdf_url:       s.valid ? 'PDF verificado' : 'PDF NO válido',
+                fetch_product_data:   s.valid ? 'Datos scrapeados' : 'Fallo scraping',
+                generate_datasheet_pdf: s.valid ? 'PDF Demo Company generado' : 'Error generando PDF',
+                generate_word_document: s.valid ? 'Word generado' : 'Error generando Word',
+                generate_excel_spreadsheet: s.valid ? 'Excel generado' : 'Error generando Excel',
+                web_search:           'Encontré en la web',
+              },
+              false: {
+                catalog_search:       'Buscando en catálogo',
+                verify_pdf_url:       'Verificando PDF',
+                fetch_product_data:   'Scrapeando página',
+                generate_datasheet_pdf: 'Generando ficha técnica Demo Company',
+                generate_word_document: 'Generando documento Word',
+                generate_excel_spreadsheet: 'Generando planilla Excel',
+                web_search:           'Buscando en la web',
+              },
+            };
+            const labelKey = s.status === 'done' ? 'true' : 'false';
+            const label = labels[labelKey][tool] || (s.status === 'done' ? 'Listo' : 'Procesando');
+            const isErrorStyle = ['verify_pdf_url','fetch_product_data','generate_datasheet_pdf'].includes(tool)
+                                  && s.status === 'done' && !s.valid;
+            const queryColor = isErrorStyle ? 'var(--danger)' : undefined;
+            return (
+              <div key={i} className={`thinking-step${s.status !== 'done' ? ' active' : ''}`}>
+                <span>{icon}</span>
+                <span>
+                  {label}:{' '}
+                  <span className="thinking-step-query" style={queryColor ? { color: queryColor } : undefined}>{s.query}</span>
+                  {(isCatalog || isWeb) && s.status === 'done' && s.count != null && (
+                    <span className="thinking-step-count">
+                      {' '}→ {s.count} resultado{s.count !== 1 ? 's' : ''}
+                      {s.total != null && s.total > s.count && <span style={{ color: 'var(--warn)', fontWeight: 600 }}> (de {s.total} totales — refinar)</span>}
+                    </span>
+                  )}
+                  {s.status !== 'done' && <span className="thinking-dots"><span/><span/><span/></span>}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/* ── UserContent ── */
+function UserContent({ content }) {
+  if (typeof content === 'string') return <>{content}</>;
+  return <>{content.map((b, i) => {
+    if (b.type === 'image') return <img key={i} src={`data:${b.source.media_type};base64,${b.source.data}`} className="msg-img" alt="adjunto" />;
+    if (b.type === 'text' && b.text) return <span key={i}>{b.text}</span>;
+    return null;
+  })}</>;
+}
+
+/* ════════════════════════════════════════════
+   ADMIN PANEL
+   ════════════════════════════════════════════ */
+
+/* ── Sistema tab ── */
+function SystemTab({ adminToken, onSaved }) {
+  const [basePrompt,  setBasePrompt]  = useState('');
+  const [rules,       setRules]       = useState([]);   // array of strings
+  const [newRule,     setNewRule]     = useState('');
+  const [baseOpen,    setBaseOpen]    = useState(false);
+  const [manualMode,  setManualMode]  = useState(false);
+  const [manualDraft, setManualDraft] = useState('');
+  const [loading,     setLoading]     = useState(true);
+  const [saving,      setSaving]      = useState(false);
+  const [err,         setErr]         = useState('');
+  // Modelo
+  const newRuleRef = useRef(null);
+
+  function parseRules(text) {
+    return (text || '').split('\n').map(l => l.trim()).filter(l => l);
+  }
+
+  useEffect(() => {
+    fetch('/api/admin/system-prompt', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.json()).then(d => {
+        setBasePrompt(d.base_prompt || '');
+        setRules(parseRules(d.custom_prompt));
+        setManualDraft(d.custom_prompt || '');
+        setLoading(false);
+      })
+      .catch(() => { setErr('Error al cargar la configuración.'); setLoading(false); });
+  }, [adminToken]);
+
+  async function persistRules(updatedRules, toastMsg) {
+    setSaving(true); setErr('');
+    const customPrompt = updatedRules.join('\n');
+    try {
+      const r = await fetch('/api/admin/system-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ custom_prompt: customPrompt }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error al guardar');
+      setRules(updatedRules);
+      setManualDraft(customPrompt);
+      onSaved(toastMsg || '✓ Reglas actualizadas');
+    } catch (e) { setErr(e.message); }
+    finally { setSaving(false); }
+  }
+
+  async function addRule() {
+    const t = newRule.trim();
+    if (!t) return;
+    await persistRules([...rules, t], `✓ Regla añadida (${rules.length + 1} en total)`);
+    setNewRule('');
+    newRuleRef.current?.focus();
+  }
+
+  async function deleteRule(idx) {
+    const updated = rules.filter((_, i) => i !== idx);
+    await persistRules(updated, '✓ Regla eliminada');
+  }
+
+  async function clearAll() {
+    if (!confirm('¿Eliminar todas las reglas personalizadas? El agente volverá a su comportamiento base.')) return;
+    await persistRules([], '✓ Personalización borrada');
+  }
+
+  async function saveManual() {
+    const updated = parseRules(manualDraft);
+    await persistRules(updated, '✓ Configuración guardada');
+  }
+
+  function handleNewKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addRule(); }
+  }
+
+  if (loading) return <div className="tab-pane" style={{ alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'var(--text-muted)' }}>Cargando…</span></div>;
+
+  return (
+    <div className="tab-pane">
+      {/* Base prompt — solo lectura */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Prompt del sistema (base)</span>
+          <span className="prompt-block-badge badge-base">Solo lectura</span>
+        </div>
+        <div className="prompt-block">
+          <div className="prompt-block-header" onClick={() => setBaseOpen(v => !v)}>
+            <span className="prompt-block-title">{baseOpen ? 'Ocultar contenido' : 'Ver prompt base completo'}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{baseOpen ? '▲' : '▼'}</span>
+          </div>
+          {baseOpen && <div className="prompt-block-body">{basePrompt}</div>}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+          Define la identidad e instrucciones base del agente. No editable.
+        </div>
+      </div>
+
+      {/* Reglas personalizadas */}
+      <div>
+        <div className="rules-header">
+          <span className="rules-title">Reglas personalizadas activas</span>
+          <span className="rules-count">{rules.length === 0 ? 'Ninguna activa' : `${rules.length} regla${rules.length !== 1 ? 's' : ''} aplicada${rules.length !== 1 ? 's' : ''}`}</span>
+          {rules.length > 0 && (
+            <button className="btn-danger" style={{ marginLeft: 'auto', padding: '5px 12px', fontSize: 11 }} onClick={clearAll} disabled={saving}>
+              Borrar todas
+            </button>
+          )}
+        </div>
+
+        {!manualMode ? (
+          <>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {rules.length === 0 ? (
+                <div className="rule-empty">
+                  📝 No hay reglas personalizadas todavía. Agregá una abajo para modificar el comportamiento del agente.
+                </div>
+              ) : rules.map((rule, i) => (
+                <div key={i} className="rule-card">
+                  <div className="rule-number">{i + 1}</div>
+                  <div className="rule-text">{rule}</div>
+                  <button className="rule-delete" onClick={() => deleteRule(i)} disabled={saving} title="Eliminar regla">×</button>
+                </div>
+              ))}
+            </div>
+
+            <div className="rule-input-wrap">
+              <textarea
+                ref={newRuleRef}
+                rows={2}
+                placeholder='Nueva regla (ej: "Siempre priorizá BERMAD en válvulas de control" · "Respondé en inglés técnico"). Enter para añadir.'
+                value={newRule}
+                onChange={e => setNewRule(e.target.value)}
+                onKeyDown={handleNewKeyDown}
+                disabled={saving}
+                onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
+              />
+              <button className="btn-add-rule" onClick={addRule} disabled={saving || !newRule.trim()}>
+                {saving ? '…' : '+ Añadir'}
+              </button>
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+              Las reglas se guardan automáticamente al añadir. Aplican inmediatamente en la próxima consulta del agente.
+            </div>
+          </>
+        ) : (
+          <div className="custom-editor">
+            <textarea
+              value={manualDraft}
+              onChange={e => setManualDraft(e.target.value)}
+              placeholder="Una regla por línea. Líneas vacías se ignoran."
+              rows={10}
+            />
+            <div className="custom-editor-footer">
+              <span className="custom-editor-hint">
+                Modo avanzado: una regla por línea. Cambios se aplican al guardar.
+                {manualDraft.length > 0 && <span style={{ marginLeft: 8, color: 'var(--blue)' }}>{manualDraft.length} caracteres</span>}
+              </span>
+              <button className="btn-blue" style={{ padding: '7px 18px' }} onClick={saveManual} disabled={saving}>
+                {saving ? 'Guardando…' : 'Guardar todo'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <label className="mode-toggle">
+          <input type="checkbox" checked={manualMode} onChange={e => setManualMode(e.target.checked)} />
+          Modo avanzado (editar manualmente como texto)
+        </label>
+
+        {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ── Memoria tab ── */
+function MemoryTab({ adminToken, onSaved }) {
+  const [mem,       setMem]      = useState(null);
+  const [loading,   setLoading]  = useState(true);
+  const [refreshing,setRefreshing] = useState(false);
+
+  function fetchMemory() {
+    setLoading(true);
+    fetch('/api/admin/memory', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.json()).then(d => setMem(d))
+      .catch(() => setMem(null))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(fetchMemory, [adminToken]);
+
+  async function refresh() {
+    setRefreshing(true);
+    try {
+      const r = await fetch('/api/admin/memory/refresh', { method: 'POST', headers: { Authorization: `Bearer ${adminToken}` } });
+      const d = await r.json();
+      setMem(d);
+      if (d.content) onSaved('✓ Memoria actualizada');
+      else if (d.error) onSaved('⚠️ ' + d.error);
+    } catch { onSaved('⚠️ Error al generar memoria'); }
+    finally { setRefreshing(false); }
+  }
+
+  const genDate = mem?.generated_at ? new Date(mem.generated_at).toLocaleString('es-UY') : null;
+
+  return (
+    <div className="tab-pane">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Memoria de interacciones</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            Análisis automático de las conversaciones recientes. Se regenera cada 24 horas o manualmente.
+          </div>
+        </div>
+        <button className="btn-blue" style={{ marginLeft: 'auto', whiteSpace: 'nowrap' }} onClick={refresh} disabled={refreshing || loading}>
+          {refreshing ? 'Analizando…' : '↺ Actualizar ahora'}
+        </button>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Cargando…</div>
+      ) : mem?.content ? (
+        <>
+          <div className="memory-meta">
+            <div><div className="memory-meta-label">Generada</div><div className="memory-meta-value">{genDate}</div></div>
+            <div style={{ width: 1, height: 32, background: 'var(--border)' }}></div>
+            <div><div className="memory-meta-label">Conversaciones analizadas</div><div className="memory-meta-value">{mem.conversations_analyzed}</div></div>
+          </div>
+          <div className="memory-content">
+            <div className="md-render" dangerouslySetInnerHTML={md(mem.content)} />
+          </div>
+        </>
+      ) : (
+        <div className="memory-content">
+          <div className="memory-empty">
+            <div className="memory-empty-icon">🧠</div>
+            <div className="memory-empty-text">
+              {mem?.error || 'No hay memoria generada aún. Las conversaciones se registran automáticamente y podés generar un análisis cuando quieras.'}
+            </div>
+            <button className="btn-blue" onClick={refresh} disabled={refreshing}>
+              {refreshing ? 'Analizando…' : 'Generar memoria ahora'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Admin chat tab ── */
+function AdminChatTab({ adminToken, onSaved }) {
+  const [messages, setMessages] = useState([{
+    role: 'assistant',
+    content: '¡Hola, Bruno! Estoy en modo administrador. Podés preguntarme sobre mi configuración actual, pedirme que cambie mi comportamiento, o consultarme sobre la memoria de interacciones. ¿En qué te puedo ayudar?'
+  }]);
+  const [input,   setInput]   = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+  const textRef   = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+
+  async function send(text) {
+    text = (text || input).trim();
+    if (!text || loading) return;
+    const newMsgs = [...messages, { role: 'user', content: text }];
+    setMessages(newMsgs); setInput(''); setLoading(true);
+
+    let streamedText = '';
+    let assistantAdded = false;
+
+    try {
+      const apiMsgs = newMsgs.filter(m => m.role !== 'system-event').map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch('/api/admin/chat/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ messages: apiMsgs }),
+      });
+      if (!res.ok) { setMessages(p => [...p, { role: 'assistant', content: '⚠️ Error de conexión.' }]); return; }
+
+      await readSSE(res, (evt) => {
+        if (evt.type === 'behavior_saved') {
+          setMessages(p => [...p, { role: 'system-event', content: `✓ Comportamiento guardado: "${evt.new_prompt.slice(0, 80)}${evt.new_prompt.length > 80 ? '…' : ''}"` }]);
+          onSaved('✓ Comportamiento del agente actualizado');
+        } else if (evt.type === 'text') {
+          streamedText += evt.text;
+          if (!assistantAdded) {
+            assistantAdded = true;
+            setMessages(p => [...p, { role: 'assistant', content: streamedText, streaming: true }]);
+          } else {
+            setMessages(p => {
+              const u = [...p];
+              const last = u[u.length - 1];
+              if (last && last.role === 'assistant') {
+                u[u.length - 1] = { ...last, content: streamedText, streaming: true };
+              }
+              return u;
+            });
+          }
+        } else if (evt.type === 'done') {
+          setMessages(p => {
+            const u = [...p];
+            const last = u[u.length - 1];
+            if (last && last.role === 'assistant' && last.streaming) {
+              u[u.length - 1] = { ...last, streaming: false };
+            } else if (!assistantAdded) {
+              u.push({ role: 'assistant', content: streamedText || 'Listo.' });
+            }
+            return u;
+          });
+        } else if (evt.type === 'error') {
+          setMessages(p => [...p, { role: 'assistant', content: `⚠️ Error: ${evt.message}` }]);
+        }
+      });
+    } catch {
+      setMessages(p => [...p, { role: 'assistant', content: '⚠️ No se pudo conectar.' }]);
+    } finally {
+      setLoading(false); textRef.current?.focus();
+    }
+  }
+
+  return (
+    <div className="admin-chat-wrap">
+      <div className="admin-chat-msgs">
+        {messages.map((m, i) => {
+          if (m.role === 'system-event') return (
+            <div key={i} className="behavior-saved-banner">✓ {m.content}</div>
+          );
+          const isLast = i === messages.length - 1;
+          const isStreaming = m.streaming && isLast;
+          return (
+            <div key={i} className={`admin-msg ${m.role}`}>
+              <div className="admin-msg-role">{m.role === 'user' ? 'Bruno' : 'Agente'}</div>
+              <div className="admin-msg-bubble">
+                {m.role === 'assistant'
+                  ? <>
+                      <AssistantMd content={m.content} />
+                      {isStreaming && <span className="streaming-cursor" />}
+                    </>
+                  : m.content
+                }
+              </div>
+            </div>
+          );
+        })}
+        {loading && !(messages[messages.length - 1]?.streaming) && (
+          <div className="progress-bar" style={{ maxWidth: 320 }}>
+            <span className="progress-bar-label">Procesando</span>
+            <div className="progress-bar-track"><div className="progress-bar-fill" /></div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <div className="admin-chat-input">
+        <textarea
+          ref={textRef}
+          rows={2}
+          placeholder="Escribile al agente… (ej: 'Quiero que siempre priorices BERMAD' · 'Contame qué sabés de tu configuración')"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+          disabled={loading}
+          onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
+        />
+        <button className="btn-blue" onClick={() => send()} disabled={loading || !input.trim()} style={{ alignSelf: 'flex-end' }}>
+          Enviar →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Usuarios tab ── */
+function UsersTab({ adminToken, onSaved }) {
+  const [users,       setUsers]       = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [newUser,     setNewUser]     = useState('');
+  const [newPass,     setNewPass]     = useState('');
+  const [creating,    setCreating]    = useState(false);
+  const [createErr,   setCreateErr]   = useState('');
+  const [viewingUser, setViewingUser] = useState(null);
+  const [conversations, setConversations] = useState(null);
+  const [convsLoading, setConvsLoading] = useState(false);
+
+  function fetchUsers() {
+    setLoading(true);
+    fetch('/api/admin/users', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.json()).then(d => setUsers(d.users || []))
+      .catch(() => setUsers([]))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(fetchUsers, [adminToken]);
+
+  async function createUser(e) {
+    e?.preventDefault?.();
+    if (!newUser.trim() || !newPass.trim()) return;
+    setCreating(true); setCreateErr('');
+    try {
+      const r = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ username: newUser.trim(), password: newPass }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error al crear');
+      setNewUser(''); setNewPass('');
+      onSaved(`✓ Usuario "${newUser}" creado`);
+      fetchUsers();
+    } catch (e) { setCreateErr(e.message); }
+    finally { setCreating(false); }
+  }
+
+  async function deleteUser(name) {
+    if (!confirm(`¿Eliminar el usuario "${name}"? Esta acción no se puede deshacer.`)) return;
+    try {
+      const r = await fetch(`/api/admin/users/${encodeURIComponent(name)}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error');
+      onSaved(`✓ Usuario "${name}" eliminado`);
+      fetchUsers();
+    } catch (e) { alert(e.message); }
+  }
+
+  async function viewConversations(name) {
+    setViewingUser(name); setConvsLoading(true); setConversations(null);
+    try {
+      const r = await fetch(`/api/admin/conversations?user=${encodeURIComponent(name)}&limit=100`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      const d = await r.json();
+      setConversations(d.conversations || []);
+    } catch { setConversations([]); }
+    finally { setConvsLoading(false); }
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return 'Nunca';
+    try { return new Date(iso).toLocaleString('es-UY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch { return iso; }
+  }
+
+  if (loading) return <div className="tab-pane" style={{ alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'var(--text-muted)' }}>Cargando…</span></div>;
+
+  return (
+    <div className="tab-pane">
+      {viewingUser && (
+        <div className="modal-overlay" style={{ background: 'rgba(10,20,50,.6)', zIndex: 300 }} onClick={e => e.target === e.currentTarget && setViewingUser(null)}>
+          <div className="modal-card" style={{ maxWidth: 720, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-title">📋 Conversaciones de {viewingUser}</div>
+            <div className="modal-subtitle">Últimas 100 interacciones registradas</div>
+            <div style={{ flex: 1, overflowY: 'auto', marginTop: 8, padding: '4px 0' }}>
+              {convsLoading ? (
+                <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Cargando…</div>
+              ) : !conversations || conversations.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                  No hay conversaciones registradas para este usuario aún.
+                </div>
+              ) : (
+                conversations.map((c, i) => (
+                  <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid var(--border-lt)' }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{fmtDate(c.ts)}</div>
+                    <div style={{ fontSize: 13, color: 'var(--blue)', marginBottom: 4 }}>
+                      <strong>Pregunta:</strong> {c.user}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      <strong>Respuesta:</strong> {(c.assistant || '').slice(0, 300)}{(c.assistant || '').length > 300 ? '…' : ''}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="modal-actions">
+              <button className="btn-ghost" onClick={() => setViewingUser(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Usuarios del sistema</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+          Cada usuario tiene su propia historia de conversaciones. Como admin podés crear, eliminar y ver el log de cada uno.
+        </div>
+
+        <form onSubmit={createUser} style={{ display: 'flex', gap: 8, marginBottom: 18, padding: 14, background: 'var(--surface2)', borderRadius: 10, border: '1px solid var(--border-lt)' }}>
+          <input
+            type="text"
+            placeholder="Nombre de usuario (letras, números, _ . -)"
+            value={newUser}
+            onChange={e => setNewUser(e.target.value)}
+            style={{ flex: 1, padding: '9px 12px', border: '1.5px solid var(--border)', borderRadius: 7, fontSize: 13, fontFamily: 'var(--sans)', outline: 'none' }}
+            disabled={creating}
+            pattern="[a-zA-Z0-9_.\-]+"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Contraseña (mín. 8 caracteres)"
+            value={newPass}
+            onChange={e => setNewPass(e.target.value)}
+            style={{ width: 220, padding: '9px 12px', border: '1.5px solid var(--border)', borderRadius: 7, fontSize: 13, fontFamily: 'var(--sans)', outline: 'none' }}
+            disabled={creating}
+            minLength={8}
+            required
+          />
+          <button type="submit" className="btn-blue" disabled={creating || !newUser.trim() || newPass.length < 8}>
+            {creating ? '…' : '+ Crear'}
+          </button>
+        </form>
+        {createErr && <div className="error-msg" style={{ marginTop: -10, marginBottom: 14, textAlign: 'left' }}>{createErr}</div>}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {users.length === 0 ? (
+            <div className="rule-empty">📭 No hay usuarios. Creá uno arriba para empezar.</div>
+          ) : users.map(u => (
+            <div key={u.username} className="rule-card" style={{ alignItems: 'center' }}>
+              <div className="rule-number" style={{ background: 'var(--blue)', color: '#fff' }}>👤</div>
+              <div className="rule-text" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ fontWeight: 700, color: 'var(--text)' }}>{u.username}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  Creado: {fmtDate(u.created_at)} · Última actividad: {fmtDate(u.last_active)} · {u.conversation_count} conversación{u.conversation_count !== 1 ? 'es' : ''}
+                </div>
+              </div>
+              <button className="btn-ghost" style={{ padding: '6px 12px', fontSize: 11 }} onClick={() => viewConversations(u.username)}>
+                Ver historial
+              </button>
+              <button className="rule-delete" onClick={() => deleteUser(u.username)} title="Eliminar usuario">×</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Tab: Asistentes ── */
+function AgentsTab({ adminToken, onSaved }) {
+  const [agents, setAgents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [promptDraft, setPromptDraft] = useState('');
+  const [promptLoading, setPromptLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+
+  function reload() {
+    setLoading(true);
+    fetch('/api/admin/agents', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.json())
+      .then(d => { setAgents(d.agents || []); setLoading(false); })
+      .catch(() => { setErr('Error al cargar agentes'); setLoading(false); });
+  }
+  useEffect(() => { reload(); }, [adminToken]);
+
+  function openEditor(agentId) {
+    setEditingId(agentId);
+    setPromptLoading(true);
+    setPromptDraft('');
+    setErr('');
+    fetch(`/api/admin/agents/${agentId}/prompt`, { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setPromptDraft(d.content || ''); setPromptLoading(false); })
+      .catch(() => { setErr('No se pudo cargar el prompt'); setPromptLoading(false); });
+  }
+  function closeEditor() { setEditingId(null); setPromptDraft(''); setErr(''); }
+
+  async function savePrompt() {
+    if (!editingId) return;
+    setSaving(true); setErr('');
+    try {
+      const r = await fetch(`/api/admin/agents/${editingId}/prompt`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ content: promptDraft }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error al guardar');
+      onSaved(`✓ Prompt de "${agents.find(a => a.id === editingId)?.name || editingId}" guardado`);
+      closeEditor();
+    } catch (e) { setErr(e.message); }
+    finally { setSaving(false); }
+  }
+
+  if (loading) return <div className="tab-pane" style={{ alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'var(--text-muted)' }}>Cargando…</span></div>;
+
+  // Vista de edición de prompt
+  if (editingId) {
+    const agent = agents.find(a => a.id === editingId);
+    return (
+      <div className="tab-pane">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+          <button className="btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }} onClick={closeEditor}>← Volver</button>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>
+              {agent?.icon} {agent?.name}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Editando system prompt — <code>app/agents/definitions/{editingId}.md</code>
+            </div>
+          </div>
+        </div>
+
+        {promptLoading ? (
+          <div className="rule-empty">Cargando prompt…</div>
+        ) : (
+          <>
+            <textarea
+              value={promptDraft}
+              onChange={e => setPromptDraft(e.target.value)}
+              rows={26}
+              spellCheck={false}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: '1.5px solid var(--border)',
+                borderRadius: 8,
+                fontFamily: 'ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace',
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: 'var(--text)',
+                background: 'var(--surface)',
+                outline: 'none',
+                resize: 'vertical',
+              }}
+              placeholder="Escribe el system prompt del agente en markdown…"
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                {promptDraft.length.toLocaleString()} caracteres. Se aplica inmediatamente sin reiniciar el servidor. Podés usar <code>{'{n_items}'}</code> para que se sustituya por el tamaño actual del catálogo.
+              </span>
+              <button className="btn-blue" style={{ marginLeft: 'auto', padding: '8px 18px' }} onClick={savePrompt} disabled={saving || !promptDraft.trim()}>
+                {saving ? 'Guardando…' : 'Guardar cambios'}
+              </button>
+            </div>
+            {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Vista lista de agentes
+  return (
+    <div className="tab-pane">
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Asistentes configurados</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          Cada asistente tiene su propio system prompt, tools habilitadas y permisos.
+          Editá el prompt para cambiar el comportamiento sin reiniciar el servidor.
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {agents.map(a => {
+          const visBadge = a.visibility === 'public'
+            ? { label: 'PÚBLICO', color: 'var(--success, #16a34a)' }
+            : a.visibility === 'private'
+              ? { label: 'PRIVADO', color: '#9333ea' }
+              : { label: `${a.allowed_users.length} USERS`, color: 'var(--blue)' };
+          const tierBadge = a.default_tier === 'auto'
+            ? null
+            : a.default_tier === 'pro'
+              ? { label: '◆ PRO', color: '#7c3aed' }
+              : a.default_tier === 'flash'
+                ? { label: '● FLASH', color: 'var(--blue)' }
+                : { label: '○ LITE', color: 'var(--text-muted)' };
+          return (
+            <div key={a.id} className="rule-card" style={{ alignItems: 'flex-start' }}>
+              <div className="rule-number" style={{ fontSize: 18, background: 'transparent', border: '1px solid var(--border)' }}>
+                {a.icon || '🤖'}
+              </div>
+              <div className="rule-text" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{a.name}</span>
+                  {a.is_default && <span className="prompt-block-badge badge-active">DEFAULT</span>}
+                  <span className="prompt-block-badge" style={{ background: visBadge.color, color: '#fff' }}>{visBadge.label}</span>
+                  {tierBadge && <span className="prompt-block-badge" style={{ background: tierBadge.color, color: '#fff' }}>{tierBadge.label}</span>}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  <code style={{ background: 'none', padding: 0, fontSize: 10 }}>{a.id}</code>
+                  {a.description && ` · ${a.description}`}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  Tools: {a.allowed_tools.length === 0 ? '(ninguna)' : a.allowed_tools.join(', ')}
+                </div>
+              </div>
+              <button className="btn-blue" style={{ padding: '7px 14px', fontSize: 12 }} onClick={() => openEditor(a.id)}>
+                Editar prompt
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ marginTop: 16, padding: 12, border: '1px dashed var(--border)', borderRadius: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+        💡 La creación y eliminación de asistentes desde la UI llega en la próxima fase. Por ahora podés agregar nuevos editando <code>agents.json</code> manualmente.
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin panel wrapper ── */
+function AdminPanel({ adminToken, onClose }) {
+  const [tab,   setTab]   = useState('chat');
+  const [toast, setToast] = useState('');
+
+  function onSaved(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  }
+
+  return (
+    <div className="admin-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      {toast && <div className="toast">{toast}</div>}
+      <div className="admin-panel">
+        <div className="admin-header">
+          <span className="admin-header-title">Demo Company Cortex · Admin</span>
+          <span className="admin-badge">ADMIN</span>
+          <div className="admin-header-right">
+            <button className="btn-ghost" style={{ color: 'rgba(255,255,255,.8)', borderColor: 'rgba(255,255,255,.3)' }} onClick={onClose}>Cerrar ✕</button>
+          </div>
+        </div>
+
+        <div className="admin-tabs">
+          {[['chat','💬 Chat con el agente'],['asistentes','🤖 Asistentes'],['sistema','⚙️ Sistema'],['usuarios','👥 Usuarios'],['memoria','🧠 Memoria']].map(([id, label]) => (
+            <div key={id} className={`admin-tab${tab === id ? ' active' : ''}`} onClick={() => setTab(id)}>{label}</div>
+          ))}
+        </div>
+
+        <div className="admin-content">
+          {tab === 'chat'       && <AdminChatTab adminToken={adminToken} onSaved={onSaved} />}
+          {tab === 'asistentes' && <AgentsTab    adminToken={adminToken} onSaved={onSaved} />}
+          {tab === 'sistema'    && <SystemTab    adminToken={adminToken} onSaved={onSaved} />}
+          {tab === 'usuarios'   && <UsersTab     adminToken={adminToken} onSaved={onSaved} />}
+          {tab === 'memoria'    && <MemoryTab    adminToken={adminToken} onSaved={onSaved} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin login small modal ── */
+function AdminLoginModal({ onSuccess, onClose }) {
+  const [u, setU] = useState('');
+  const [p, setP] = useState('');
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault(); setLoading(true); setErr('');
+    try {
+      const r = await fetch('/api/admin/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p }),
+      });
+      if (!r.ok) { setErr((await r.json().catch(() => ({}))).detail || 'Credenciales incorrectas'); return; }
+      const { token } = await r.json();
+      setAdminTok(token); onSuccess(token);
+    } catch { setErr('No se pudo conectar'); }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <div className="modal-sm-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <form className="modal-sm" onSubmit={submit}>
+        <div className="modal-sm-title">⚙️ Acceso Administrador</div>
+        <div className="modal-sm-sub">Ingresá tus credenciales para acceder al panel de administración del agente.</div>
+        <div className="field"><label>Usuario</label><input type="text" value={u} onChange={e => setU(e.target.value)} autoFocus required /></div>
+        <div className="field"><label>Contraseña</label><input type="password" value={p} onChange={e => setP(e.target.value)} required /></div>
+        {err && <div className="error-msg">{err}</div>}
+        <div className="modal-sm-actions">
+          <button type="button" className="btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn-blue" disabled={loading}>{loading ? 'Verificando…' : 'Ingresar'}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════
+   MAIN CHAT
+   ════════════════════════════════════════════ */
+
+function Login({ onLogin }) {
+  const [u, setU] = useState(''); const [p, setP] = useState('');
+  const [err, setErr] = useState(''); const [loading, setLoading] = useState(false);
+  async function submit(e) {
+    e.preventDefault(); setLoading(true); setErr('');
+    try {
+      const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
+      if (!r.ok) { setErr((await r.json().catch(() => ({}))).detail || 'Credenciales incorrectas'); return; }
+      const d = await r.json();
+      setToken(d.token); setUsername(d.username || u);
+      onLogin(d.token, d.username || u);
+    } catch { setErr('No se pudo conectar con el servidor'); }
+    finally { setLoading(false); }
+  }
+  return (
+    <div className="login-wrap">
+      <form className="login-card" onSubmit={submit}>
+        <div className="login-mark">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="M12 7v-3M12 20v-3"/>
+          </svg>
+        </div>
+        <div className="login-logo-wrap">
+          <span className="login-logo">Demo Company</span>
+          <span className="login-cortex">Cortex</span>
+        </div>
+        <div className="login-tagline">Plataforma agéntica interna</div>
+        <div className="field">
+          <label>Usuario</label>
+          <input type="text" value={u} onChange={e => setU(e.target.value)} autoFocus required placeholder="Tu usuario" />
+        </div>
+        <div className="field">
+          <label>Contraseña</label>
+          <input type="password" value={p} onChange={e => setP(e.target.value)} required placeholder="••••••••" />
+        </div>
+        <button className="btn-primary" type="submit" disabled={loading}>
+          {loading ? 'Ingresando…' : 'Ingresar al sistema'}
+        </button>
+        {err && <div className="error-msg">{err}</div>}
+        <div className="login-footer">
+          Acceso interno · Demo Company S.A.
+          <div style={{ marginTop: 10, fontSize: 9.5, opacity: 0.55, letterSpacing: '0.04em' }}>
+            powered by <b style={{ fontWeight: 600 }}>AgentX</b>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function Chat({ token, username, theme, onToggleTheme, onLogout }) {
+  const [chats,         setChats]         = useState(() => loadChats(username));
+  const [activeId,      setActiveId]      = useState(null);
+  const [messages,      setMessages]      = useState([]);
+  const [input,         setInput]         = useState('');
+  const [loading,       setLoading]       = useState(false);
+  const [thinkingSteps, setThinkingSteps] = useState([]);
+  const [sidebarOpen,   setSidebarOpen]   = useState(() => typeof window !== 'undefined' ? window.innerWidth > 720 : true);
+  const [sidebarQuery,  setSidebarQuery]  = useState('');
+  const [feedback,      setFeedback]      = useState({}); // {msgIndex: 'up'|'down'}
+  const [pendingImg,    setPendingImg]    = useState(null);
+  const [pendingDocs,   setPendingDocs]   = useState([]); // [{filename, char_count, text}]
+  const [uploadingDoc,  setUploadingDoc]  = useState(false);
+  const [activeModel,   setActiveModel]   = useState(null); // {model, source}
+  const [recording,     setRecording]     = useState(false);
+  const [adminState,    setAdminState]    = useState(null); // null | 'login' | 'panel'
+  const [adminToken,    setAdminToken]    = useState(getAdminTok);
+  const [toast,         setToast]         = useState('');
+  // ── Agentes ─────────────────────────────────────────────────────
+  const [agents,         setAgents]         = useState([]);
+  const [currentAgentId, setCurrentAgentId] = useState(() => {
+    try { return localStorage.getItem(`demo_company_agent_${username}`) || null; } catch { return null; }
+  });
+  const [agentMenuOpen,  setAgentMenuOpen]  = useState(false);
+
+  const bottomRef  = useRef(null);
+  const textareaRef = useRef(null);
+  const fileRef    = useRef(null);
+  const docFileRef = useRef(null);
+  const recogRef   = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading, thinkingSteps]);
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3000); return () => clearTimeout(t); }, [toast]);
+
+  // Migración: chats viejos (pre-multiusuario) estaban en 'demo_company_chats' sin namespace
+  useEffect(() => {
+    if (!username) return;
+    try {
+      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'demo_company_chats'
+      const newRaw = localStorage.getItem(chatsKey(username));
+      const hasOld = oldRaw && oldRaw !== '[]' && oldRaw !== 'null';
+      const hasNew = newRaw && newRaw !== '[]' && newRaw !== 'null';
+      if (hasOld && !hasNew) {
+        localStorage.setItem(chatsKey(username), oldRaw);
+        localStorage.removeItem(STORAGE_KEY);
+        setChats(JSON.parse(oldRaw));
+        setToast('✓ Recuperé tus conversaciones anteriores');
+      }
+    } catch {}
+  }, [username]);
+
+  // ── Carga de agentes disponibles ────────────────────────────────
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/agents', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d) return;
+        setAgents(d.agents || []);
+        // Si el agente guardado en localStorage ya no está disponible, caer al default
+        const ids = new Set((d.agents || []).map(a => a.id));
+        if (!currentAgentId || !ids.has(currentAgentId)) {
+          setCurrentAgentId(d.default_agent_id || (d.agents || [])[0]?.id || null);
+        }
+      })
+      .catch(() => {});
+  }, [token]);
+
+  // Persistir el agente activo
+  useEffect(() => {
+    if (!currentAgentId || !username) return;
+    try { localStorage.setItem(`demo_company_agent_${username}`, currentAgentId); } catch {}
+  }, [currentAgentId, username]);
+
+  // Cerrar el menú al click afuera
+  useEffect(() => {
+    if (!agentMenuOpen) return;
+    const handler = e => { if (!e.target.closest('.agent-selector')) setAgentMenuOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [agentMenuOpen]);
+
+  const currentAgent = agents.find(a => a.id === currentAgentId) || null;
+
+  // Cambiar de agente: limpia chat activo (cada hilo es de un agente)
+  function switchAgent(newAgentId) {
+    if (newAgentId === currentAgentId) { setAgentMenuOpen(false); return; }
+    setCurrentAgentId(newAgentId);
+    setAgentMenuOpen(false);
+    setActiveId(null);
+    setMessages([]);
+    setInput('');
+    setPendingImg(null);
+    setPendingDocs([]);
+    setFeedback({});
+    setThinkingSteps([]);
+  }
+
+  // En mobile: cerrar sidebar al seleccionar una conversación o crear una nueva
+  function autoCloseSidebarMobile() {
+    if (window.innerWidth <= 720) setSidebarOpen(false);
+  }
+  function startNewChat() { setActiveId(null); setMessages([]); setInput(''); setPendingImg(null); setFeedback({}); autoCloseSidebarMobile(); }
+  function loadChat(id) {
+    const c = chats.find(c => c.id === id);
+    if (!c) return;
+    // Si el chat es de otro asistente, cambiar al asistente correspondiente
+    const chatAgent = c.agentId || 'fidi';
+    if (chatAgent !== currentAgentId) setCurrentAgentId(chatAgent);
+    setActiveId(id); setMessages(c.messages); setFeedback({}); autoCloseSidebarMobile();
+  }
+  function deleteChat(id) { const u = chats.filter(c => c.id !== id); setChats(u); saveChats(u, username); if (activeId === id) startNewChat(); }
+  function persistMessages(id, msgs) {
+    setChats(prev => {
+      const exists = prev.find(c => c.id === id);
+      const updated = exists
+        ? prev.map(c => c.id === id ? { ...c, messages: msgs } : c)
+        : [{ id, title: convTitle(msgs), date: new Date().toISOString(), agentId: currentAgentId, messages: msgs }, ...prev];
+      saveChats(updated, username); return updated;
+    });
+  }
+
+  function ingestImageFile(file, defaultName) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    if (file.size > 8 * 1024 * 1024) { setToast('⚠️ Imagen muy grande (máx 8MB)'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const [header, data] = ev.target.result.split(',');
+      setPendingImg({
+        data,
+        mediaType: header.match(/:(.*?);/)[1],
+        previewUrl: ev.target.result,
+        name: file.name || defaultName || 'pegado.png',
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleFileChange(e) {
+    ingestImageFile(e.target.files[0]);
+    e.target.value = '';
+  }
+
+  async function handleDocFileChange(e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      setToast('⚠️ Archivo muy grande (máx 25MB)');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!['pdf','docx','pptx','xlsx','xlsm','csv','txt','md'].includes(ext)) {
+      setToast('⚠️ Formato no soportado. Usá PDF, Word, Excel, PowerPoint, CSV o TXT.');
+      return;
+    }
+    setUploadingDoc(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('/api/upload-document', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (r.status === 401) { onLogout(); return; }
+      const d = await r.json();
+      if (!r.ok) {
+        setToast(`⚠️ ${d.detail || 'No se pudo procesar el archivo'}`);
+        return;
+      }
+      setPendingDocs(prev => [...prev, { filename: d.filename, char_count: d.char_count, text: d.text }]);
+      setToast(`✓ ${d.filename} (${d.char_count.toLocaleString()} chars) listo para consultar`);
+    } catch {
+      setToast('⚠️ Error subiendo el archivo');
+    } finally {
+      setUploadingDoc(false);
+    }
+  }
+
+  function removeDoc(idx) {
+    setPendingDocs(prev => prev.filter((_, i) => i !== idx));
+  }
+
+  function buildDocContext() {
+    if (!pendingDocs.length) return '';
+    return pendingDocs.map((d, i) =>
+      `=== Documento ${i + 1}: ${d.filename} (${d.char_count} caracteres) ===\n${d.text}`
+    ).join('\n\n');
+  }
+
+  function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.kind === 'file' && item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const ext  = (file.type.split('/')[1] || 'png').split('+')[0];
+        ingestImageFile(file, `pegado-${Date.now()}.${ext}`);
+        setToast('📋 Imagen pegada desde el portapapeles');
+        return;
+      }
+    }
+  }
+
+  function toggleVoice() {
+    if (recording) { recogRef.current?.stop(); setRecording(false); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const r = new SR(); r.lang = 'es'; r.continuous = false; r.interimResults = false;
+    r.onresult = e => { const t = e.results[0][0].transcript; setInput(p => p ? p + ' ' + t : t); };
+    r.onerror = () => setRecording(false); r.onend = () => setRecording(false);
+    recogRef.current = r; r.start(); setRecording(true);
+  }
+
+  function openAdmin() {
+    if (adminToken) setAdminState('panel');
+    else setAdminState('login');
+  }
+
+  async function reloadStock() {
+    try {
+      const r = await fetch('/api/reload-stock', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      if (r.status === 401) { onLogout(); return; }
+      setToast((await r.json()).message || 'Catálogo recargado');
+    } catch { setToast('Error al recargar el catálogo'); }
+  }
+
+  // Regenerar la última respuesta del agente: quita el último mensaje assistant
+  // y re-envía el último mensaje user para que el modelo dé una nueva respuesta.
+  async function regenerateLast() {
+    if (loading) return;
+    // Buscar último mensaje user
+    let lastUserIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') { lastUserIdx = i; break; }
+    }
+    if (lastUserIdx === -1) return;
+    const lastUser = messages[lastUserIdx];
+    // Reset feedback de los mensajes que se van a borrar
+    const newFb = {};
+    Object.entries(feedback).forEach(([k, v]) => { if (Number(k) < lastUserIdx) newFb[k] = v; });
+    setFeedback(newFb);
+    // Truncar mensajes hasta antes del user message
+    const kept = messages.slice(0, lastUserIdx);
+    setMessages(kept);
+    // Re-enviar: usamos el contenido del último user (texto o imagen+texto)
+    const userText = typeof lastUser.content === 'string'
+      ? lastUser.content
+      : (lastUser.content.find(b => b.type === 'text')?.text || '');
+    // Re-stage la imagen si la había
+    const userImg = typeof lastUser.content === 'string'
+      ? null
+      : lastUser.content.find(b => b.type === 'image');
+    if (userImg) {
+      setPendingImg({
+        data: userImg.source.data,
+        mediaType: userImg.source.media_type,
+        previewUrl: `data:${userImg.source.media_type};base64,${userImg.source.data}`,
+        name: 'regenerada',
+      });
+    }
+    // Esperar un tick para que el state se asiente, después enviar
+    setTimeout(() => { sendMessage(userText); }, 50);
+  }
+
+  async function sendMessage(text) {
+    text = (text || input).trim();
+    if ((!text && !pendingImg && !pendingDocs.length) || loading) return;
+    // Indicar visualmente al usuario qué documentos van adjuntos en este turno
+    const docNote = pendingDocs.length
+      ? `\n\n📎 Adjunto: ${pendingDocs.map(d => d.filename).join(', ')}`
+      : '';
+    const visibleText = text + docNote;
+    let content = pendingImg
+      ? [{ type: 'image', source: { type: 'base64', media_type: pendingImg.mediaType, data: pendingImg.data } }, ...(visibleText ? [{ type: 'text', text: visibleText }] : [])]
+      : visibleText;
+
+    const docContext = buildDocContext();
+    const newMessages = [...messages, { role: 'user', content }];
+    const currentId = activeId || genId();
+    if (!activeId) setActiveId(currentId);
+    setMessages(newMessages); setInput(''); setPendingImg(null); setPendingDocs([]); setLoading(true); setThinkingSteps([]); setActiveModel(null);
+
+    let streamedText = '';
+    let assistantAdded = false;
+
+    try {
+      const res = await fetch('/api/chat/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ messages: newMessages, system_context: docContext, agent_id: currentAgentId }),
+      });
+      if (res.status === 401) { onLogout(); return; }
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        const err = [...newMessages, { role: 'assistant', content: `⚠️ Error: ${d.detail || 'Error inesperado.'}` }];
+        setMessages(err); persistMessages(currentId, err); return;
+      }
+
+      await readSSE(res, (evt) => {
+        if (evt.type === 'model_selected') {
+          setActiveModel({ model: evt.model, source: evt.source });
+        } else if (evt.type === 'thinking') {
+          setThinkingSteps(prev => {
+            const i = prev.findIndex(s => s.tool === evt.tool && s.query === evt.query);
+            if (i >= 0) { const u = [...prev]; u[i] = evt; return u; }
+            return [...prev, evt];
+          });
+        } else if (evt.type === 'text') {
+          streamedText += evt.text;
+          if (!assistantAdded) {
+            assistantAdded = true;
+            setMessages([...newMessages, { role: 'assistant', content: streamedText, streaming: true }]);
+          } else {
+            setMessages(prev => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last && last.role === 'assistant') {
+                updated[updated.length - 1] = { ...last, content: streamedText, streaming: true };
+              }
+              return updated;
+            });
+          }
+        } else if (evt.type === 'done') {
+          const final = [...newMessages, { role: 'assistant', content: streamedText || '(Sin respuesta del modelo)' }];
+          setMessages(final); persistMessages(currentId, final);
+        } else if (evt.type === 'error') {
+          const err = [...newMessages, { role: 'assistant', content: `⚠️ Error: ${evt.message}` }];
+          setMessages(err); persistMessages(currentId, err);
+        }
+      });
+    } catch {
+      const err = [...newMessages, { role: 'assistant', content: '⚠️ No se pudo conectar.' }];
+      setMessages(err); persistMessages(currentId, err);
+    } finally { setLoading(false); setThinkingSteps([]); textareaRef.current?.focus(); }
+  }
+
+  const _q = sidebarQuery.trim().toLowerCase();
+  // Filtrar conversaciones por agente activo. Chats viejos sin agentId → asumimos default.
+  const _chatsForAgent = currentAgentId
+    ? chats.filter(c => (c.agentId || 'fidi') === currentAgentId)
+    : chats;
+  const filteredChats = _q
+    ? _chatsForAgent.filter(c => (c.title || '').toLowerCase().includes(_q))
+    : _chatsForAgent;
+  const groups = groupByDate([...filteredChats].sort((a, b) => new Date(b.date) - new Date(a.date)));
+  const chatTitle = activeId
+    ? (chats.find(c => c.id === activeId)?.title || 'Conversación')
+    : 'Nueva consulta';
+
+  // ── Exportar conversación como archivo .txt descargable ─────────
+  function exportConversation() {
+    if (!messages.length) {
+      setToast('No hay nada para compartir todavía.');
+      return;
+    }
+    const now = new Date();
+    const dateStr = now.toLocaleString('es-UY', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const userLabel = (username || 'Usuario').toUpperCase();
+    const header = [
+      '═══════════════════════════════════════════════════════════════',
+      '  DEMO COMPANY · CORTEX',
+      `  Conversación: ${chatTitle}`,
+      `  Usuario: ${username || '—'}`,
+      `  Exportado: ${dateStr}`,
+      '═══════════════════════════════════════════════════════════════',
+      '',
+    ].join('\n');
+
+    // Convertir cada mensaje a texto plano
+    const parts = messages.map(m => {
+      let body;
+      if (typeof m.content === 'string') {
+        body = m.content;
+      } else if (Array.isArray(m.content)) {
+        const text = m.content.find(b => b.type === 'text')?.text || '';
+        const hasImg = m.content.some(b => b.type === 'image');
+        body = (hasImg ? '[Imagen adjunta]\n' : '') + text;
+      } else {
+        body = String(m.content || '');
+      }
+      // Limpiar markdown básico para que se lea como texto plano
+      const clean = body
+        .replace(/\*\*(.+?)\*\*/g, '$1')           // negritas
+        .replace(/\*(.+?)\*/g, '$1')                // itálicas
+        .replace(/`(.+?)`/g, '$1')                  // inline code
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)')  // links → "texto (url)"
+        .replace(/^#{1,6}\s+/gm, '')                // headings
+        .replace(/^\s*[-*]\s+/gm, ' • ')            // listas
+        .replace(/\n{3,}/g, '\n\n');                // colapsar saltos múltiples
+      const who = m.role === 'user' ? userLabel : 'DEMO COMPANY CORTEX';
+      return `[ ${who} ]\n${'─'.repeat(64)}\n${clean.trim()}`;
+    });
+
+    const footer = [
+      '',
+      '═══════════════════════════════════════════════════════════════',
+      '  Fin de la conversación',
+      '  Generado por Demo Company S.A. — Agente Consultor',
+      '═══════════════════════════════════════════════════════════════',
+    ].join('\n');
+
+    const text = header + parts.join('\n\n\n') + footer;
+
+    // Crear blob + link descargable
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const safeTitle = (chatTitle || 'conversacion').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_').slice(0, 40) || 'conversacion';
+    const dateTag   = now.toISOString().slice(0, 10);
+    a.href     = url;
+    a.download = `demo_company_${dateTag}_${safeTitle}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setToast('✓ Conversación exportada como .txt');
+  }
+  const SUGGESTED_PROMPTS = [
+    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué válvulas BERMAD tienen disponibles?' },
+    { icon: 'Sensor', cat: 'Sensores',             text: 'Sensores de nivel NIVELCO para tanque de 6m' },
+    { icon: 'Wrench', cat: 'Selección',            text: 'Actuador neumático NUTORK para válvula DN150' },
+    { icon: 'Book',   cat: 'Normativas',           text: '¿Qué norma aplica para válvulas API 600?' },
+    { icon: 'Valve',  cat: 'Comparativa',          text: '¿Diferencia entre válvula de bola y compuerta?' },
+    { icon: 'Wrench', cat: 'Recomendación',        text: 'Válvula para fluido corrosivo a 80°C — ¿qué recomendás?' },
+  ];
+
+  const userInitials = (username || 'U').slice(0, 2).toUpperCase();
+
+  return (
+    <div className="app" data-sidebar={sidebarOpen ? "open" : "collapsed"}>
+      {adminState === 'login' && (
+        <AdminLoginModal
+          onSuccess={tok => { setAdminToken(tok); setAdminState('panel'); }}
+          onClose={() => setAdminState(null)}
+        />
+      )}
+      {adminState === 'panel' && adminToken && (
+        <AdminPanel adminToken={adminToken} onClose={() => setAdminState(null)} />
+      )}
+      {toast && <div className="toast">{toast}</div>}
+
+      {/* ── Topbar ─────────────────────────────────────────────── */}
+      <header className="topbar">
+        <button className="topbar-icon-btn" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle sidebar">
+          <Icon.Menu />
+        </button>
+        <div className="brand">
+          <span className="brand-logo">Demo Company</span>
+          <span className="brand-cortex">Cortex</span>
+        </div>
+        <div className="topbar-spacer" />
+        {username && (
+          <button className="topbar-user" title={username}>
+            <span className="avatar-mini">{userInitials}</span>
+            <span>{username}</span>
+          </button>
+        )}
+        <button className="topbar-icon-btn" onClick={onToggleTheme} aria-label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
+          {theme === 'dark' ? <Icon.Sun /> : <Icon.Moon />}
+        </button>
+        <button className="topbar-icon-btn" onClick={openAdmin} aria-label="Panel de administración">
+          <Icon.Settings />
+        </button>
+        <button className="btn-salir" onClick={onLogout}>Salir</button>
+      </header>
+
+      {/* ── Sidebar ────────────────────────────────────────────── */}
+      <aside className="sidebar">
+        <div className="sidebar-top">
+          {/* Selector de asistente */}
+          {agents.length > 0 && (
+            <div className="agent-selector">
+              <button
+                className="agent-selector-btn"
+                onClick={() => setAgentMenuOpen(o => !o)}
+                title="Cambiar asistente"
+              >
+                <span className="agent-icon">{currentAgent?.icon || '🤖'}</span>
+                <span className="agent-name">{currentAgent?.name || 'Asistente'}</span>
+                <span className="agent-chevron">{agentMenuOpen ? '▲' : '▼'}</span>
+              </button>
+              {agentMenuOpen && (
+                <div className="agent-selector-menu">
+                  {agents.map(a => (
+                    <div
+                      key={a.id}
+                      className={"agent-option" + (a.id === currentAgentId ? ' active' : '')}
+                      onClick={() => switchAgent(a.id)}
+                    >
+                      <span className="agent-icon">{a.icon || '🤖'}</span>
+                      <div className="agent-option-text">
+                        <div className="agent-option-name">{a.name}</div>
+                        {a.description && <div className="agent-option-desc">{a.description}</div>}
+                      </div>
+                      {a.id === currentAgentId && <span className="check">✓</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <button className="new-consult-btn" onClick={startNewChat}>
+            <span className="pencil-icon"><Icon.Edit /></span>
+            <span>Nueva consulta</span>
+          </button>
+          <div className="sidebar-search">
+            <span className="sidebar-search-icon"><Icon.Search /></span>
+            <input
+              type="text"
+              placeholder="Buscar conversaciones"
+              value={sidebarQuery}
+              onChange={e => setSidebarQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        <nav className="conv-section">
+          {Object.keys(groups).length === 0 ? (
+            <div className="conv-empty">
+              {sidebarQuery ? 'Sin coincidencias' : 'Todavía no hay conversaciones'}
+            </div>
+          ) : Object.entries(groups).map(([label, group], gi) => (
+            <div className="conv-group" key={label}>
+              <div className={"conv-group-label" + (gi === 0 ? " first" : "")}>{label}</div>
+              {group.map(c => {
+                const IconCmp = Icon[pickConvIcon(c.title)] || Icon.Message;
+                return (
+                  <button
+                    key={c.id}
+                    className={"conv-item" + (activeId === c.id ? " active" : "")}
+                    onClick={() => loadChat(c.id)}
+                    title={c.title}
+                  >
+                    <span className="conv-item-icon"><IconCmp /></span>
+                    <span className="conv-item-text">{c.title}</span>
+                    <span
+                      className="conv-item-delete"
+                      onClick={e => { e.stopPropagation(); deleteChat(c.id); }}
+                      title="Eliminar conversación"
+                    >
+                      <Icon.X width="13" height="13" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Backdrop clickeable solo visible en mobile cuando el sidebar está abierto */}
+      <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
+
+      {/* ── Main ───────────────────────────────────────────────── */}
+      <main className="main">
+        <div className="chat-header">
+          <div className="chat-title">{chatTitle}</div>
+          <div className="chat-header-actions">
+            <button
+              className="icon-btn-ghost"
+              title="Exportar conversación como archivo de texto"
+              onClick={exportConversation}
+              disabled={messages.length === 0}
+              style={messages.length === 0 ? { opacity: 0.35, cursor: 'not-allowed' } : undefined}
+            >
+              <Icon.Share />
+            </button>
+          </div>
+        </div>
+        <div className="chat-scroll">
+          <div className="chat-inner">
+            <div className="messages-area">
+            {messages.length === 0 ? (
+              <div className="welcome">
+                <div className="welcome-mark">
+                  {currentAgent?.icon ? (
+                    <span style={{ fontSize: 32 }}>{currentAgent.icon}</span>
+                  ) : (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="M12 7v-3M12 20v-3"/>
+                    </svg>
+                  )}
+                </div>
+                <h1 className="welcome-title">Buenas, {username || 'usuario'}.</h1>
+                <p className="welcome-subtitle">
+                  {currentAgent
+                    ? <>Estás hablando con <b>{currentAgent.name}</b>{currentAgent.description ? ` — ${currentAgent.description}` : ''}</>
+                    : <>¿Qué necesitás <b>encontrar</b> hoy?</>
+                  }
+                </p>
+              </div>
+            ) : (
+              <>
+                {messages.map((m, i) => {
+                  const isLast = i === messages.length - 1;
+                  const isStreaming = m.streaming && isLast;
+                  const isUser = m.role === 'user';
+                  return (
+                    <div key={i} className={`message-row ${m.role}`}>
+                      <div className="message-block">
+                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Demo Company Cortex')}</div>
+                        {isUser ? (
+                          <div className="user-bubble"><UserContent content={m.content} /></div>
+                        ) : (
+                          <>
+                            <div className="assistant-card">
+                              <AssistantMd content={m.content} />
+                              {isStreaming && <span className="streaming-cursor" />}
+                            </div>
+                            {!isStreaming && !loading && (
+                              <div className="msg-actions">
+                                {isLast && (
+                                  <button className="msg-action-btn" onClick={regenerateLast} title="Regenerar respuesta">
+                                    <Icon.Refresh /><span>Regenerar</span>
+                                  </button>
+                                )}
+                                <button
+                                  className={"msg-action-btn" + (feedback[i] === 'up' ? ' active' : '')}
+                                  onClick={() => setFeedback(p => ({ ...p, [i]: p[i] === 'up' ? null : 'up' }))}
+                                  title="Útil"
+                                >
+                                  <Icon.ThumbUp />
+                                </button>
+                                <button
+                                  className={"msg-action-btn" + (feedback[i] === 'down' ? ' active' : '')}
+                                  onClick={() => setFeedback(p => ({ ...p, [i]: p[i] === 'down' ? null : 'down' }))}
+                                  title="No útil"
+                                >
+                                  <Icon.ThumbDown />
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {loading && (
+                  <WorkingChip
+                    steps={thinkingSteps}
+                    isStreaming={!!messages[messages.length - 1]?.streaming}
+                    activeModel={activeModel}
+                  />
+                )}
+                {loading && thinkingSteps.length > 0 && (
+                  <ThinkingIndicator steps={thinkingSteps} loading={loading} />
+                )}
+                {loading && thinkingSteps.length === 0 && !(messages[messages.length - 1]?.streaming) && (
+                  <div className="progress-bar">
+                    <span className="progress-bar-label">Procesando consulta</span>
+                    <div className="progress-bar-track"><div className="progress-bar-fill" /></div>
+                  </div>
+                )}
+                <div ref={bottomRef} />
+              </>
+            )}
+            </div>
+          </div>
+        </div>
+
+        <div className="composer-wrap">
+          {pendingImg && (
+            <div className="composer-attachment-preview">
+              <img src={pendingImg.previewUrl} className="composer-attachment-thumb" alt="" />
+              <span className="composer-attachment-name">{pendingImg.name}</span>
+              <button className="composer-attachment-remove" onClick={() => setPendingImg(null)} title="Quitar imagen">
+                <Icon.X width="14" height="14" />
+              </button>
+            </div>
+          )}
+          {pendingDocs.map((d, i) => (
+            <div key={i} className="composer-attachment-preview">
+              <div className="composer-attachment-doc-icon">📄</div>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                <span className="composer-attachment-name">{d.filename}</span>
+                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{d.char_count.toLocaleString()} caracteres extraídos</span>
+              </div>
+              <button className="composer-attachment-remove" onClick={() => removeDoc(i)} title="Quitar documento">
+                <Icon.X width="14" height="14" />
+              </button>
+            </div>
+          ))}
+          {uploadingDoc && (
+            <div className="composer-attachment-preview">
+              <span className="thinking-spinner" />
+              <span className="composer-attachment-name">Procesando documento…</span>
+            </div>
+          )}
+          <div className="composer">
+            <div className="composer-tools">
+              <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+              <input ref={docFileRef} type="file" accept=".pdf,.docx,.pptx,.xlsx,.xlsm,.csv,.txt,.md,application/pdf" style={{ display: 'none' }} onChange={handleDocFileChange} />
+              <button className="composer-icon-btn" onClick={() => fileRef.current?.click()} disabled={loading || uploadingDoc} title="Adjuntar imagen">
+                <Icon.Paperclip />
+              </button>
+              <button className="composer-icon-btn" onClick={() => docFileRef.current?.click()} disabled={loading || uploadingDoc} title="Adjuntar documento (PDF, Word, Excel, PowerPoint)">
+                <Icon.Doc />
+              </button>
+            </div>
+            <textarea
+              ref={textareaRef} rows={1}
+              className="composer-input"
+              placeholder={pendingImg ? "Agregá una descripción (opcional)…" : "Consultá productos o pegá una imagen con Ctrl+V…"}
+              value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              onPaste={handlePaste}
+              disabled={loading}
+              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'; }}
+            />
+            {HAS_SPEECH && (
+              <div className="composer-tools">
+                <button
+                  className={`composer-icon-btn${recording ? ' recording' : ''}`}
+                  onClick={toggleVoice}
+                  disabled={loading}
+                  title={recording ? 'Detener dictado' : 'Dictar por voz'}
+                >
+                  <Icon.Mic />
+                </button>
+              </div>
+            )}
+            <button
+              className={`composer-send${loading ? ' is-loading' : ''}`}
+              onClick={() => sendMessage()}
+              disabled={loading || (!input.trim() && !pendingImg)}
+              title={loading ? 'Trabajando…' : 'Enviar (Enter)'}
+            >
+              {loading ? <span className="composer-send-spinner" /> : <Icon.ArrowUp />}
+            </button>
+          </div>
+          <div className="composer-hint">
+            <span className="composer-hint-text">
+              Cortex puede cometer errores. Por favor, chequeá todas sus respuestas.
+            </span>
+            <span className="powered-by">powered by <b>AgentX</b></span>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  const [token, setTokenSt]    = useState(getToken);
+  const [username, setUserSt]  = useState(getUsername);
+  const [theme, setThemeSt]    = useState(() => localStorage.getItem('demo_company_theme') || 'light');
+
+  // Aplicar tema al documento + persistir
+  useEffect(() => {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('demo_company_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setThemeSt(t => t === 'dark' ? 'light' : 'dark');
+
+  if (!token) return <Login onLogin={(t, u) => { setTokenSt(t); setUserSt(u); }} />;
+  return <Chat
+    token={token}
+    username={username}
+    theme={theme}
+    onToggleTheme={toggleTheme}
+    onLogout={() => { clearToken(); clearUsername(); setTokenSt(null); setUserSt(''); }}
+  />;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

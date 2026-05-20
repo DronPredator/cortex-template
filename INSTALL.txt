@@ -1,0 +1,152 @@
+════════════════════════════════════════════════════════════════
+  DEMO COMPANY — AGENTE CONSULTOR
+  Instrucciones de instalacion en PC nueva
+════════════════════════════════════════════════════════════════
+
+QUE ES
+──────
+Chatbot interno de Demo Company S.A. con frontend redisenado (Apple-style)
++ backend FastAPI + LLM Gemini con tool calling (catalog_search,
+verify_pdf_url, fetch_product_data, generate_datasheet_pdf).
+
+Features principales:
+  - Streaming de texto con cursor de tipeo
+  - Multi-usuario con auth JWT (passwords hasheados PBKDF2)
+  - Panel admin con 4 tabs (Chat / Sistema / Usuarios / Memoria)
+  - Dark mode toggle
+  - Mobile responsive con sidebar off-canvas
+  - Verificacion HTTP real de URLs antes de citarlas
+  - Generacion de fichas tecnicas PDF con branding Demo Company
+  - Google Search grounding integrado
+
+PRE-REQUISITOS
+──────────────
+  - Windows 10 o 11
+  - Python 3.11 o superior
+    https://www.python.org/downloads/
+    [IMPORTANTE] Marcar "Add Python to PATH" al instalar
+  - Conexion a internet (para instalar dependencias + LLM API)
+  - ~200 MB libres en disco
+
+INSTALACION RAPIDA
+──────────────────
+
+  Opcion A — Si tenes Claude Code instalado en esta PC:
+    1. Descomprimi el ZIP en una carpeta, ej: C:\Demo Company\
+    2. Abri Claude Code en esa carpeta
+    3. Decile: "Lee CLAUDE.md y ayudame a instalar este proyecto"
+    4. Te va a guiar paso por paso
+
+  Opcion B — Manual:
+    1. Descomprimi el ZIP en una carpeta, ej: C:\Demo Company\
+    2. Doble-click en `quick_start.bat`
+       (chequea Python, instala deps, configura .env, te pide los
+        secrets, y arranca el server automaticamente)
+    3. Abri en el navegador: http://localhost:8000
+
+  Opcion C — Paso a paso manual:
+    1. Doble-click en `setup_install.bat`
+       (chequea Python e instala dependencias ~1-2 min)
+
+    2. Configura los 3 secrets (te lo indica el instalador):
+
+         a) JWT secret (clave para firmar sesiones):
+              python set_secret.py JWT_SECRET
+            (poner cualquier string aleatorio largo, minimo 32 chars)
+
+         b) Google API key (motor del chat):
+              python set_secret.py GOOGLE_API_KEY
+            Generala primero en: https://aistudio.google.com/apikey
+
+         c) Contrasena admin (panel ⚙️):
+              python set_secret.py ADMIN_PASSWORD
+
+    3. (Opcional) Edita `.env` y cambia:
+         CHAT_USER=demo_company     → usuario regular inicial
+         CHAT_PASSWORD=...     → password del usuario inicial
+         ADMIN_USER=admin      → nombre del admin
+
+    4. Arranca el server: doble-click en `start_server.bat`
+
+    5. Abri http://localhost:8000 en el navegador
+
+
+ACCESO DESDE OTRAS PCs EN LA RED LAN
+────────────────────────────────────
+Una vez que el server esta corriendo:
+
+  1. Click derecho en `setup_lan.ps1` → "Run with PowerShell"
+     (corre como admin — abre el puerto 8000 en el Firewall)
+  2. El script te muestra la IP de la PC
+  3. Las otras PCs entran a: http://<IP>:8000
+
+
+ARRANQUE AUTOMATICO AL PRENDER LA PC
+────────────────────────────────────
+  1. Click derecho en `start_server_silent.vbs` → "Crear acceso directo"
+  2. Win+R → `shell:startup` → Enter
+  3. Mover el acceso directo a esa carpeta
+
+
+SI ALGO NO FUNCIONA
+───────────────────
+  - "Python no se reconoce": no instalaste Python o no marcaste "Add
+    to PATH". Reinstala Python.
+  - "pip install falla": problema de red o de antivirus. Revisalos.
+  - El server arranca pero no podes entrar: verifica que
+    http://localhost:8000 abra desde esta PC. Si abre pero da error
+    de conexion desde otra PC, revisa el Firewall (setup_lan.ps1).
+  - "JWT_SECRET no esta configurado": ejecuta el paso a) de arriba.
+  - "GOOGLE_API_KEY no esta configurada": el LLM no puede arrancar.
+    Generala en https://aistudio.google.com/apikey y meterla con
+    `python set_secret.py GOOGLE_API_KEY`.
+
+
+CREDENCIALES INICIALES (cambiarlas en el primer dia)
+────────────────────────────────────────────────────
+  - Usuario regular:  demo_company / [lo que pongas en CHAT_PASSWORD]
+  - Admin:            admin   / [lo que pongas en ADMIN_PASSWORD]
+
+  Despues, desde el panel admin (tab Usuarios) podes crear mas
+  usuarios para que cada persona tenga su propia cuenta con su
+  propio historial de conversaciones.
+
+
+ARCHIVOS QUE NO SE VERSIONAN (datos locales del usuario)
+──────────────────────────────────────────────────────────
+Estos archivos se crean automaticamente al usar la app — NO los
+borres ni los compartas:
+
+  - users.json                    → usuarios con hashes
+  - conversations_log.jsonl       → historial de chats (rotado a 5MB)
+  - memory.json                   → memoria diaria generada
+  - system_prompt_custom.txt      → reglas custom del admin
+  - runtime_config.json           → modelo activo, etc.
+  - static/datasheets/*.pdf       → fichas tecnicas generadas
+
+Para backups: copialos a OneDrive/USB cada tanto.
+
+
+ESTRUCTURA DE ARCHIVOS
+──────────────────────
+  demo-cortex/
+  ├── CLAUDE.md                   → Guia para Claude Code
+  ├── INSTALL.txt                 → Este archivo
+  ├── main.py                     → Backend FastAPI
+  ├── search.py                   → Busqueda en catalogo
+  ├── gemini_engine.py            → Provider Gemini
+  ├── datasheet_tools.py          → Scraping + generacion PDF
+  ├── set_secret.py               → Helper para secrets
+  ├── requirements.txt            → Dependencias Python
+  ├── .env.example                → Template de config
+  ├── .gitignore                  → Protege datos locales
+  ├── stock.csv                   → Catalogo (12500 items)
+  ├── static/
+  │   └── index.html              → Frontend React (un solo archivo)
+  ├── quick_start.bat             → Instalacion + arranque en uno
+  ├── setup_install.bat           → Solo instalacion
+  ├── setup_lan.ps1               → Abrir Firewall para LAN
+  ├── start_server.bat            → Arrancar (con ventana)
+  └── start_server_silent.vbs     → Arrancar (sin ventana)
+
+════════════════════════════════════════════════════════════════
