@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reseteando Fidemar Cortex…</title>
+  <!-- No cachear esta página NUNCA. El sw.js también la excluye explícitamente. -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <style>
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: #fbfbfd;
+      color: #1d1d1f;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
+      padding: 16px;
+    }
+    .card {
+      max-width: 480px; padding: 32px;
+      background: white; border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    h1 { font-size: 20px; margin: 12px 0 8px; }
+    p  { font-size: 14px; color: #515154; line-height: 1.5; margin: 8px 0; }
+    .ok    { color: #1f7c3e; }
+    .step  { display: block; padding: 4px 0; }
+    .spin  {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid #1a4ea0; border-top-color: transparent;
+      border-radius: 50%; animation: spin .8s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .done { color: #1f7c3e; font-weight: 600; }
+    .err  { color: #d63b3b; }
+    .btn {
+      display: inline-block; margin-top: 16px;
+      padding: 10px 18px; background: #1a4ea0; color: white;
+      border: 0; border-radius: 8px; cursor: pointer;
+      font-size: 14px; font-weight: 500;
+      text-decoration: none;
+    }
+    .btn:hover { background: #143d80; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧹 Limpiando cache de Fidemar Cortex</h1>
+    <div id="status">
+      <span class="step"><span class="spin"></span> Desregistrando service workers…</span>
+    </div>
+    <p id="result"></p>
+  </div>
+
+<script>
+(async () => {
+  const status = document.getElementById('status');
+  const result = document.getElementById('result');
+  const steps = [];
+  function add(text, cls) {
+    steps.push(`<span class="step ${cls||''}">${text}</span>`);
+    status.innerHTML = steps.join('');
+  }
+
+  // 1. Unregister service workers
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+      add(`✓ ${regs.length} service worker(s) desregistrado(s)`, 'done');
+    } else {
+      add('⊘ Service Worker API no disponible (saltado)', 'done');
+    }
+  } catch (e) {
+    add(`✗ Error desregistrando SW: ${e.message}`, 'err');
+  }
+
+  // 2. Limpiar todos los caches del browser para este origin
+  try {
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+      add(`✓ ${keys.length} cache(s) eliminado(s)`, 'done');
+    } else {
+      add('⊘ Cache API no disponible (saltado)', 'done');
+    }
+  } catch (e) {
+    add(`✗ Error limpiando caches: ${e.message}`, 'err');
+  }
+
+  // 3. (Opcional) Borrar localStorage de la app — comentado por default
+  // porque borra el token JWT y el usuario tiene que volver a loguearse.
+  // Si querés un reset completo, descomentá las próximas 2 líneas:
+  //   localStorage.clear();
+  //   add('✓ localStorage limpiado', 'done');
+
+  // 4. Redirigir
+  result.innerHTML = `
+    <span class="ok"><b>Listo.</b> Tu browser ya no tiene cache viejo de Fidemar Cortex.</span><br/>
+    Redirigiendo a la app en 2 segundos…
+  `;
+  document.title = '✓ Cache limpio';
+
+  setTimeout(() => {
+    // location.replace evita que el usuario haga "atrás" y vuelva a esta página.
+    // El query param ?fresh=<timestamp> rompe cualquier HTTP cache que quede.
+    window.location.replace('/?fresh=' + Date.now());
+  }, 2000);
+})();
+</script>
+</body>
+</html>

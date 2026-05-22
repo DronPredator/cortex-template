@@ -68,7 +68,7 @@ def generate_memory() -> dict:
         )
 
         analysis_prompt = (
-            f"Analizá estas {len(entries)} conversaciones recientes del chatbot del cliente "
+            f"Analizá estas {len(entries)} conversaciones recientes del chatbot de Fidemar S.A. "
             "y generá un resumen de memoria estructurado en español:\n\n"
             f"{convs_text}\n\n"
             "Generá un análisis con estas secciones:\n"
@@ -137,11 +137,17 @@ def generate_memory() -> dict:
 
 
 async def memory_refresh_loop() -> None:
-    """Tarea de fondo que regenera memoria cada 24 horas."""
+    """Tarea de fondo que regenera memoria + ejemplos cada 24 horas."""
     while True:
         try:
             await asyncio.sleep(24 * 3600)
             await asyncio.to_thread(generate_memory)
+            # Después de la memoria, regenerar los ejemplos por agente
+            try:
+                from app.storage.examples import generate_all_examples
+                await asyncio.to_thread(generate_all_examples)
+            except Exception as e:
+                logger.warning("examples_refresh_failed | {}", e)
         except asyncio.CancelledError:
             break
         except Exception as e:

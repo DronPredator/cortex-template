@@ -84,7 +84,7 @@ def verify_admin_token_dep(
             settings.jwt_secret,
             algorithms=[settings.jwt_algorithm],
         )
-        if payload.get("role") != "admin":
+        if payload.get("role") != "admin" or payload.get("user") != settings.admin_user:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Se requieren credenciales de administrador",

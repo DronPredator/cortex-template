@@ -39,7 +39,8 @@ loguru
 tenacity
 
 # Seguridad
-slowapi  # rate limiting para FastAPI
+slowapi      # rate limiting para FastAPI
+defusedxml   # B4: hardening de parsers XML de la stdlib contra XXE/billion laughs
 
 # Tests
 pytest

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import asyncio
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from app.auth import verify_admin_token_dep
+from app.security.rate_limit import ADMIN_ACTION_LIMIT, limiter
 from app.storage.memory import generate_memory, load_memory
 
 
@@ -22,5 +23,8 @@ def get_memory(_token: str = Depends(verify_admin_token_dep)):
 
 
 @router.post("/api/admin/memory/refresh")
-async def refresh_memory(_token: str = Depends(verify_admin_token_dep)):
+@limiter.limit(ADMIN_ACTION_LIMIT)
+async def refresh_memory(
+    request: Request, _token: str = Depends(verify_admin_token_dep)
+):
     return await asyncio.to_thread(generate_memory)

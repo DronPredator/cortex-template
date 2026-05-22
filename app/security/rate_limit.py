@@ -33,7 +33,10 @@ limiter = Limiter(
     # Almacenamiento en memoria — OK para single-process. Si escalás a múltiples
     # workers, migrar a Redis con `storage_uri="redis://..."`
     storage_uri="memory://",
-    headers_enabled=True,  # Devuelve X-RateLimit-* headers en responses
+    # Keep limits active without requiring every decorated endpoint to accept
+    # an explicit Starlette Response object. With headers_enabled=True, slowapi
+    # can raise 500s on plain dict/streaming responses.
+    headers_enabled=False,
 )
 
 

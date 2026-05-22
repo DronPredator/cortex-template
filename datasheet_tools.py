@@ -1,4 +1,4 @@
-"""Scraping de páginas de producto + generación de PDFs con branding del cliente.
+"""Scraping de páginas de producto + generación de PDFs branded Fidemar.
 
 Dos funciones públicas:
   - fetch_product_data(url) -> dict con title/text/tables
@@ -22,22 +22,6 @@ from reportlab.platypus import (Paragraph, SimpleDocTemplate, Spacer, Table,
                                   TableStyle, HRFlowable)
 
 
-
-def _company_name() -> str:
-    try:
-        from app.config import settings
-        return settings.company_full_name
-    except Exception:
-        return 'Demo Company S.A.'
-
-def _company_short() -> str:
-    try:
-        from app.config import settings
-        return settings.company_name
-    except Exception:
-        return 'Demo Company'
-
-
 _UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
@@ -54,7 +38,7 @@ def fetch_product_data(url: str, timeout: int = 10, max_html: int = 1_500_000) -
 
     # SSRF guard — bloquear IPs privadas, loopback, link-local, metadata services
     try:
-        from app.security.url_safety import UnsafeURLError, require_safe_url
+        from app.security.url_safety import UnsafeURLError, require_safe_url, safe_urlopen
         require_safe_url(url)
     except UnsafeURLError as e:
         return {"error": f"URL bloqueada por política de seguridad: {e}"}
@@ -66,7 +50,7 @@ def fetch_product_data(url: str, timeout: int = 10, max_html: int = 1_500_000) -
     }
     try:
         req = urllib.request.Request(url, method="GET", headers=headers)
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with safe_urlopen(req, timeout=timeout) as resp:
             status = getattr(resp, "status", 200)
             ct = (resp.headers.get("Content-Type") or "").lower()
             final_url = resp.url
@@ -78,6 +62,8 @@ def fetch_product_data(url: str, timeout: int = 10, max_html: int = 1_500_000) -
         return {"error": f"HTTP {e.code}: {getattr(e, 'reason', '')}"}
     except urllib.error.URLError as e:
         return {"error": f"Error de red: {str(getattr(e, 'reason', e))[:80]}"}
+    except UnsafeURLError as e:
+        return {"error": f"URL bloqueada por política de seguridad: {e}"}
     except Exception as e:
         return {"error": f"Error: {str(e)[:120]}"}
 
@@ -142,8 +128,8 @@ def fetch_product_data(url: str, timeout: int = 10, max_html: int = 1_500_000) -
 
 # ── Generación de PDF ─────────────────────────────────────────────────────────
 
-_BRAND_BLUE = colors.HexColor("#1a4ea0")
-_BRAND_DARK = colors.HexColor("#0f3a7a")
+_FIDEMAR_BLUE = colors.HexColor("#1a4ea0")
+_FIDEMAR_DARK = colors.HexColor("#0f3a7a")
 _LIGHT_BG     = colors.HexColor("#f0f4f9")
 _TEXT_GRAY    = colors.HexColor("#4a5b75")
 
@@ -154,7 +140,7 @@ def _make_styles():
         "title": ParagraphStyle(
             "FdmTitle", parent=base["Title"],
             fontName="Helvetica-Bold", fontSize=20, leading=24,
-            textColor=_BRAND_DARK, spaceAfter=4, alignment=TA_CENTER,
+            textColor=_FIDEMAR_DARK, spaceAfter=4, alignment=TA_CENTER,
         ),
         "subtitle": ParagraphStyle(
             "FdmSubtitle", parent=base["Normal"],
@@ -164,35 +150,35 @@ def _make_styles():
         "h2": ParagraphStyle(
             "FdmH2", parent=base["Heading2"],
             fontName="Helvetica-Bold", fontSize=13, leading=16,
-            textColor=_BRAND_BLUE, spaceBefore=12, spaceAfter=6,
+            textColor=_FIDEMAR_BLUE, spaceBefore=12, spaceAfter=6,
         ),
         "body": ParagraphStyle(
             "FdmBody", parent=base["BodyText"],
             fontName="Helvetica", fontSize=10, leading=14,
             textColor=colors.HexColor("#1a2740"), spaceAfter=6, alignment=TA_JUSTIFY,
         ),
-        "kv_key":   ParagraphStyle("BrandKVK", fontName="Helvetica-Bold", fontSize=9.5, leading=12, textColor=_BRAND_DARK),
+        "kv_key":   ParagraphStyle("FdmKVK", fontName="Helvetica-Bold", fontSize=9.5, leading=12, textColor=_FIDEMAR_DARK),
         "kv_val":   ParagraphStyle("FdmKVV", fontName="Helvetica",      fontSize=9.5, leading=12, textColor=colors.HexColor("#1a2740")),
         "footer":   ParagraphStyle("FdmFoot", fontName="Helvetica-Oblique", fontSize=8.5, leading=11,
                                    textColor=_TEXT_GRAY, alignment=TA_JUSTIFY),
         "source":   ParagraphStyle("FdmSrc",  fontName="Helvetica", fontSize=8, leading=10, textColor=_TEXT_GRAY),
         "head_logo": ParagraphStyle("FdmLogo", fontName="Helvetica-Bold", fontSize=22, leading=26,
-                                    textColor=_BRAND_DARK, alignment=TA_CENTER),
+                                    textColor=_FIDEMAR_DARK, alignment=TA_CENTER),
         "head_sub":  ParagraphStyle("FdmHeadSub", fontName="Helvetica", fontSize=8, leading=10,
                                      textColor=_TEXT_GRAY, alignment=TA_CENTER),
     }
 
 
 def _page_header_footer(canvas, doc):
-    """Header con logo del cliente + footer con paginación."""
+    """Header con logo FIDEMAR + footer con paginación."""
     canvas.saveState()
     # Header bar
-    canvas.setFillColor(_BRAND_BLUE)
+    canvas.setFillColor(_FIDEMAR_BLUE)
     canvas.rect(0, A4[1] - 1.8 * cm, A4[0], 1.8 * cm, fill=1, stroke=0)
     # Texto del header
     canvas.setFillColor(colors.white)
     canvas.setFont("Helvetica-Bold", 16)
-    canvas.drawString(2 * cm, A4[1] - 1.15 * cm, _company_name().upper())
+    canvas.drawString(2 * cm, A4[1] - 1.15 * cm, "FIDEMAR S.A.")
     canvas.setFont("Helvetica", 8.5)
     canvas.drawString(2 * cm, A4[1] - 1.55 * cm, "Ingeniería de fluidos · Instrumentación · Automatización industrial")
     canvas.setFont("Helvetica-Bold", 9)
@@ -204,10 +190,10 @@ def _page_header_footer(canvas, doc):
     canvas.setFillColor(_TEXT_GRAY)
     canvas.setFont("Helvetica", 8)
     canvas.drawString(2 * cm, 1.2 * cm,
-                       "Documento generado por " + _company_name() + " en base a datos oficiales del fabricante.")
+                       "Documento generado por Fidemar S.A. en base a datos oficiales del fabricante.")
     canvas.drawRightString(A4[0] - 2 * cm, 1.2 * cm, f"Página {doc.page}")
     # Línea separadora del footer
-    canvas.setStrokeColor(_BRAND_BLUE)
+    canvas.setStrokeColor(_FIDEMAR_BLUE)
     canvas.setLineWidth(0.5)
     canvas.line(2 * cm, 1.7 * cm, A4[0] - 2 * cm, 1.7 * cm)
     canvas.restoreState()
@@ -233,10 +219,10 @@ def generate_datasheet_pdf(
     applications: str = "",
     source_urls: list[str] | None = None,
 ) -> dict:
-    """Genera una ficha técnica con branding del cliente. Devuelve {filename, url, size_bytes}."""
+    """Genera una ficha técnica branded Fidemar. Devuelve {filename, url, size_bytes}."""
     out_dir.mkdir(parents=True, exist_ok=True)
     pdf_id   = uuid.uuid4().hex[:12]
-    filename = f"cortex_{pdf_id}.pdf"
+    filename = f"fidemar_{pdf_id}.pdf"
     filepath = out_dir / filename
 
     doc = SimpleDocTemplate(
@@ -246,8 +232,8 @@ def generate_datasheet_pdf(
         bottomMargin=2.2 * cm, # deja espacio para footer
         leftMargin=2 * cm,
         rightMargin=2 * cm,
-        title=f"{_company_short()} — {title[:80]}",
-        author=_company_name(),
+        title=f"Fidemar — {title[:80]}",
+        author="Fidemar S.A.",
     )
 
     styles = _make_styles()
@@ -260,7 +246,7 @@ def generate_datasheet_pdf(
     if model:        sub_parts.append(f"Modelo: <b>{_esc(model)}</b>")
     if sub_parts:
         story.append(Paragraph("&nbsp;&nbsp;·&nbsp;&nbsp;".join(sub_parts), styles["subtitle"]))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=_BRAND_BLUE, spaceAfter=10))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=_FIDEMAR_BLUE, spaceAfter=10))
 
     # Descripción
     if description:
@@ -281,7 +267,7 @@ def generate_datasheet_pdf(
             ])
         tbl = Table(data, colWidths=[6 * cm, 10 * cm], hAlign="LEFT", repeatRows=1)
         tbl.setStyle(TableStyle([
-            ("BACKGROUND",  (0, 0), (-1, 0), _BRAND_BLUE),
+            ("BACKGROUND",  (0, 0), (-1, 0), _FIDEMAR_BLUE),
             ("TEXTCOLOR",   (0, 0), (-1, 0), colors.white),
             ("GRID",        (0, 0), (-1, -1), 0.3, colors.HexColor("#c8d4e5")),
             ("VALIGN",      (0, 0), (-1, -1), "TOP"),
@@ -304,10 +290,10 @@ def generate_datasheet_pdf(
     story.append(HRFlowable(width="100%", thickness=0.3, color=colors.HexColor("#c8d4e5")))
     story.append(Spacer(1, 6))
     disclaimer = (
-        "Esta ficha técnica fue elaborada por <b>{_COMPANY_PLACEHOLDER_}</b> en base a información "
+        "Esta ficha técnica fue elaborada por <b>Fidemar S.A.</b> en base a información "
         "publicada por el fabricante en sus canales oficiales o por distribuidores autorizados. "
         "Para confirmación de especificaciones críticas, normas de aplicación y compatibilidad, "
-        "consulte directamente al fabricante o contacte al área técnica de {_COMPANY_PLACEHOLDER_SHORT_}."
+        "consulte directamente al fabricante o contacte al área técnica de Fidemar."
     )
     story.append(Paragraph(disclaimer, styles["footer"]))
 

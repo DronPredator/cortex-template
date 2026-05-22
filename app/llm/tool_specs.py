@@ -12,21 +12,21 @@ from app.config import settings
 CATALOG_TOOL = {
     "name": "catalog_search",
     "description": (
-        "Busca ítems en el catálogo completo del cliente. "
+        "Busca ítems en el catálogo completo de Fidemar S.A. (12.500 ítems). "
         f"Devuelve hasta {settings.catalog_result_limit} resultados ranqueados por relevancia "
         "+ el total real de coincidencias. "
         "Para ver más allá de los primeros 200, pasar `offset: 200`, `offset: 400`, etc. "
         "Llamar múltiples veces con diferentes términos para búsquedas exhaustivas. "
-        "Usar términos técnicos del dominio del cliente: marca, tipo de producto, "
-        "tamaño, material, norma técnica o código de producto. "
-        "Personalizar esta descripción al vocabulario real del catálogo del cliente."
+        "Usar términos técnicos: marca (NUTORK, BERMAD, NIVELCO...), tipo de componente "
+        "(valvula, actuador, sensor, manometro...), tamaño (DN100, 2 pulgadas, 1/2...), "
+        "material (acero, SS316...), norma (API, ANSI, DIN...) o código de producto."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "Términos de búsqueda separados por espacios.",
+                "description": "Términos de búsqueda. Ejemplos: 'NUTORK actuador electrico', 'BERMAD control hidraulico'",
             },
             "offset": {
                 "type": "integer",
@@ -58,7 +58,7 @@ FETCH_PAGE_TOOL = {
 GENERATE_DATASHEET_TOOL = {
     "name": "generate_datasheet_pdf",
     "description": (
-        "Genera una ficha técnica PDF profesional con branding del cliente. "
+        "Genera una ficha técnica PDF profesional con branding de Fidemar S.A. "
         "Usar SOLO como ÚLTIMO RECURSO cuando NO existe un datasheet PDF oficial descargable. "
         "Devuelve {filename, url} — usá la URL en tu respuesta al usuario."
     ),
@@ -90,7 +90,7 @@ GENERATE_DATASHEET_TOOL = {
 GENERATE_WORD_TOOL = {
     "name": "generate_word_document",
     "description": (
-        "Genera un documento Word (.docx) con branding del cliente. "
+        "Genera un documento Word (.docx) con branding Fidemar. "
         "Usar cuando el usuario pide informes, propuestas, cotizaciones, memorias técnicas. "
         "Soporta títulos, párrafos, tablas y listas."
     ),
@@ -186,19 +186,43 @@ TAVILY_SEARCH_TOOL = {
     },
 }
 
-SAVE_BEHAVIOR_TOOL = {
-    "name": "save_behavior",
+SAVE_AGENT_PROMPT_TOOL = {
+    "name": "save_agent_prompt",
     "description": (
-        "Actualiza el prompt personalizado del agente. "
-        "Proporcionar el texto COMPLETO actualizado. Vacío para resetear."
+        "Actualiza el SYSTEM PROMPT completo de un agente específico. "
+        "Proporcionar el texto COMPLETO actualizado del prompt (markdown). "
+        "El prompt anterior se reemplaza por el nuevo (no se mergea). "
+        "Antes de llamar esta tool, confirmá al admin: 'voy a guardar el prompt "
+        "completo del agente X, vas a perder lo que estaba antes — ¿procedo?'."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
-            "new_custom_prompt": {
+            "agent_id": {
                 "type": "string",
-                "description": "Texto completo del nuevo prompt personalizado.",
-            }
+                "description": "ID del agente a editar (ej: 'fidi', 'steamy_seg', 'generador_codigos').",
+            },
+            "new_prompt": {
+                "type": "string",
+                "description": "Texto markdown COMPLETO del nuevo prompt del agente.",
+            },
+        },
+        "required": ["agent_id", "new_prompt"],
+    },
+}
+
+# DEPRECADO — se mantiene la spec por backward compat con sesiones de admin
+# que todavía no actualizaron al nuevo flujo. NO se exporta en ADMIN_CHAT_TOOLS.
+SAVE_BEHAVIOR_TOOL = {
+    "name": "save_behavior",
+    "description": (
+        "[DEPRECADO] Antes editaba un 'comportamiento global' que ya no existe. "
+        "Usar save_agent_prompt en su lugar."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "new_custom_prompt": {"type": "string"},
         },
         "required": ["new_custom_prompt"],
     },
@@ -216,7 +240,7 @@ CHAT_TOOLS = [
     TAVILY_SEARCH_TOOL,
 ]
 
-ADMIN_CHAT_TOOLS = [SAVE_BEHAVIOR_TOOL]
+ADMIN_CHAT_TOOLS = [SAVE_AGENT_PROMPT_TOOL]
 
 
 # Lookup por nombre — para filtrar dinámicamente según el agente activo

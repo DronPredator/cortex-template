@@ -170,6 +170,18 @@ async def stream_chat(
     client = genai.Client(api_key=api_key)
     contents = _convert_messages(messages)
 
+    # NOTA — Idioma de los thoughts:
+    # Gemini con include_thoughts=True razona en inglés por default. Si
+    # tu despliegue necesita forzar otro idioma (ej. español), prepend
+    # la directiva al `system` ANTES de llamar a esta función — desde
+    # `app/routes/chat.py` que ya tiene acceso a `settings`. Acá no
+    # acoplamos el engine a un idioma específico para que el template
+    # sea reusable.
+    #
+    # Ejemplo de uso desde chat.py:
+    #   if settings.language_directive:
+    #       system_str = settings.language_directive + "\n\n" + system_str
+
     # Tools
     gemini_tools: list[types.Tool] = []
     has_functions = bool(tools)
@@ -184,7 +196,16 @@ async def stream_chat(
             pass
 
     budget = _thinking_budget(thinking)
-    thinking_cfg = types.ThinkingConfig(thinking_budget=budget) if budget is not None else None
+    # include_thoughts=True hace que Gemini devuelva los "thoughts" (razonamiento
+    # del modelo) como parts separados con .thought=True. Los streameamos al
+    # frontend como evento "reasoning" para mostrarlos en vivo en el panel.
+    # Solo tiene sentido si el thinking está habilitado (budget != 0).
+    if budget == 0:
+        thinking_cfg = types.ThinkingConfig(thinking_budget=0)
+    elif budget is not None:
+        thinking_cfg = types.ThinkingConfig(thinking_budget=budget, include_thoughts=True)
+    else:
+        thinking_cfg = types.ThinkingConfig(include_thoughts=True)
 
     # Cuando combinamos function_declarations + google_search,
     # Gemini 3.x exige este flag para devolver las invocaciones de tools server-side.
@@ -236,8 +257,16 @@ async def stream_chat(
                     continue
                 for part in (content.parts or []):
                     text = getattr(part, "text", None)
+                    # Si el part es un "thought" (razonamiento interno del modelo),
+                    # lo emitimos como evento "reasoning" para que el frontend
+                    # lo muestre en el panel colapsible — NO va al cuerpo de la
+                    # respuesta visible.
+                    is_thought = bool(getattr(part, "thought", False))
                     if text:
-                        yield {"type": "text", "text": text}
+                        if is_thought:
+                            yield {"type": "reasoning", "text": text}
+                        else:
+                            yield {"type": "text", "text": text}
                     fc = getattr(part, "function_call", None)
                     if fc and fc.name and fc.name in client_tool_names:
                         # Tool declarada por nosotros → ejecutamos client-side

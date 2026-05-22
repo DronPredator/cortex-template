@@ -10,6 +10,7 @@ from loguru import logger
 from app.auth import verify_admin_token_dep
 from app.config import settings
 from app.models import CreateUserRequest
+from app.security.rate_limit import ADMIN_ACTION_LIMIT, limiter
 from app.storage.audit import audit_event
 from app.storage.users import (
     count_conversations_by_user,
@@ -45,6 +46,7 @@ def list_users(_token: str = Depends(verify_admin_token_dep)):
 
 
 @router.post("/api/admin/users")
+@limiter.limit(ADMIN_ACTION_LIMIT)
 def create_user(
     req: CreateUserRequest,
     request: Request,
@@ -54,10 +56,15 @@ def create_user(
     users = load_users()
     if req.username in users:
         raise HTTPException(status_code=409, detail="El usuario ya existe")
+    # Nota: permitimos crear un user regular con el mismo nombre que el admin.
+    # Los flujos de autenticación están separados (admin via env vars, user via
+    # users.json con PBKDF2) y los JWTs llevan `role` explícito, por lo que no
+    # hay escalación de privilegios. Solo logueamos para trazabilidad.
     if req.username == settings.admin_user:
-        raise HTTPException(
-            status_code=400,
-            detail="No podés usar el mismo nombre que el administrador",
+        logger.warning(
+            "user_created_with_admin_name | username={} (sin riesgo de escalación,"
+            " pero conviene tenerlo presente en los logs)",
+            req.username,
         )
     users[req.username] = {
         "password_hash": hash_password(req.password),
@@ -76,6 +83,7 @@ def create_user(
 
 
 @router.delete("/api/admin/users/{username}")
+@limiter.limit(ADMIN_ACTION_LIMIT)
 def delete_user(
     username: str,
     request: Request,

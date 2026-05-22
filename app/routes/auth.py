@@ -22,6 +22,13 @@ def login(req: LoginRequest, request: Request):
     ensure_users_file()
     if not authenticate(req.username, req.password):
         logger.warning("login_failed | username={}", req.username)
+        # B2: trazabilidad forense. El audit log es la fuente para detectar
+        # brute-force que pasó por debajo del rate-limit (ej. IP rotada).
+        audit_event(
+            actor=req.username[:32],
+            action="user_login_failed",
+            request=request,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Credenciales incorrectas",

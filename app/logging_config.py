@@ -1,7 +1,7 @@
 """Configuración de logging con loguru.
 
 Reemplaza print() / except:pass por logs estructurados accesibles desde
-`logs/cortex.log` (rotado automáticamente). También pinta en consola con colores.
+`logs/fidemar.log` (rotado automáticamente). También pinta en consola con colores.
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def setup_logging(level: str = "INFO") -> None:
 
     # Archivo — todos los niveles, rotación diaria, retención 14 días
     logger.add(
-        log_dir / "cortex.log",
+        log_dir / "fidemar.log",
         level="DEBUG",
         rotation="00:00",
         retention="14 days",
@@ -57,13 +57,13 @@ def setup_logging(level: str = "INFO") -> None:
 
     # Archivo separado para errores (más fácil de auditar)
     logger.add(
-        log_dir / "cortex_errors.log",
+        log_dir / "fidemar_errors.log",
         level="ERROR",
         rotation="1 week",
         retention="30 days",
         compression="zip",
         backtrace=True,
-        diagnose=True,  # incluye valores de variables en el stack trace
+        diagnose=False,  # evita incluir valores de variables/secrets en tracebacks
         enqueue=True,
     )
 
