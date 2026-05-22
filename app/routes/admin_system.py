@@ -17,6 +17,7 @@ from app.config import (
 )
 from app.models import AutoRouteRequest, ModelRequest, SystemPromptRequest
 from app.prompts.loader import _load as load_prompt_file
+from app.security.rate_limit import ADMIN_ACTION_LIMIT, limiter
 from app.storage.atomic import atomic_write
 from app.storage.memory import load_custom_prompt
 from app.storage.runtime_config import (
@@ -40,6 +41,7 @@ def get_system_prompt(_token: str = Depends(verify_admin_token_dep)):
 
 
 @router.post("/api/admin/system-prompt")
+@limiter.limit(ADMIN_ACTION_LIMIT)
 def update_system_prompt(
     req: SystemPromptRequest,
     request: Request,
@@ -75,6 +77,7 @@ def get_model_endpoint(_token: str = Depends(verify_admin_token_dep)):
 
 
 @router.post("/api/admin/model")
+@limiter.limit(ADMIN_ACTION_LIMIT)
 def set_model_endpoint(
     req: ModelRequest,
     request: Request,
@@ -102,6 +105,7 @@ def set_model_endpoint(
 
 
 @router.post("/api/admin/auto-route")
+@limiter.limit(ADMIN_ACTION_LIMIT)
 def set_auto_route(
     req: AutoRouteRequest,
     request: Request,

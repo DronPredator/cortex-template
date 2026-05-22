@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ipaddress
 import socket
+import urllib.request
 from urllib.parse import urlparse
 
 from loguru import logger
@@ -100,3 +101,21 @@ def require_safe_url(url: str) -> None:
     if not safe:
         logger.warning("ssrf_blocked | url={} reason={}", url[:200], reason)
         raise UnsafeURLError(reason)
+
+
+class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Redirect handler that re-validates every hop against the SSRF policy."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        require_safe_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def safe_urlopen(req_or_url, *, timeout: int):
+    """Open an HTTP(S) URL after SSRF checks, including every redirect hop."""
+    if isinstance(req_or_url, urllib.request.Request):
+        require_safe_url(req_or_url.full_url)
+    else:
+        require_safe_url(str(req_or_url))
+    opener = urllib.request.build_opener(SafeRedirectHandler)
+    return opener.open(req_or_url, timeout=timeout)

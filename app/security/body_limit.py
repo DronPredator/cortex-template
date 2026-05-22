@@ -23,14 +23,18 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 
-# (path_prefix, max_bytes) — orden importa, se evalúa la primera coincidencia
+# (path_prefix, max_bytes) — orden importa, se evalúa la primera coincidencia.
+# Reglas más específicas (paths más largos) PRIMERO.
 _LIMITS: list[tuple[str, int]] = [
     ("/api/login", 4 * 1024),
     ("/api/admin/login", 4 * 1024),
     ("/api/chat/stream", 5 * 1024 * 1024),
     ("/api/admin/chat/stream", 5 * 1024 * 1024),
     ("/api/upload-document", 30 * 1024 * 1024),  # cubre el max_upload_bytes
-    ("/api/admin/agents", 200 * 1024),
+    # Upload de knowledge files (multipart): hasta 16 MB para cubrir PDFs grandes
+    # con el overhead del multipart encoding. El handler cap a 15 MB el contenido.
+    ("/api/admin/agents/", 16 * 1024 * 1024),
+    ("/api/admin/agents", 200 * 1024),  # listado/CRUD (JSON pequeño)
     ("/api/admin/system-prompt", 200 * 1024),
     ("/api/admin/", 200 * 1024),
     ("/api/", 1 * 1024 * 1024),

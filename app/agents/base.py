@@ -25,7 +25,12 @@ class AgentDefinition:
     id: str
     name: str
     description: str = ""
-    icon: str = "🤖"
+    icon: str = "🤖"  # emoji fallback (si no hay icon_url)
+    # URL/path opcional a un PNG/SVG custom del agente. Convención:
+    # `/agents/<id>.png` servido como static. Si está, el frontend lo
+    # usa en lugar del emoji. Si el archivo no existe en disco, el
+    # frontend tiene fallback automático al emoji.
+    icon_url: str = ""
 
     # Prompt: el contenido vive en `app/agents/definitions/<id>.md`.
     # Acá guardamos solo el id; el contenido se carga on-demand vía registry.
@@ -38,6 +43,11 @@ class AgentDefinition:
     # Permisos
     visibility: Visibility = "public"
     allowed_users: list[str] = field(default_factory=list)  # solo si visibility="users"
+
+    # Ejemplos de consultas para mostrar en el welcome screen.
+    # Si está vacío, se usan los generados dinámicamente por LLM desde el
+    # log de conversaciones (memory.json). Si hay ambos, se mezclan.
+    seed_examples: list[str] = field(default_factory=list)
 
     # Metadata
     is_default: bool = False  # cuál se usa si el cliente no manda agent_id

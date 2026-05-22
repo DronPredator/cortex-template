@@ -2,15 +2,54 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo Company Cortex</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Cortex</title>
+
+  <!-- PWA: instalable como app en Chrome/Edge/iOS/Android -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1A4EA0" />
+  <meta name="application-name" content="Cortex" />
+  <meta name="description" content="Plataforma agéntica multi-agente." />
+
+  <!-- iOS / Safari (PWA en home screen) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cortex" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+
+  <!-- Favicon e iconos generales -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/marked@12/marked.min.js"></script>
+  <!-- CDN scripts pineados a versión exacta + Subresource Integrity (SRI).
+       Si Babel/React/marked/DOMPurify publican un breaking change con
+       @latest la app se rompería sin aviso; si unpkg sirve JS modificado
+       (compromise o MITM) el browser lo rechaza por hash mismatch.
+
+       Para subir versiones:
+       1. Cambiar la versión en el src.
+       2. Regenerar el hash sha384 (PowerShell: ver scripts/sri_hashes.ps1).
+       3. Probar en dev en una rama.
+       4. Verificar consola sin errores "Failed to find a valid digest". -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
+          integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
+          integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.4/babel.min.js"
+          integrity="sha384-qVgGRi0TCdh+xrBD9+4kG0YlkbOkWu2J3CB46EekpYQmtM96n9v+uaKIS5ipaqKb"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/marked@12.0.2/marked.min.js"
+          integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/dompurify@3.2.4/dist/purify.min.js"
+          integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+          crossorigin="anonymous"></script>
   <style>
     :root {
       /* ── Brand ───────────────────────────────────────────── */
@@ -608,6 +647,55 @@
       animation: fadeUp 540ms var(--ease-out) 120ms both;
     }
     .welcome-subtitle b { color: var(--brand); font-weight: 600; }
+
+    /* ── Welcome examples (prompt cards) ──────────────────────────── */
+    .welcome-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 560px;
+      margin: 28px auto 0;
+      animation: fadeUp 540ms var(--ease-out) 220ms both;
+    }
+    .welcome-example {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text-1);
+      transition: all var(--d-fast) var(--ease-out);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .welcome-example:hover {
+      border-color: var(--brand-soft);
+      background: var(--brand-tint-08, rgba(26,78,160,0.05));
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(26,78,160,0.08);
+    }
+    .welcome-example:active { transform: translateY(0); }
+    .welcome-example-arrow {
+      color: var(--text-3);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: transform var(--d-fast) var(--ease-out), color var(--d-fast);
+    }
+    .welcome-example:hover .welcome-example-arrow {
+      color: var(--brand);
+      transform: translateX(3px);
+    }
+    @media (max-width: 720px) {
+      .welcome-examples { max-width: 100%; padding: 0 4px; }
+      .welcome-example { padding: 12px 14px; font-size: 13px; }
+    }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(4px); }
       to   { opacity: 1; transform: none; }
@@ -979,6 +1067,162 @@
     .working-chip-tier.tier-lite   { background: rgba(52,199,89,0.14);  color: #1f7c3e; }
     .working-chip-tier.tier-manual { background: var(--bg-hover);       color: var(--text-2); }
 
+    /* Update banner — aparece cuando el server pasó a una versión nueva */
+    .update-banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: var(--brand);
+      color: white;
+      padding: 10px 14px 10px 16px;
+      border-radius: 999px;
+      box-shadow:
+        0 4px 16px rgba(20, 61, 128, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; line-height: 1.4;
+      max-width: 92vw;
+      animation: update-banner-in 220ms ease-out;
+    }
+    @keyframes update-banner-in {
+      from { transform: translate(-50%, -16px); opacity: 0; }
+      to   { transform: translate(-50%, 0);     opacity: 1; }
+    }
+    .update-banner-icon { font-size: 15px; }
+    .update-banner-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .update-banner-text b { font-weight: 700; letter-spacing: 0.01em; }
+    .update-banner-btn {
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12.5px; font-weight: 600;
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .update-banner-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.32); }
+    .update-banner-btn:disabled { opacity: 0.6; cursor: wait; }
+    .update-banner-close {
+      background: transparent;
+      border: 0;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 4px 6px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 50%;
+    }
+    .update-banner-close:hover { color: white; background: rgba(255,255,255,0.12); }
+    @media (max-width: 600px) {
+      .update-banner { font-size: 12px; padding: 8px 10px; gap: 8px; }
+      .update-banner-text { max-width: 50vw; }
+    }
+
+    /* Razonamiento del modelo en vivo (Gemini "thoughts") */
+    .reasoning-panel {
+      align-self: flex-start;
+      max-width: 720px;
+      width: 100%;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 0;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-2);
+    }
+    .reasoning-panel details { padding: 10px 14px; }
+    .reasoning-summary {
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none;
+      color: var(--text-2);
+      font-weight: 500;
+      list-style: none;
+    }
+    .reasoning-summary::-webkit-details-marker { display: none; }
+    .reasoning-summary::before {
+      content: '▸';
+      display: inline-block;
+      transition: transform .15s ease;
+      color: var(--text-3, var(--text-2));
+      font-size: 10px;
+    }
+    .reasoning-panel details[open] .reasoning-summary::before {
+      transform: rotate(90deg);
+    }
+    .reasoning-body {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      white-space: pre-wrap;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text-2);
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    /* Editar mensaje del usuario inline (estilo Gemini) */
+    .user-bubble-wrap {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+    }
+    .msg-edit-btn {
+      position: absolute;
+      top: 4px;
+      right: -32px;
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      background: var(--bg-elev-1);
+      border-radius: 50%;
+      color: var(--text-2);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .12s ease, background .12s ease;
+    }
+    .user-bubble-wrap:hover .msg-edit-btn { opacity: 1; }
+    .msg-edit-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+    .msg-edit-form {
+      width: min(640px, 100%);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .msg-edit-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px 12px;
+      border: 1px solid var(--brand, var(--border));
+      border-radius: var(--r);
+      background: var(--bg-elev-1);
+      color: var(--text-1);
+      font: inherit;
+      resize: vertical;
+    }
+    .msg-edit-actions {
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+    .msg-edit-actions button {
+      padding: 6px 14px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      background: var(--bg-elev-1);
+      color: var(--text-1);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .msg-edit-actions button.primary {
+      background: var(--brand, var(--brand-deep));
+      color: white;
+      border-color: transparent;
+    }
+    .msg-edit-actions button:hover { background: var(--bg-hover); }
+    .msg-edit-actions button.primary:hover { filter: brightness(1.08); }
+
     /* Spinner dentro del botón send cuando está cargando */
     .composer-send.is-loading {
       pointer-events: none;
@@ -1052,6 +1296,28 @@
     }
     .composer-attachment-remove:hover { color: var(--danger); background: rgba(214,59,59,0.08); }
 
+    /* Contenedor de la lista de adjuntos (imgs + docs). Stack vertical
+     * con un contador chiquito al final. Limita el alto para no empujar
+     * el composer fuera de la pantalla cuando hay muchos. */
+    .composer-attachments-row {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-bottom: 4px;
+    }
+    .composer-attachments-row .composer-attachment-preview { margin: 0; }
+    .composer-attachments-count {
+      align-self: flex-end;
+      font-size: 10.5px;
+      color: var(--text-3);
+      padding: 2px 8px;
+      letter-spacing: 0.02em;
+    }
+
     .composer {
       max-width: 780px;
       margin: 0 auto;
@@ -1090,13 +1356,23 @@
       resize: none;
       font-size: 15px;
       color: var(--text-1);
-      padding: 9px 4px;
-      min-height: 24px;
-      max-height: 160px;
+      padding: 11px 4px;
+      /* Default: ~2 líneas visibles. Antes era 24px (1 línea) → quedaba
+         demasiado chico y sin espacio para escribir tranquilo. */
+      min-height: 56px;
+      /* Crece hasta ~10 líneas antes de habilitar scroll. Antes era 160px. */
+      max-height: 240px;
       line-height: 1.5;
       letter-spacing: -0.005em;
+      transition: min-height 160ms ease-out;
     }
     .composer-input::placeholder { color: var(--text-3); }
+    /* Al hacer focus, el composer se expande para dar más aire visual.
+       Solo aplica cuando el textarea está vacío o tiene poco texto — si
+       hay mucho, el auto-resize JS ya lo hace crecer más allá de esto. */
+    .composer-pill:focus-within .composer-input {
+      min-height: 96px;
+    }
     .composer-send {
       background: var(--brand);
       color: white;
@@ -1110,6 +1386,15 @@
     }
     .composer-send:hover { background: var(--brand-deep); }
     .composer-send:active { transform: translateY(1px); }
+    /* Variante "detener generación" — gris oscuro con cuadrado blanco.
+     * Visualmente distinto del azul de "enviar" para que sea claro qué
+     * va a pasar al clickearlo. */
+    .composer-send.is-stop {
+      background: var(--text-1);
+      color: white;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .composer-send.is-stop:hover { background: var(--text-2, #2a2a2a); }
     .composer-send:disabled {
       background: var(--bg-hover);
       color: var(--text-3);
@@ -1801,18 +2086,24 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-const STORAGE_KEY = 'demo_company_chats';
+const STORAGE_KEY = 'cortex_chats';
 const HAS_SPEECH  = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
 function md(text) {
   const html = marked.parse(text || '', { breaks: true, gfm: true });
   // Abrir todos los links externos en nueva pestaña, con rel seguro
-  const safeHtml = html.replace(/<a\s+href=/gi, '<a target="_blank" rel="noopener noreferrer" href=');
+  const sanitized = window.DOMPurify
+    ? DOMPurify.sanitize(html, {
+        ADD_ATTR: ['target', 'rel'],
+        ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|\/(?!\/)|#|[^:/?#]+(?:[/?#]|$))/i,
+      })
+    : String(html).replace(/</g, '&lt;');
+  const safeHtml = sanitized.replace(/<a\s+href=/gi, '<a target="_blank" rel="noopener noreferrer" href=');
   return { __html: safeHtml };
 }
 
 /* ── AssistantMd: renderiza markdown + agrega botón "Copiar tabla" en cada <table>. ── */
-function AssistantMd({ content }) {
+function AssistantMd({ content, onProtectedDownload }) {
   const ref = React.useRef(null);
   React.useEffect(() => {
     const root = ref.current;
@@ -1838,7 +2129,27 @@ function AssistantMd({ content }) {
       wrap.appendChild(table);
     });
   });
-  return <span ref={ref} dangerouslySetInnerHTML={md(content)} />;
+  function handleClick(e) {
+    const anchor = e.target.closest?.('a');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href') || '';
+    if (isProtectedDownloadUrl(href)) {
+      e.preventDefault();
+      onProtectedDownload?.(href);
+    }
+  }
+
+  return <span ref={ref} onClick={handleClick} dangerouslySetInnerHTML={md(content)} />;
+}
+
+function isProtectedDownloadUrl(href) {
+  try {
+    const u = new URL(href, window.location.origin);
+    return u.origin === window.location.origin
+      && (u.pathname.startsWith('/documents/') || u.pathname.startsWith('/datasheets/'));
+  } catch {
+    return false;
+  }
 }
 
 function copyTableToClipboard(table, btn) {
@@ -1879,18 +2190,18 @@ function copyTableToClipboard(table, btn) {
     flash(false);
   }
 }
-function getToken()    { return localStorage.getItem('demo_company_token'); }
-function setToken(t)   { localStorage.setItem('demo_company_token', t); }
-function clearToken()  { localStorage.removeItem('demo_company_token'); }
-function getUsername() { return localStorage.getItem('demo_company_user') || ''; }
-function setUsername(u){ localStorage.setItem('demo_company_user', u); }
-function clearUsername(){ localStorage.removeItem('demo_company_user'); }
-function getAdminTok() { return sessionStorage.getItem('demo_company_admin_token'); }
-function setAdminTok(t){ sessionStorage.setItem('demo_company_admin_token', t); }
-function clearAdminTok(){ sessionStorage.removeItem('demo_company_admin_token'); }
+function getToken()    { return localStorage.getItem('cortex_token'); }
+function setToken(t)   { localStorage.setItem('cortex_token', t); }
+function clearToken()  { localStorage.removeItem('cortex_token'); }
+function getUsername() { return localStorage.getItem('cortex_user') || ''; }
+function setUsername(u){ localStorage.setItem('cortex_user', u); }
+function clearUsername(){ localStorage.removeItem('cortex_user'); }
+function getAdminTok() { return sessionStorage.getItem('cortex_admin_token'); }
+function setAdminTok(t){ sessionStorage.setItem('cortex_admin_token', t); }
+function clearAdminTok(){ sessionStorage.removeItem('cortex_admin_token'); }
 function genId()       { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-function chatsKey(user) { return user ? `demo_company_chats_${user}` : STORAGE_KEY; }
+function chatsKey(user) { return user ? `cortex_chats_${user}` : STORAGE_KEY; }
 function loadChats(user) { try { return JSON.parse(localStorage.getItem(chatsKey(user)) || '[]'); } catch { return []; } }
 function saveChats(c, user) { try { localStorage.setItem(chatsKey(user), JSON.stringify(c)); } catch {} }
 
@@ -1928,6 +2239,7 @@ const Icon = {
   Doc:      (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>,
   Mic:      (p={}) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>,
   ArrowUp:  (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" {...p}><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>,
+  Stop:     (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" {...p}><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>,
   Valve:    (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="M12 7v-3M12 20v-3"/></svg>,
   Wrench:   (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14.7 6.3a4 4 0 0 0 5 5l-3.4 3.4 4.4 4.4a2 2 0 1 1-2.8 2.8l-4.4-4.4-3.4 3.4a4 4 0 0 0-5-5"/></svg>,
   Sensor:   (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.48m-8.48 0a6 6 0 0 1 0-8.48m11.31-2.83a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>,
@@ -1943,11 +2255,79 @@ const Icon = {
   Sun:      (p={}) => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>,
 };
 
+
+// Renderiza el icono de un agente. Si tiene `icon_url`, intenta cargar
+// la imagen; si falla (404, error de red, etc.) cae automáticamente al
+// emoji. Esto hace que la app no se rompa si falta un PNG.
+function AgentIcon({ iconUrl, emoji, size = 24, alt = '' }) {
+  const [failed, setFailed] = React.useState(false);
+  const fallbackEmoji = emoji || '🤖';
+  if (iconUrl && !failed) {
+    return (
+      <img
+        src={iconUrl}
+        alt={alt}
+        width={size}
+        height={size}
+        style={{
+          borderRadius: '22%',
+          objectFit: 'cover',
+          display: 'inline-block',
+          verticalAlign: 'middle',
+          background: '#fff',
+        }}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return (
+    <span style={{ fontSize: Math.round(size * 0.85), lineHeight: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size }}>
+      {fallbackEmoji}
+    </span>
+  );
+}
+
 /* Heurística simple: elegí un icono según el título de la conversación */
+// Saludo del welcome screen. Pool combinado: el saludo por hora del día
+// + variantes neutrales (no dependen del momento). Se elige UNA opción
+// random al montar el componente (ver useState en Chat) — queda fija
+// durante la sesión y no cambia ante los ojos del usuario.
+function pickGreeting(username) {
+  const u = username || 'usuario';
+  const h = new Date().getHours();
+
+  // Saludo por franja horaria (siempre incluido en el pool)
+  let timed;
+  if (h >= 6  && h < 13)      timed = `Buenos días, ${u}.`;
+  else if (h >= 13 && h < 20) timed = `Buenas tardes, ${u}.`;
+  else                        timed = `Buenas noches, ${u}.`;
+
+  // Variantes neutrales — cordiales, rioplatenses, con puntuación correcta
+  const neutral = [
+    `¿Qué necesitás, ${u}?`,
+    `¿Arrancamos, ${u}?`,
+    `¡${u} volvió!`,
+    `¿En qué andamos, ${u}?`,
+    `Acá estoy, ${u}.`,
+    `Listo cuando quieras, ${u}.`,
+    `¿Por dónde empezamos, ${u}?`,
+    `Te leo, ${u}.`,
+    `Contame, ${u}.`,
+    `Dale, ${u}.`,
+    `¿Qué tenemos hoy, ${u}?`,
+    `${u}, todo tuyo.`,
+  ];
+
+  // Damos al saludo por hora el mismo peso que cualquier variante neutral.
+  const pool = [timed, ...neutral];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+
 function pickConvIcon(title) {
   const t = (title || '').toLowerCase();
   if (/valvula|valve|reductora|compuerta|mariposa|esferica|globo/.test(t))         return 'Valve';
-  if (/sensor|nivel|presion|caudal|transmisor|detector|medidor/.test(t))        return 'Sensor';
+  if (/sensor|nivel|presion|caudal|transmisor|nivelco|banner|turck/.test(t))        return 'Sensor';
   if (/actuador|wrench|herramient|repuesto|junta|kit/.test(t))                      return 'Wrench';
   if (/norma|api |ansi|din|iso |awwa|nfpa|ul\/fm|catalog/.test(t))                  return 'Book';
   if (/imagen|foto|adjunto/.test(t))                                                return 'Image';
@@ -1991,14 +2371,32 @@ function WorkingChip({ steps, isStreaming, activeModel }) {
   } else if (isStreaming) {
     sub = 'Redactando respuesta';
   }
-  // Mostrar tier de modelo si está auto-seleccionado
+  // Mostrar tier del modelo activo. Funciona para los 3 modos de selección:
+  //   - source = "auto:flash" → router automático eligió Flash
+  //   - source = "agent:<id>"  → el agente tiene tier fijo
+  //   - source = "manual"      → modelo override por config admin
+  // Derivamos el tier del nombre del modelo (más robusto que del source).
+  function inferTier(modelName) {
+    if (!modelName) return null;
+    const m = modelName.toLowerCase();
+    if (m.includes('pro')) return 'pro';
+    if (m.includes('lite')) return 'lite';
+    if (m.includes('flash')) return 'flash';
+    return null;
+  }
   let modelBadge = null;
-  if (activeModel?.source?.startsWith('auto:')) {
-    const tier = activeModel.source.split(':')[1];
-    const tierLabel = { pro: 'Pro', flash: 'Flash', lite: 'Lite' }[tier] || tier;
-    modelBadge = <span className={`working-chip-tier tier-${tier}`}>{tierLabel}</span>;
-  } else if (activeModel?.source === 'manual') {
-    modelBadge = <span className="working-chip-tier tier-manual">Manual</span>;
+  if (activeModel?.model) {
+    const tier = inferTier(activeModel.model);
+    const tierLabel = { pro: 'Pro', flash: 'Flash', lite: 'Lite' }[tier] || activeModel.model;
+    const tierClass = tier ? `tier-${tier}` : 'tier-manual';
+    modelBadge = (
+      <span
+        className={`working-chip-tier ${tierClass}`}
+        title={`Modelo activo: ${activeModel.model}`}
+      >
+        {tierLabel}
+      </span>
+    );
   }
   return (
     <div className="working-chip" role="status" aria-live="polite">
@@ -2006,6 +2404,119 @@ function WorkingChip({ steps, isStreaming, activeModel }) {
       <span className="working-chip-label">Trabajando</span>
       {modelBadge}
       <span className="working-chip-sub">· {sub}</span>
+    </div>
+  );
+}
+
+/* ── ReasoningPanel ───────────────────────────────────────────────
+   Bloque colapsible que muestra el "thought stream" del modelo en vivo
+   durante la generación. Se llena con eventos `reasoning` del SSE y se
+   vacía al terminar (no se persiste con la respuesta).
+   Diseño: gris discreto, abierto por default mientras se piensa, con
+   un check al terminar (cuando ya no se reciben más thoughts y el texto
+   final empezó a llegar). */
+function ReasoningPanel({ text }) {
+  if (!text) return null;
+  // Auto-scroll al fondo del bloque mientras se llena
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
+  }, [text]);
+  return (
+    <div className="reasoning-panel">
+      <details open>
+        <summary className="reasoning-summary">
+          <span className="thinking-spinner" />
+          <span>Pensando…</span>
+        </summary>
+        <div ref={ref} className="reasoning-body">{text}</div>
+      </details>
+    </div>
+  );
+}
+
+/* ── UpdateBanner ─────────────────────────────────────────────────
+   Detecta updates del server (vía polling a /api/version cada 60s) y
+   muestra un banner "Nueva versión disponible" con botón "Recargar".
+   Al recargar, limpia el service worker + caches del browser, así la
+   próxima carga viene fresca del server sin que el SW viejo intervenga.
+
+   Por qué no auto-reload silencioso: el usuario podría estar a mitad de
+   escribir un mensaje en el chat o leyendo una respuesta — preferimos
+   darle el control. Tiene botón ✕ para descartar si está ocupado. */
+function UpdateBanner() {
+  const [currentVersion, setCurrentVersion] = React.useState(null);
+  const [latestVersion, setLatestVersion]   = React.useState(null);
+  const [dismissed, setDismissed]           = React.useState(false);
+  const [reloading, setReloading]           = React.useState(false);
+
+  // Capturar versión inicial al montar
+  React.useEffect(() => {
+    fetch('/api/version', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.version) setCurrentVersion(d.version); })
+      .catch(() => {});
+  }, []);
+
+  // Polling cada 60s. Si la versión del server difiere de la inicial → update.
+  React.useEffect(() => {
+    if (!currentVersion) return;
+    let cancelled = false;
+    const tick = async () => {
+      if (cancelled) return;
+      try {
+        const r = await fetch('/api/version', { cache: 'no-store' });
+        if (!r.ok) return;
+        const d = await r.json();
+        if (!cancelled && d?.version && d.version !== currentVersion) {
+          setLatestVersion(d.version);
+        }
+      } catch {}
+    };
+    const id = setInterval(tick, 60_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [currentVersion]);
+
+  async function applyUpdate() {
+    setReloading(true);
+    try {
+      // 1. Unregister el SW activo — fuerza al browser a buscar uno nuevo
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      // 2. Limpiar TODOS los caches (no solo el del SW de este proyecto)
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (e) {
+      // No es crítico — el reload de abajo igual debería traer la versión nueva
+      console.warn('Update cleanup failed:', e);
+    }
+    // 3. Hard reload — bypasses HTTP cache del browser también
+    window.location.reload();
+  }
+
+  if (!latestVersion || dismissed || latestVersion === currentVersion) return null;
+
+  return (
+    <div className="update-banner" role="status" aria-live="polite">
+      <span className="update-banner-icon">🔄</span>
+      <span className="update-banner-text">
+        Nueva versión disponible (<b>{latestVersion}</b>). Recargá para aplicarla.
+      </span>
+      <button className="update-banner-btn" onClick={applyUpdate} disabled={reloading}>
+        {reloading ? 'Recargando…' : 'Recargar'}
+      </button>
+      <button
+        className="update-banner-close"
+        onClick={() => setDismissed(true)}
+        title="Descartar — podés recargar más tarde manualmente"
+        aria-label="Descartar"
+      >
+        ✕
+      </button>
     </div>
   );
 }
@@ -2050,7 +2561,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Encontré en catálogo',
                 verify_pdf_url:       s.valid ? 'PDF verificado' : 'PDF NO válido',
                 fetch_product_data:   s.valid ? 'Datos scrapeados' : 'Fallo scraping',
-                generate_datasheet_pdf: s.valid ? 'PDF Demo Company generado' : 'Error generando PDF',
+                generate_datasheet_pdf: s.valid ? 'PDF generado' : 'Error generando PDF',
                 generate_word_document: s.valid ? 'Word generado' : 'Error generando Word',
                 generate_excel_spreadsheet: s.valid ? 'Excel generado' : 'Error generando Excel',
                 web_search:           'Encontré en la web',
@@ -2059,7 +2570,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Buscando en catálogo',
                 verify_pdf_url:       'Verificando PDF',
                 fetch_product_data:   'Scrapeando página',
-                generate_datasheet_pdf: 'Generando ficha técnica Demo Company',
+                generate_datasheet_pdf: 'Generando ficha técnica',
                 generate_word_document: 'Generando documento Word',
                 generate_excel_spreadsheet: 'Generando planilla Excel',
                 web_search:           'Buscando en la web',
@@ -2234,7 +2745,7 @@ function SystemTab({ adminToken, onSaved }) {
               <textarea
                 ref={newRuleRef}
                 rows={2}
-                placeholder='Nueva regla (ej: "Siempre priorizá la marca X" · "Respondé en inglés técnico"). Enter para añadir.'
+                placeholder='Nueva regla (ej: "Siempre priorizá BERMAD en válvulas de control" · "Respondé en inglés técnico"). Enter para añadir.'
                 value={newRule}
                 onChange={e => setNewRule(e.target.value)}
                 onKeyDown={handleNewKeyDown}
@@ -2358,14 +2869,30 @@ function MemoryTab({ adminToken, onSaved }) {
 function AdminChatTab({ adminToken, onSaved }) {
   const [messages, setMessages] = useState([{
     role: 'assistant',
-    content: '¡Hola, Bruno! Estoy en modo administrador. Podés preguntarme sobre mi configuración actual, pedirme que cambie mi comportamiento, o consultarme sobre la memoria de interacciones. ¿En qué te puedo ayudar?'
+    content: '¡Hola! Soy el **Meta-Editor de Cortex**. Tengo memoria de todos los agentes activos y puedo editar el prompt de cualquiera.\n\nHay dos formas de editar un agente:\n\n- **Tab 🤖 Asistentes** → editor markdown directo del prompt completo.\n- **Acá conmigo** → me decís qué cambios querés y yo modifico el prompt del agente que elijas.\n\n¿Qué agente querés editar? (Clic en los chips de arriba o describí qué cambio querés hacer.)'
   }]);
   const [input,   setInput]   = useState('');
   const [loading, setLoading] = useState(false);
+  const [agents,  setAgents]  = useState([]);  // lista para los chips
   const bottomRef = useRef(null);
   const textRef   = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+
+  // Cargar lista de agentes activos para mostrar como chips
+  useEffect(() => {
+    if (!adminToken) return;
+    fetch('/api/admin/agents', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setAgents(d.agents || []); })
+      .catch(() => {});
+  }, [adminToken]);
+
+  function pickAgent(agent) {
+    // Cargar template en el input para que el admin lo edite
+    setInput(`Quiero editar el agente **${agent.name}** (id: \`${agent.id}\`). `);
+    setTimeout(() => textRef.current?.focus(), 50);
+  }
 
   async function send(text) {
     text = (text || input).trim();
@@ -2386,9 +2913,12 @@ function AdminChatTab({ adminToken, onSaved }) {
       if (!res.ok) { setMessages(p => [...p, { role: 'assistant', content: '⚠️ Error de conexión.' }]); return; }
 
       await readSSE(res, (evt) => {
-        if (evt.type === 'behavior_saved') {
-          setMessages(p => [...p, { role: 'system-event', content: `✓ Comportamiento guardado: "${evt.new_prompt.slice(0, 80)}${evt.new_prompt.length > 80 ? '…' : ''}"` }]);
-          onSaved('✓ Comportamiento del agente actualizado');
+        if (evt.type === 'agent_prompt_saved') {
+          setMessages(p => [...p, { role: 'system-event', content: `✓ Prompt del agente "${evt.agent_name}" guardado (${evt.bytes} caracteres)` }]);
+          onSaved(`✓ Prompt de ${evt.agent_name} actualizado`);
+        } else if (evt.type === 'behavior_saved') {
+          // Backward compat — el modelo viejo todavía podría devolver este evento
+          setMessages(p => [...p, { role: 'system-event', content: '⚠️ Se llamó la tool deprecada save_behavior — sin efecto. Usar save_agent_prompt.' }]);
         } else if (evt.type === 'text') {
           streamedText += evt.text;
           if (!assistantAdded) {
@@ -2428,6 +2958,32 @@ function AdminChatTab({ adminToken, onSaved }) {
 
   return (
     <div className="admin-chat-wrap">
+      {agents.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '8px 12px', borderBottom: '1px solid var(--border)', background: 'var(--bg-elev-1, transparent)' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-3)', alignSelf: 'center', marginRight: 4 }}>Editar:</span>
+          {agents.map(a => (
+            <button
+              key={a.id}
+              onClick={() => pickAgent(a)}
+              disabled={loading}
+              style={{
+                fontSize: 12, fontWeight: 600,
+                padding: '5px 11px',
+                borderRadius: 14,
+                border: '1px solid var(--border)',
+                background: 'var(--surface, #fff)',
+                color: 'var(--text)',
+                cursor: loading ? 'wait' : 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+              }}
+              title={a.description || a.name}
+            >
+              <AgentIcon iconUrl={a.icon_url} emoji={a.icon} size={20} />
+              <span>{a.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="admin-chat-msgs">
         {messages.map((m, i) => {
           if (m.role === 'system-event') return (
@@ -2437,7 +2993,7 @@ function AdminChatTab({ adminToken, onSaved }) {
           const isStreaming = m.streaming && isLast;
           return (
             <div key={i} className={`admin-msg ${m.role}`}>
-              <div className="admin-msg-role">{m.role === 'user' ? 'Bruno' : 'Agente'}</div>
+              <div className="admin-msg-role">{m.role === 'user' ? 'Admin' : 'Agente'}</div>
               <div className="admin-msg-bubble">
                 {m.role === 'assistant'
                   ? <>
@@ -2462,7 +3018,7 @@ function AdminChatTab({ adminToken, onSaved }) {
         <textarea
           ref={textRef}
           rows={2}
-          placeholder="Escribile al agente… (ej: 'Quiero que siempre priorices la marca X' · 'Contame qué sabés de tu configuración')"
+          placeholder="Escribile al agente… (ej: 'Quiero que siempre priorices BERMAD' · 'Contame qué sabés de tu configuración')"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -2642,6 +3198,637 @@ function UsersTab({ adminToken, onSaved }) {
 }
 
 /* ── Tab: Asistentes ── */
+function KnowledgeSection({ agentId, adminToken, onSaved }) {
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+  const [viewing, setViewing] = useState(null); // {filename, content}
+  const [viewContent, setViewContent] = useState('');
+  const fileInputRef = useRef(null);
+
+  function reload() {
+    setLoading(true);
+    fetch(`/api/admin/agents/${agentId}/knowledge`, { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { setFiles(d?.files || []); setLoading(false); })
+      .catch(() => { setLoading(false); setErr('Error al cargar archivos.'); });
+  }
+  useEffect(() => { if (agentId) reload(); }, [agentId, adminToken]);
+
+  function fmtBytes(n) {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  }
+  function fmtMtime(ts) {
+    try {
+      const d = new Date(ts * 1000);
+      return d.toLocaleString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch { return ''; }
+  }
+
+  async function handleFileSelect(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const lower = file.name.toLowerCase();
+    const accepted = ['.md', '.pdf', '.docx', '.pptx', '.xlsx', '.csv', '.txt'];
+    const ext = accepted.find(x => lower.endsWith(x));
+    if (!ext) {
+      setErr('Formato no soportado. Aceptados: PDF, DOCX, PPTX, XLSX, CSV, TXT, MD.');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setErr('Archivo demasiado grande (máx 15 MB).');
+      return;
+    }
+
+    // Markdown: leer directo en el browser (sin viaje al server)
+    if (ext === '.md') {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        setNewName(file.name);
+        setNewContent(ev.target.result || '');
+        setUploadOpen(true);
+        setErr('');
+      };
+      reader.readAsText(file, 'utf-8');
+      return;
+    }
+
+    // Otros formatos: extraer texto en el backend
+    setErr('');
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch(`/api/admin/agents/${agentId}/knowledge/extract`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: fd,
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.detail || `Error ${r.status} al extraer texto`);
+      }
+      const d = await r.json();
+      setNewName(d.filename_suggested || (file.name.replace(/\.[^.]+$/, '') + '.md'));
+      setNewContent(d.content || '');
+      setUploadOpen(true);
+      onSaved(`✓ Texto extraído de "${file.name}" (${d.char_count} chars). Revisalo y guardalo.`);
+    } catch (e) {
+      setErr(e.message || 'No se pudo extraer texto.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function uploadFile() {
+    if (!newName.trim() || !newContent.trim()) return;
+    setSaving(true); setErr('');
+    try {
+      const r = await fetch(`/api/admin/agents/${agentId}/knowledge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ filename: newName.trim(), content: newContent }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error al guardar');
+      const d = await r.json();
+      onSaved(`✓ Documento "${d.filename}" guardado`);
+      setUploadOpen(false); setNewName(''); setNewContent('');
+      reload();
+    } catch (e) { setErr(e.message); }
+    finally { setSaving(false); }
+  }
+
+  async function viewFile(filename) {
+    setViewing({ filename, loading: true });
+    setViewContent('');
+    try {
+      const r = await fetch(`/api/admin/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`,
+        { headers: { Authorization: `Bearer ${adminToken}` } });
+      if (!r.ok) throw new Error('No se pudo leer el archivo');
+      const d = await r.json();
+      setViewContent(d.content || '');
+      setViewing({ filename, loading: false });
+    } catch (e) {
+      setErr(e.message);
+      setViewing(null);
+    }
+  }
+
+  async function saveViewedFile() {
+    if (!viewing) return;
+    setSaving(true); setErr('');
+    try {
+      const r = await fetch(`/api/admin/agents/${agentId}/knowledge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ filename: viewing.filename, content: viewContent }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail || 'Error al guardar');
+      onSaved(`✓ "${viewing.filename}" actualizado`);
+      setViewing(null);
+      reload();
+    } catch (e) { setErr(e.message); }
+    finally { setSaving(false); }
+  }
+
+  async function deleteFile(filename) {
+    if (!confirm(`¿Borrar "${filename}"? El agente perderá esa información en su próxima consulta.`)) return;
+    try {
+      const r = await fetch(`/api/admin/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`,
+        { method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` } });
+      if (!r.ok) throw new Error('No se pudo borrar');
+      onSaved(`✓ "${filename}" eliminado`);
+      reload();
+    } catch (e) { setErr(e.message); }
+  }
+
+  // Vista de edición de un archivo
+  if (viewing) {
+    return (
+      <div style={{ marginTop: 24, padding: 16, border: '1px solid var(--border)', borderRadius: 8, background: 'var(--bg-elev-1, transparent)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <button className="btn-ghost" style={{ padding: '5px 10px', fontSize: 11 }} onClick={() => setViewing(null)}>← Volver</button>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>📄 {viewing.filename}</span>
+        </div>
+        {viewing.loading ? (
+          <div className="rule-empty">Cargando…</div>
+        ) : (
+          <>
+            <textarea
+              value={viewContent}
+              onChange={e => setViewContent(e.target.value)}
+              rows={18}
+              spellCheck={false}
+              style={{ width: '100%', padding: 10, border: '1px solid var(--border)', borderRadius: 6, fontFamily: 'ui-monospace, monospace', fontSize: 12, lineHeight: 1.5, resize: 'vertical', background: 'var(--surface)' }}
+            />
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button className="btn-blue" style={{ padding: '6px 14px', fontSize: 12 }} onClick={saveViewedFile} disabled={saving}>
+                {saving ? 'Guardando…' : 'Guardar cambios'}
+              </button>
+              <button className="btn-danger" style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => { deleteFile(viewing.filename); setViewing(null); }}>
+                Eliminar archivo
+              </button>
+            </div>
+            {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 28, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>📚 Base de conocimiento</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          Archivos <code>.md</code> que se cargan automáticamente al system prompt en cada consulta del agente.
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="rule-empty">Cargando archivos…</div>
+      ) : files.length === 0 && !uploadOpen ? (
+        <div className="rule-empty">
+          📭 Sin documentos cargados. Subí un <code>.md</code> para que el agente lo tenga siempre disponible.
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {files.map(f => (
+            <div key={f.filename} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '8px 12px',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              background: f.loaded ? 'var(--surface)' : 'rgba(150,150,150,0.07)',
+              opacity: f.loaded ? 1 : 0.7,
+            }}>
+              <span style={{ fontSize: 16 }}>{f.loaded ? '📄' : '🚫'}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                  {f.filename}
+                  {!f.loaded && <span style={{ marginLeft: 6, fontSize: 10, color: 'var(--text-3)' }}>(ignorado — empieza con _)</span>}
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                  {fmtBytes(f.size_bytes)} · {fmtMtime(f.mtime)}
+                </div>
+              </div>
+              <button className="btn-ghost" style={{ padding: '4px 10px', fontSize: 11 }} onClick={() => viewFile(f.filename)}>Ver / Editar</button>
+              <button className="rule-delete" onClick={() => deleteFile(f.filename)} title="Eliminar">×</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Botón subir + dialogo */}
+      {!uploadOpen ? (
+        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <button className="btn-blue" style={{ padding: '7px 14px', fontSize: 12 }} onClick={() => fileInputRef.current?.click()} disabled={saving}>
+            {saving ? 'Extrayendo…' : '+ Subir documento'}
+          </button>
+          <button className="btn-ghost" style={{ padding: '7px 14px', fontSize: 12 }} onClick={() => { setNewName(''); setNewContent(''); setUploadOpen(true); }}>
+            + Crear desde cero
+          </button>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', alignSelf: 'center' }}>
+            Acepta PDF, Word, Excel, PowerPoint, CSV, TXT, MD (máx 15 MB)
+          </span>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".md,.pdf,.docx,.pptx,.xlsx,.csv,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain,text/csv,text/markdown"
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+          />
+        </div>
+      ) : (
+        <div style={{ marginTop: 14, padding: 12, border: '1.5px dashed var(--brand-soft, var(--border))', borderRadius: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Nuevo archivo de conocimiento</div>
+          <input
+            type="text"
+            placeholder="nombre_archivo.md"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            style={{ width: '100%', padding: 8, border: '1px solid var(--border)', borderRadius: 6, fontSize: 13, marginBottom: 8 }}
+          />
+          <textarea
+            value={newContent}
+            onChange={e => setNewContent(e.target.value)}
+            placeholder="# Título&#10;&#10;Contenido en markdown..."
+            rows={10}
+            spellCheck={false}
+            style={{ width: '100%', padding: 10, border: '1px solid var(--border)', borderRadius: 6, fontFamily: 'ui-monospace, monospace', fontSize: 12, lineHeight: 1.5, resize: 'vertical', background: 'var(--surface)' }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              {newContent.length.toLocaleString()} caracteres. Se aplica al instante (sin reiniciar).
+            </span>
+            <button className="btn-blue" style={{ marginLeft: 'auto', padding: '6px 14px', fontSize: 12 }} onClick={uploadFile} disabled={saving || !newName.trim() || !newContent.trim()}>
+              {saving ? 'Guardando…' : 'Guardar archivo'}
+            </button>
+            <button className="btn-ghost" style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => { setUploadOpen(false); setErr(''); }}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+    </div>
+  );
+}
+
+
+/* ── IconSection ─────────────────────────────────────────────────
+   Upload de icono custom del agente (PNG/JPG). Reemplaza el flujo
+   viejo de tener que dejar archivos manualmente en static/agents/.
+
+   Endpoints (v1.4.0):
+     POST   /api/admin/agents/{id}/icon  (multipart file)
+     DELETE /api/admin/agents/{id}/icon
+
+   El backend valida magic bytes, ratio de compresión y tamaño <=2MB.
+   Devuelve el `icon_url` con cache-buster `?v=<ts>` para que el browser
+   no se quede con un 404 cacheado de versiones anteriores. */
+function IconSection({ agent, adminToken, onSaved, onAgentUpdated }) {
+  const [uploading, setUploading] = useState(false);
+  const [err, setErr] = useState('');
+  const fileInputRef = React.useRef(null);
+
+  if (!agent) return null;
+
+  async function uploadIcon(file) {
+    if (!file) return;
+    // Validación rápida del lado cliente — backend revalida con magic bytes
+    const okType = /^image\/(png|jpe?g)$/i.test(file.type);
+    if (!okType) {
+      setErr('Solo PNG o JPG');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setErr('Máximo 2 MB');
+      return;
+    }
+    setErr('');
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch(`/api/admin/agents/${encodeURIComponent(agent.id)}/icon`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: fd,
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.detail || `HTTP ${r.status}`);
+      }
+      const data = await r.json();
+      onSaved(`✓ Icono subido (${(data.size_bytes / 1024).toFixed(1)} KB)`);
+      onAgentUpdated();
+    } catch (e) {
+      setErr(`No se pudo subir el icono: ${e.message}`);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function deleteIcon() {
+    if (!confirm('¿Quitar el icono custom de este agente? Vuelve al emoji default.')) return;
+    setErr('');
+    try {
+      const r = await fetch(`/api/admin/agents/${encodeURIComponent(agent.id)}/icon`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.detail || `HTTP ${r.status}`);
+      }
+      onSaved('✓ Icono eliminado');
+      onAgentUpdated();
+    } catch (e) {
+      setErr(`No se pudo eliminar el icono: ${e.message}`);
+    }
+  }
+
+  return (
+    <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>
+        Icono del agente
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>
+        PNG o JPG, máximo 2 MB. Si no hay icono custom se usa el emoji <code>{agent.icon || '🤖'}</code>.
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        {/* Preview grande del icono actual */}
+        <div style={{
+          width: 72, height: 72,
+          borderRadius: 16,
+          border: '1.5px solid var(--border)',
+          background: 'var(--surface)',
+          display: 'grid', placeItems: 'center',
+          overflow: 'hidden',
+        }}>
+          <AgentIcon iconUrl={agent.icon_url} emoji={agent.icon} size={56} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg"
+            style={{ display: 'none' }}
+            onChange={e => uploadIcon(e.target.files?.[0])}
+          />
+          <button
+            type="button"
+            className="btn-blue"
+            style={{ padding: '8px 16px', fontSize: 13 }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? 'Subiendo…' : (agent.icon_url ? 'Reemplazar icono' : 'Subir icono')}
+          </button>
+          {agent.icon_url && (
+            <button
+              type="button"
+              className="btn-ghost"
+              style={{ padding: '6px 14px', fontSize: 12, color: 'var(--danger, #d63b3b)' }}
+              onClick={deleteIcon}
+              disabled={uploading}
+            >
+              Quitar icono
+            </button>
+          )}
+        </div>
+      </div>
+
+      {err && <div className="error-msg" style={{ marginTop: 10 }}>{err}</div>}
+    </div>
+  );
+}
+
+
+function PermissionsSection({ agent, adminToken, availableUsers, onSaved, onAgentUpdated }) {
+  // Permisos: visibility ('public'|'private'|'users') + lista de usernames si users.
+  // Estado local que se inicializa desde el agente y permite editar antes de guardar.
+  const [visibility, setVisibility] = useState(agent?.visibility || 'public');
+  const [allowedUsers, setAllowedUsers] = useState(agent?.allowed_users || []);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+  const [search, setSearch] = useState('');
+
+  // Re-sincronizar si cambia el agente en edición (el padre pasó otro objeto)
+  useEffect(() => {
+    setVisibility(agent?.visibility || 'public');
+    setAllowedUsers(agent?.allowed_users || []);
+    setErr('');
+  }, [agent?.id, agent?.visibility, agent?.allowed_users]);
+
+  function toggleUser(username) {
+    setAllowedUsers(prev => prev.includes(username)
+      ? prev.filter(u => u !== username)
+      : [...prev, username]);
+  }
+
+  // ¿Hay cambios respecto al estado guardado del agente?
+  const hasChanges = (
+    visibility !== (agent?.visibility || 'public') ||
+    JSON.stringify([...allowedUsers].sort()) !== JSON.stringify([...(agent?.allowed_users || [])].sort())
+  );
+
+  async function savePermissions() {
+    if (!agent) return;
+    setSaving(true); setErr('');
+    try {
+      // El endpoint upsert requiere el agente COMPLETO. Mandamos todos los
+      // campos actuales + los nuevos visibility/allowed_users.
+      const body = {
+        id: agent.id,
+        name: agent.name,
+        description: agent.description || '',
+        icon: agent.icon || '🤖',
+        allowed_tools: agent.allowed_tools || [],
+        default_tier: agent.default_tier || 'auto',
+        visibility,
+        // Si la visibility no es "users", limpiamos la lista para que no quede
+        // ruido en el JSON guardado.
+        allowed_users: visibility === 'users' ? allowedUsers : [],
+        is_default: !!agent.is_default,
+      };
+      const r = await fetch('/api/admin/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.detail || `Error ${r.status}`);
+      }
+      const label = visibility === 'public' ? 'público'
+                  : visibility === 'private' ? 'privado'
+                  : `${allowedUsers.length} usuario${allowedUsers.length !== 1 ? 's' : ''}`;
+      onSaved(`✓ Permisos de "${agent.name}" actualizados (${label})`);
+      onAgentUpdated?.();  // Refrescar lista del padre
+    } catch (e) {
+      setErr(e.message || 'No se pudieron guardar los permisos');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Filtrar usuarios para el buscador (útil cuando hay >10)
+  const filteredUsers = (availableUsers || []).filter(u =>
+    !search.trim() || u.username.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  return (
+    <div style={{ marginTop: 28, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>🔐 Permisos de acceso</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          Quién puede ver y usar este asistente desde el selector del chat.
+        </span>
+      </div>
+
+      {/* Selector de visibility */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+        {[
+          { id: 'public',  icon: '🌐', label: 'Público',   desc: 'Todos los usuarios pueden verlo y usarlo' },
+          { id: 'private', icon: '🔒', label: 'Privado',   desc: 'Solo el administrador puede usarlo' },
+          { id: 'users',   icon: '👥', label: 'Usuarios específicos', desc: 'Solo los usuarios que selecciones abajo' },
+        ].map(opt => {
+          const active = visibility === opt.id;
+          return (
+            <label
+              key={opt.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 12px',
+                border: `1.5px solid ${active ? 'var(--brand)' : 'var(--border)'}`,
+                borderRadius: 8,
+                cursor: 'pointer',
+                background: active ? 'var(--brand-tint-08, rgba(26,78,160,0.06))' : 'var(--surface)',
+                transition: 'all var(--d-fast) var(--ease-out)',
+              }}
+            >
+              <input
+                type="radio"
+                name={`vis-${agent?.id}`}
+                value={opt.id}
+                checked={active}
+                onChange={() => setVisibility(opt.id)}
+                style={{ accentColor: 'var(--brand)' }}
+              />
+              <span style={{ fontSize: 18 }}>{opt.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{opt.label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{opt.desc}</div>
+              </div>
+            </label>
+          );
+        })}
+      </div>
+
+      {/* Lista de usuarios cuando visibility = 'users' */}
+      {visibility === 'users' && (
+        <div style={{ padding: 12, border: '1px solid var(--border)', borderRadius: 8, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>
+              Usuarios con acceso: {allowedUsers.length}
+            </span>
+            {(availableUsers || []).length > 6 && (
+              <input
+                type="text"
+                placeholder="Buscar usuario…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  marginLeft: 'auto',
+                  padding: '5px 9px',
+                  fontSize: 12,
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  width: 180,
+                }}
+              />
+            )}
+          </div>
+          {(availableUsers || []).length === 0 ? (
+            <div className="rule-empty" style={{ fontSize: 12 }}>
+              No hay usuarios creados todavía. Andá a la tab 👥 Usuarios y creá algunos primero.
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="rule-empty" style={{ fontSize: 12 }}>Sin coincidencias.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 240, overflowY: 'auto' }}>
+              {filteredUsers.map(u => {
+                const checked = allowedUsers.includes(u.username);
+                return (
+                  <label
+                    key={u.username}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      background: checked ? 'var(--brand-tint-08, rgba(26,78,160,0.06))' : 'transparent',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleUser(u.username)}
+                      style={{ accentColor: 'var(--brand)' }}
+                    />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>{u.username}</span>
+                    {u.conversation_count > 0 && (
+                      <span style={{ fontSize: 10, color: 'var(--text-3)', marginLeft: 'auto' }}>
+                        {u.conversation_count} conversación{u.conversation_count !== 1 ? 'es' : ''}
+                      </span>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Botón guardar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          {hasChanges ? '⚠️ Hay cambios sin guardar' : 'Sin cambios pendientes'}
+        </span>
+        <button
+          className="btn-blue"
+          style={{ marginLeft: 'auto', padding: '7px 16px', fontSize: 12 }}
+          onClick={savePermissions}
+          disabled={saving || !hasChanges}
+        >
+          {saving ? 'Guardando…' : 'Guardar permisos'}
+        </button>
+      </div>
+      {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+
+      <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+        ℹ️ El admin SIEMPRE tiene acceso a todos los agentes (sin importar esta configuración).
+        Los usuarios regulares ven en el selector de su chat solo los agentes a los que pueden acceder.
+      </div>
+    </div>
+  );
+}
+
+
 function AgentsTab({ adminToken, onSaved }) {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -2650,6 +3837,8 @@ function AgentsTab({ adminToken, onSaved }) {
   const [promptLoading, setPromptLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
+  // Lista de usuarios disponibles para asignar permisos granulares
+  const [availableUsers, setAvailableUsers] = useState([]);
 
   function reload() {
     setLoading(true);
@@ -2658,7 +3847,15 @@ function AgentsTab({ adminToken, onSaved }) {
       .then(d => { setAgents(d.agents || []); setLoading(false); })
       .catch(() => { setErr('Error al cargar agentes'); setLoading(false); });
   }
-  useEffect(() => { reload(); }, [adminToken]);
+
+  function loadUsers() {
+    fetch('/api/admin/users', { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setAvailableUsers(d?.users || []))
+      .catch(() => {});
+  }
+
+  useEffect(() => { reload(); loadUsers(); }, [adminToken]);
 
   function openEditor(agentId) {
     setEditingId(agentId);
@@ -2698,8 +3895,9 @@ function AgentsTab({ adminToken, onSaved }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
           <button className="btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }} onClick={closeEditor}>← Volver</button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>
-              {agent?.icon} {agent?.name}
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <AgentIcon iconUrl={agent?.icon_url} emoji={agent?.icon} size={24} />
+              <span>{agent?.name}</span>
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
               Editando system prompt — <code>app/agents/definitions/{editingId}.md</code>
@@ -2714,16 +3912,20 @@ function AgentsTab({ adminToken, onSaved }) {
             <textarea
               value={promptDraft}
               onChange={e => setPromptDraft(e.target.value)}
-              rows={26}
+              rows={36}
               spellCheck={false}
               style={{
                 width: '100%',
-                padding: '12px 14px',
+                /* BUG-FIX v1.3.3: editor de prompts más grande para que
+                   los prompts largos (~15KB típicos) se puedan editar sin
+                   scroll constante. Antes era rows=26 + sin minHeight. */
+                minHeight: '70vh',
+                padding: '14px 16px',
                 border: '1.5px solid var(--border)',
                 borderRadius: 8,
                 fontFamily: 'ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace',
-                fontSize: 12,
-                lineHeight: 1.55,
+                fontSize: 13,
+                lineHeight: 1.6,
                 color: 'var(--text)',
                 background: 'var(--surface)',
                 outline: 'none',
@@ -2740,6 +3942,26 @@ function AgentsTab({ adminToken, onSaved }) {
               </button>
             </div>
             {err && <div className="error-msg" style={{ marginTop: 8 }}>{err}</div>}
+
+            {/* ── Knowledge base ─────────────────────────────────────── */}
+            <KnowledgeSection agentId={editingId} adminToken={adminToken} onSaved={onSaved} />
+
+            {/* ── Icono del agente (v1.4.0) ──────────────────────────── */}
+            <IconSection
+              agent={agents.find(a => a.id === editingId)}
+              adminToken={adminToken}
+              onSaved={onSaved}
+              onAgentUpdated={reload}
+            />
+
+            {/* ── Permisos de acceso por usuario ─────────────────────── */}
+            <PermissionsSection
+              agent={agents.find(a => a.id === editingId)}
+              adminToken={adminToken}
+              availableUsers={availableUsers}
+              onSaved={onSaved}
+              onAgentUpdated={reload}
+            />
           </>
         )}
       </div>
@@ -2773,8 +3995,8 @@ function AgentsTab({ adminToken, onSaved }) {
                 : { label: '○ LITE', color: 'var(--text-muted)' };
           return (
             <div key={a.id} className="rule-card" style={{ alignItems: 'flex-start' }}>
-              <div className="rule-number" style={{ fontSize: 18, background: 'transparent', border: '1px solid var(--border)' }}>
-                {a.icon || '🤖'}
+              <div className="rule-number" style={{ fontSize: 18, background: 'transparent', border: '1px solid var(--border)', padding: 4 }}>
+                <AgentIcon iconUrl={a.icon_url} emoji={a.icon} size={28} />
               </div>
               <div className="rule-text" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -2821,7 +4043,7 @@ function AdminPanel({ adminToken, onClose }) {
       {toast && <div className="toast">{toast}</div>}
       <div className="admin-panel">
         <div className="admin-header">
-          <span className="admin-header-title">Demo Company Cortex · Admin</span>
+          <span className="admin-header-title">Cortex · Admin</span>
           <span className="admin-badge">ADMIN</span>
           <div className="admin-header-right">
             <button className="btn-ghost" style={{ color: 'rgba(255,255,255,.8)', borderColor: 'rgba(255,255,255,.3)' }} onClick={onClose}>Cerrar ✕</button>
@@ -2829,7 +4051,7 @@ function AdminPanel({ adminToken, onClose }) {
         </div>
 
         <div className="admin-tabs">
-          {[['chat','💬 Chat con el agente'],['asistentes','🤖 Asistentes'],['sistema','⚙️ Sistema'],['usuarios','👥 Usuarios'],['memoria','🧠 Memoria']].map(([id, label]) => (
+          {[['chat','💬 Chat con el agente'],['asistentes','🤖 Asistentes'],['usuarios','👥 Usuarios'],['memoria','🧠 Memoria']].map(([id, label]) => (
             <div key={id} className={`admin-tab${tab === id ? ' active' : ''}`} onClick={() => setTab(id)}>{label}</div>
           ))}
         </div>
@@ -2837,7 +4059,6 @@ function AdminPanel({ adminToken, onClose }) {
         <div className="admin-content">
           {tab === 'chat'       && <AdminChatTab adminToken={adminToken} onSaved={onSaved} />}
           {tab === 'asistentes' && <AgentsTab    adminToken={adminToken} onSaved={onSaved} />}
-          {tab === 'sistema'    && <SystemTab    adminToken={adminToken} onSaved={onSaved} />}
           {tab === 'usuarios'   && <UsersTab     adminToken={adminToken} onSaved={onSaved} />}
           {tab === 'memoria'    && <MemoryTab    adminToken={adminToken} onSaved={onSaved} />}
         </div>
@@ -2911,7 +4132,7 @@ function Login({ onLogin }) {
           </svg>
         </div>
         <div className="login-logo-wrap">
-          <span className="login-logo">Demo Company</span>
+          <span className="login-logo">Cortex</span>
           <span className="login-cortex">Cortex</span>
         </div>
         <div className="login-tagline">Plataforma agéntica interna</div>
@@ -2928,7 +4149,7 @@ function Login({ onLogin }) {
         </button>
         {err && <div className="error-msg">{err}</div>}
         <div className="login-footer">
-          Acceso interno · Demo Company S.A.
+          Acceso interno
           <div style={{ marginTop: 10, fontSize: 9.5, opacity: 0.55, letterSpacing: '0.04em' }}>
             powered by <b style={{ fontWeight: 600 }}>AgentX</b>
           </div>
@@ -2948,9 +4169,11 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   const [sidebarOpen,   setSidebarOpen]   = useState(() => typeof window !== 'undefined' ? window.innerWidth > 720 : true);
   const [sidebarQuery,  setSidebarQuery]  = useState('');
   const [feedback,      setFeedback]      = useState({}); // {msgIndex: 'up'|'down'}
-  const [pendingImg,    setPendingImg]    = useState(null);
+  const [pendingImgs,   setPendingImgs]   = useState([]); // [{data, mediaType, previewUrl, name}]
   const [pendingDocs,   setPendingDocs]   = useState([]); // [{filename, char_count, text}]
   const [uploadingDoc,  setUploadingDoc]  = useState(false);
+  // Cap total de adjuntos (imágenes + documentos) por mensaje
+  const MAX_ATTACHMENTS = 8;
   const [activeModel,   setActiveModel]   = useState(null); // {model, source}
   const [recording,     setRecording]     = useState(false);
   const [adminState,    setAdminState]    = useState(null); // null | 'login' | 'panel'
@@ -2959,7 +4182,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // ── Agentes ─────────────────────────────────────────────────────
   const [agents,         setAgents]         = useState([]);
   const [currentAgentId, setCurrentAgentId] = useState(() => {
-    try { return localStorage.getItem(`demo_company_agent_${username}`) || null; } catch { return null; }
+    try { return localStorage.getItem(`cortex_agent_${username}`) || null; } catch { return null; }
   });
   const [agentMenuOpen,  setAgentMenuOpen]  = useState(false);
 
@@ -2967,16 +4190,33 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   const textareaRef = useRef(null);
   const fileRef    = useRef(null);
   const docFileRef = useRef(null);
+  // AbortController activo durante un fetch a /api/chat/stream — sirve
+  // para que el botón "detener" cancele la generación en curso.
+  const abortRef   = useRef(null);
   const recogRef   = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading, thinkingSteps]);
+
+  // Mantiene el textarea con altura ajustada al contenido. Reacciona a
+  // cualquier cambio de `input` (escritura, clear post-envío, paste, etc.)
+  // y NO depende de eventos del DOM — así no salta entre renders ni se
+  // queda alto cuando se borra el contenido.
+  // El cap (240px) tiene que coincidir con `max-height` del CSS
+  // `.composer-input` — si los desincronizás, salta el scroll.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const next = Math.min(el.scrollHeight, 240);
+    el.style.height = (next > 0 ? next : 0) + 'px';
+  }, [input]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3000); return () => clearTimeout(t); }, [toast]);
 
-  // Migración: chats viejos (pre-multiusuario) estaban en 'demo_company_chats' sin namespace
+  // Migración: chats viejos (pre-multiusuario) estaban en 'cortex_chats' sin namespace
   useEffect(() => {
     if (!username) return;
     try {
-      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'demo_company_chats'
+      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'cortex_chats'
       const newRaw = localStorage.getItem(chatsKey(username));
       const hasOld = oldRaw && oldRaw !== '[]' && oldRaw !== 'null';
       const hasNew = newRaw && newRaw !== '[]' && newRaw !== 'null';
@@ -2990,26 +4230,49 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   }, [username]);
 
   // ── Carga de agentes disponibles ────────────────────────────────
+  // BUG-FIX v1.3.4: antes el .catch era silencioso, así que si el token
+  // JWT expiraba (8h max) o el server caía, el frontend quedaba con
+  // agents=[] → no se renderizaba el selector → el usuario veía la
+  // welcome screen sin opciones y sin entender por qué. Ahora:
+  //   - 401 → auto-logout (force re-login)
+  //   - otros errores → toast visible con el mensaje real
   useEffect(() => {
     if (!token) return;
-    fetch('/api/agents', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (!d) return;
+    let aborted = false;
+    (async () => {
+      try {
+        const r = await fetch('/api/agents', { headers: { Authorization: `Bearer ${token}` } });
+        if (aborted) return;
+        if (r.status === 401) {
+          // Token expirado / inválido → logout y dejar al usuario re-loguear.
+          // No mostramos toast porque el flujo de re-login ya es señal suficiente.
+          onLogout();
+          return;
+        }
+        if (!r.ok) {
+          const detail = await r.text().catch(() => '');
+          throw new Error(`HTTP ${r.status}: ${detail.slice(0, 200) || r.statusText}`);
+        }
+        const d = await r.json();
+        if (aborted) return;
         setAgents(d.agents || []);
         // Si el agente guardado en localStorage ya no está disponible, caer al default
         const ids = new Set((d.agents || []).map(a => a.id));
         if (!currentAgentId || !ids.has(currentAgentId)) {
           setCurrentAgentId(d.default_agent_id || (d.agents || [])[0]?.id || null);
         }
-      })
-      .catch(() => {});
+      } catch (e) {
+        if (aborted) return;
+        setToast(`⚠️ No se pudieron cargar los asistentes: ${e.message}`);
+      }
+    })();
+    return () => { aborted = true; };
   }, [token]);
 
   // Persistir el agente activo
   useEffect(() => {
     if (!currentAgentId || !username) return;
-    try { localStorage.setItem(`demo_company_agent_${username}`, currentAgentId); } catch {}
+    try { localStorage.setItem(`cortex_agent_${username}`, currentAgentId); } catch {}
   }, [currentAgentId, username]);
 
   // Cerrar el menú al click afuera
@@ -3022,6 +4285,38 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
 
   const currentAgent = agents.find(a => a.id === currentAgentId) || null;
 
+  // Saludo del welcome screen: se calcula UNA sola vez al montar el componente.
+  // Sin esto, React recalcula `pickGreeting()` en cada render y el saludo
+  // "salta" ante los ojos del usuario al escribir o cambiar de agente.
+  const [greeting] = useState(() => pickGreeting(username));
+
+  // Ejemplos de consultas del agente activo (welcome screen)
+  const [examples, setExamples] = useState([]);
+  // Razonamiento del modelo durante la generación (ephemeral). Se llena con
+  // eventos `reasoning` del SSE; se limpia al empezar otro stream. La idea
+  // es mostrar el "pensamiento" del modelo en vivo,
+  // para todos los agentes vía thinking events.
+  const [reasoningText, setReasoningText] = useState('');
+  // Edición inline de mensaje del usuario (estilo Gemini). Cuando es null
+  // no hay edición activa; cuando es un número, ese índice del array
+  // messages está en modo edit y se renderiza un textarea inline.
+  const [editingMessageIdx, setEditingMessageIdx] = useState(null);
+  const [editDraft, setEditDraft] = useState('');
+
+  useEffect(() => {
+    if (!token || !currentAgentId) { setExamples([]); return; }
+    fetch(`/api/agents/${encodeURIComponent(currentAgentId)}/examples?count=3`,
+      { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setExamples(d?.examples || []))
+      .catch(() => setExamples([]));
+  }, [token, currentAgentId]);
+
+  function pickExample(text) {
+    setInput(text);
+    setTimeout(() => textareaRef.current?.focus(), 50);
+  }
+
   // Cambiar de agente: limpia chat activo (cada hilo es de un agente)
   function switchAgent(newAgentId) {
     if (newAgentId === currentAgentId) { setAgentMenuOpen(false); return; }
@@ -3030,7 +4325,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     setActiveId(null);
     setMessages([]);
     setInput('');
-    setPendingImg(null);
+    setPendingImgs([]);
     setPendingDocs([]);
     setFeedback({});
     setThinkingSteps([]);
@@ -3040,7 +4335,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   function autoCloseSidebarMobile() {
     if (window.innerWidth <= 720) setSidebarOpen(false);
   }
-  function startNewChat() { setActiveId(null); setMessages([]); setInput(''); setPendingImg(null); setFeedback({}); autoCloseSidebarMobile(); }
+  function startNewChat() { setActiveId(null); setMessages([]); setInput(''); setPendingImgs([]); setFeedback({}); autoCloseSidebarMobile(); }
   function loadChat(id) {
     const c = chats.find(c => c.id === id);
     if (!c) return;
@@ -3060,6 +4355,19 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     });
   }
 
+  // Total actual de adjuntos (imágenes + docs). Lo lee como callback para
+  // que checkAttachmentSlot vea el state más reciente cuando se loopea.
+  function attachmentsCount() {
+    return pendingImgs.length + pendingDocs.length;
+  }
+  function canAddMoreAttachments(extra = 1) {
+    if (attachmentsCount() + extra > MAX_ATTACHMENTS) {
+      setToast(`⚠️ Máximo ${MAX_ATTACHMENTS} archivos por consulta`);
+      return false;
+    }
+    return true;
+  }
+
   function ingestImageFile(file, defaultName) {
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
@@ -3067,35 +4375,95 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const reader = new FileReader();
     reader.onload = ev => {
       const [header, data] = ev.target.result.split(',');
-      setPendingImg({
+      const newImg = {
         data,
         mediaType: header.match(/:(.*?);/)[1],
         previewUrl: ev.target.result,
         name: file.name || defaultName || 'pegado.png',
+      };
+      setPendingImgs(prev => {
+        // Cap defensivo en el setter (por si llegan asíncronas)
+        if (prev.length + pendingDocs.length >= MAX_ATTACHMENTS) {
+          setToast(`⚠️ Máximo ${MAX_ATTACHMENTS} archivos por consulta`);
+          return prev;
+        }
+        return [...prev, newImg];
       });
     };
     reader.readAsDataURL(file);
   }
 
   function handleFileChange(e) {
-    ingestImageFile(e.target.files[0]);
+    const files = Array.from(e.target.files || []);
     e.target.value = '';
+    const slotsLeft = MAX_ATTACHMENTS - attachmentsCount();
+    if (slotsLeft <= 0) {
+      setToast(`⚠️ Máximo ${MAX_ATTACHMENTS} archivos por consulta`);
+      return;
+    }
+    files.slice(0, slotsLeft).forEach(f => ingestImageFile(f));
+    if (files.length > slotsLeft) {
+      setToast(`⚠️ Solo se cargaron las primeras ${slotsLeft} imágenes (máx ${MAX_ATTACHMENTS} totales)`);
+    }
   }
 
-  async function handleDocFileChange(e) {
-    const file = e.target.files[0];
+  // Handler unificado: dispatch por tipo de archivo (imagen vs documento)
+  // Reemplaza el flow viejo donde había 2 inputs separados.
+  async function handleAnyFileChange(e) {
+    const files = Array.from(e.target.files || []);
     e.target.value = '';
-    if (!file) return;
-    if (file.size > 25 * 1024 * 1024) {
-      setToast('⚠️ Archivo muy grande (máx 25MB)');
+    if (!files.length) return;
+
+    const slotsLeft = MAX_ATTACHMENTS - attachmentsCount();
+    if (slotsLeft <= 0) {
+      setToast(`⚠️ Máximo ${MAX_ATTACHMENTS} archivos por consulta`);
       return;
+    }
+    const toProcess = files.slice(0, slotsLeft);
+    if (files.length > slotsLeft) {
+      setToast(`⚠️ Solo se procesarán los primeros ${slotsLeft} archivos`);
+    }
+
+    // Separar por tipo. Las imágenes van por ingestImageFile (in-memory),
+    // los documentos van al endpoint /api/upload-document (extracción server).
+    const imgs = [];
+    const docs = [];
+    for (const f of toProcess) {
+      if (f.type && f.type.startsWith('image/')) {
+        imgs.push(f);
+      } else {
+        docs.push(f);
+      }
+    }
+
+    imgs.forEach(f => ingestImageFile(f));
+
+    if (docs.length) {
+      setUploadingDoc(true);
+      let ok = 0;
+      try {
+        for (const f of docs) {
+          if (await uploadOneDoc(f)) ok++;
+        }
+        if (ok > 0) {
+          setToast(`✓ ${ok} documento${ok !== 1 ? 's' : ''} listo${ok !== 1 ? 's' : ''} para consultar`);
+        }
+      } finally {
+        setUploadingDoc(false);
+      }
+    }
+  }
+
+  async function uploadOneDoc(file) {
+    if (file.size > 25 * 1024 * 1024) {
+      setToast(`⚠️ "${file.name}" muy grande (máx 25MB)`);
+      return false;
     }
     const ext = (file.name.split('.').pop() || '').toLowerCase();
     if (!['pdf','docx','pptx','xlsx','xlsm','csv','txt','md'].includes(ext)) {
-      setToast('⚠️ Formato no soportado. Usá PDF, Word, Excel, PowerPoint, CSV o TXT.');
-      return;
+      setToast(`⚠️ "${file.name}": formato no soportado`);
+      return false;
     }
-    setUploadingDoc(true);
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -3104,19 +4472,53 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
-      if (r.status === 401) { onLogout(); return; }
+      if (r.status === 401) { onLogout(); return false; }
       const d = await r.json();
       if (!r.ok) {
         setToast(`⚠️ ${d.detail || 'No se pudo procesar el archivo'}`);
-        return;
+        return false;
       }
       setPendingDocs(prev => [...prev, { filename: d.filename, char_count: d.char_count, text: d.text }]);
-      setToast(`✓ ${d.filename} (${d.char_count.toLocaleString()} chars) listo para consultar`);
+      return true;
     } catch {
-      setToast('⚠️ Error subiendo el archivo');
+      setToast(`⚠️ Error subiendo "${file.name}"`);
+      return false;
+    }
+  }
+
+  async function handleDocFileChange(e) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length) return;
+
+    const slotsLeft = MAX_ATTACHMENTS - attachmentsCount();
+    if (slotsLeft <= 0) {
+      setToast(`⚠️ Máximo ${MAX_ATTACHMENTS} archivos por consulta`);
+      return;
+    }
+    const toUpload = files.slice(0, slotsLeft);
+    if (files.length > slotsLeft) {
+      setToast(`⚠️ Solo se procesarán los primeros ${slotsLeft} archivos`);
+    }
+
+    setUploadingDoc(true);
+    let okCount = 0;
+    try {
+      // Subir secuencialmente — el endpoint procesa de a uno, evita pico de RAM
+      for (const f of toUpload) {
+        const ok = await uploadOneDoc(f);
+        if (ok) okCount++;
+      }
+      if (okCount > 0) {
+        setToast(`✓ ${okCount} documento${okCount !== 1 ? 's' : ''} listo${okCount !== 1 ? 's' : ''} para consultar`);
+      }
     } finally {
       setUploadingDoc(false);
     }
+  }
+
+  function removeImg(idx) {
+    setPendingImgs(prev => prev.filter((_, i) => i !== idx));
   }
 
   function removeDoc(idx) {
@@ -3130,18 +4532,84 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     ).join('\n\n');
   }
 
-  function handlePaste(e) {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-      if (item.kind === 'file' && item.type.startsWith('image/')) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        const ext  = (file.type.split('/')[1] || 'png').split('+')[0];
-        ingestImageFile(file, `pegado-${Date.now()}.${ext}`);
-        setToast('📋 Imagen pegada desde el portapapeles');
+  async function downloadProtectedFile(href) {
+    try {
+      const u = new URL(href, window.location.origin);
+      const r = await fetch(u.pathname, { headers: { Authorization: `Bearer ${token}` } });
+      if (r.status === 401) { onLogout(); return; }
+      if (!r.ok) {
+        setToast('No se pudo descargar el archivo');
         return;
       }
+      const blob = await r.blob();
+      const cd = r.headers.get('Content-Disposition') || '';
+      const match = cd.match(/filename="?([^"]+)"?/i);
+      const filename = match?.[1] || decodeURIComponent(u.pathname.split('/').pop() || 'archivo');
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      setToast('No se pudo descargar el archivo');
+    }
+  }
+
+  function handlePaste(e) {
+    // El clipboard puede traer 2 fuentes distintas:
+    //   1. `e.clipboardData.files` → archivos copiados del explorer/desktop
+    //      con Ctrl+C (Windows) o equivalente. Cualquier tipo (PDF, Word,
+    //      PNG, etc.) — los procesamos via handleAnyFileChange.
+    //   2. `e.clipboardData.items` → datos en formato item (image/png cuando
+    //      hacés print-screen, text/plain cuando copiás texto). Las imágenes
+    //      que vienen acá NO aparecen en `files` en algunos browsers.
+    // Procesamos las 2 fuentes y deduplicamos por nombre+size.
+
+    const filesFromExplorer = Array.from(e.clipboardData?.files || []);
+    const itemFiles = [];
+    for (const item of (e.clipboardData?.items || [])) {
+      if (item.kind === 'file') {
+        const f = item.getAsFile();
+        if (f) itemFiles.push(f);
+      }
+    }
+
+    // Dedupe por nombre+size (archivos del explorer suelen aparecer en ambos)
+    const all = [];
+    const seen = new Set();
+    for (const f of [...filesFromExplorer, ...itemFiles]) {
+      const key = `${f.name}|${f.size}`;
+      if (!seen.has(key)) { seen.add(key); all.push(f); }
+    }
+
+    if (all.length === 0) return;  // Ctrl+V de texto → comportamiento default
+
+    e.preventDefault();
+
+    // Asignar nombre a screenshots sin nombre ("image.png" genérico de print-screen)
+    const named = all.map(f => {
+      if (!f.name || f.name === 'image.png' || f.name === 'unnamed') {
+        const ext = (f.type.split('/')[1] || 'png').split('+')[0];
+        return new File([f], `pegado-${Date.now()}.${ext}`, { type: f.type });
+      }
+      return f;
+    });
+
+    // Reusar el handler unificado de file input — hace todo: split por tipo,
+    // límite de adjuntos, upload de docs, ingest de imágenes.
+    handleAnyFileChange({ target: { files: named, value: '' } });
+
+    const imgCount = named.filter(f => f.type?.startsWith('image/')).length;
+    const docCount = named.length - imgCount;
+    if (imgCount && docCount) {
+      setToast(`📋 ${imgCount} imagen${imgCount > 1 ? 'es' : ''} + ${docCount} documento${docCount > 1 ? 's' : ''} pegado${named.length > 1 ? 's' : ''}`);
+    } else if (imgCount) {
+      setToast(`📋 ${imgCount} imagen${imgCount > 1 ? 'es' : ''} pegada${imgCount > 1 ? 's' : ''} del portapapeles`);
+    } else {
+      setToast(`📋 ${docCount} documento${docCount > 1 ? 's' : ''} pegado${docCount > 1 ? 's' : ''} del portapapeles`);
     }
   }
 
@@ -3167,75 +4635,42 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     } catch { setToast('Error al recargar el catálogo'); }
   }
 
-  // Regenerar la última respuesta del agente: quita el último mensaje assistant
-  // y re-envía el último mensaje user para que el modelo dé una nueva respuesta.
-  async function regenerateLast() {
-    if (loading) return;
-    // Buscar último mensaje user
-    let lastUserIdx = -1;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].role === 'user') { lastUserIdx = i; break; }
+  function stopGeneration() {
+    if (abortRef.current) {
+      try { abortRef.current.abort(); } catch {}
     }
-    if (lastUserIdx === -1) return;
-    const lastUser = messages[lastUserIdx];
-    // Reset feedback de los mensajes que se van a borrar
-    const newFb = {};
-    Object.entries(feedback).forEach(([k, v]) => { if (Number(k) < lastUserIdx) newFb[k] = v; });
-    setFeedback(newFb);
-    // Truncar mensajes hasta antes del user message
-    const kept = messages.slice(0, lastUserIdx);
-    setMessages(kept);
-    // Re-enviar: usamos el contenido del último user (texto o imagen+texto)
-    const userText = typeof lastUser.content === 'string'
-      ? lastUser.content
-      : (lastUser.content.find(b => b.type === 'text')?.text || '');
-    // Re-stage la imagen si la había
-    const userImg = typeof lastUser.content === 'string'
-      ? null
-      : lastUser.content.find(b => b.type === 'image');
-    if (userImg) {
-      setPendingImg({
-        data: userImg.source.data,
-        mediaType: userImg.source.media_type,
-        previewUrl: `data:${userImg.source.media_type};base64,${userImg.source.data}`,
-        name: 'regenerada',
-      });
-    }
-    // Esperar un tick para que el state se asiente, después enviar
-    setTimeout(() => { sendMessage(userText); }, 50);
   }
 
-  async function sendMessage(text) {
-    text = (text || input).trim();
-    if ((!text && !pendingImg && !pendingDocs.length) || loading) return;
-    // Indicar visualmente al usuario qué documentos van adjuntos en este turno
-    const docNote = pendingDocs.length
-      ? `\n\n📎 Adjunto: ${pendingDocs.map(d => d.filename).join(', ')}`
-      : '';
-    const visibleText = text + docNote;
-    let content = pendingImg
-      ? [{ type: 'image', source: { type: 'base64', media_type: pendingImg.mediaType, data: pendingImg.data } }, ...(visibleText ? [{ type: 'text', text: visibleText }] : [])]
-      : visibleText;
-
-    const docContext = buildDocContext();
-    const newMessages = [...messages, { role: 'user', content }];
-    const currentId = activeId || genId();
-    if (!activeId) setActiveId(currentId);
-    setMessages(newMessages); setInput(''); setPendingImg(null); setPendingDocs([]); setLoading(true); setThinkingSteps([]); setActiveModel(null);
+  // ─── Core de streaming ─────────────────────────────────────────────
+  // Recibe un array de mensajes YA armado (con el último user incluido) y
+  // dispara el stream SSE contra /api/chat/stream. Es la pieza compartida
+  // entre sendMessage (turno nuevo), regenerateLast (rehacer última) y
+  // editMessage (editar user + rehacer). Mantenerlo "puro" — no toca
+  // `input`, `pendingImgs`, `pendingDocs`: eso es responsabilidad del wrapper.
+  async function streamFromMessages(messagesToSend, currentId, docContext) {
+    setLoading(true);
+    setThinkingSteps([]);
+    setActiveModel(null);
+    setReasoningText('');
 
     let streamedText = '';
     let assistantAdded = false;
+    let reasoningBuf = '';
+
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const res = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ messages: newMessages, system_context: docContext, agent_id: currentAgentId }),
+        body: JSON.stringify({ messages: messagesToSend, system_context: docContext, agent_id: currentAgentId }),
+        signal: controller.signal,
       });
       if (res.status === 401) { onLogout(); return; }
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        const err = [...newMessages, { role: 'assistant', content: `⚠️ Error: ${d.detail || 'Error inesperado.'}` }];
+        const err = [...messagesToSend, { role: 'assistant', content: `⚠️ Error: ${d.detail || 'Error inesperado.'}` }];
         setMessages(err); persistMessages(currentId, err); return;
       }
 
@@ -3248,11 +4683,16 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
             if (i >= 0) { const u = [...prev]; u[i] = evt; return u; }
             return [...prev, evt];
           });
+        } else if (evt.type === 'reasoning') {
+          // Razonamiento del modelo (Gemini "thoughts"). Aparece en vivo
+          // durante la generación y se muestra en bloque colapsible.
+          reasoningBuf += evt.text || '';
+          setReasoningText(reasoningBuf);
         } else if (evt.type === 'text') {
           streamedText += evt.text;
           if (!assistantAdded) {
             assistantAdded = true;
-            setMessages([...newMessages, { role: 'assistant', content: streamedText, streaming: true }]);
+            setMessages([...messagesToSend, { role: 'assistant', content: streamedText, streaming: true }]);
           } else {
             setMessages(prev => {
               const updated = [...prev];
@@ -3264,17 +4704,127 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
             });
           }
         } else if (evt.type === 'done') {
-          const final = [...newMessages, { role: 'assistant', content: streamedText || '(Sin respuesta del modelo)' }];
+          const final = [...messagesToSend, { role: 'assistant', content: streamedText || '(Sin respuesta del modelo)' }];
           setMessages(final); persistMessages(currentId, final);
         } else if (evt.type === 'error') {
-          const err = [...newMessages, { role: 'assistant', content: `⚠️ Error: ${evt.message}` }];
+          const err = [...messagesToSend, { role: 'assistant', content: `⚠️ Error: ${evt.message}` }];
           setMessages(err); persistMessages(currentId, err);
         }
       });
-    } catch {
-      const err = [...newMessages, { role: 'assistant', content: '⚠️ No se pudo conectar.' }];
-      setMessages(err); persistMessages(currentId, err);
-    } finally { setLoading(false); setThinkingSteps([]); textareaRef.current?.focus(); }
+    } catch (e) {
+      // AbortError = el usuario hizo click en "detener" → no es un error,
+      // solo conservamos lo que se haya generado hasta ese momento.
+      if (e && (e.name === 'AbortError' || controller.signal.aborted)) {
+        const stoppedContent = streamedText
+          ? streamedText + '\n\n_⏹ Generación detenida por el usuario._'
+          : '_⏹ Generación detenida por el usuario._';
+        const stopped = [...messagesToSend, { role: 'assistant', content: stoppedContent }];
+        setMessages(stopped); persistMessages(currentId, stopped);
+      } else {
+        const err = [...messagesToSend, { role: 'assistant', content: '⚠️ No se pudo conectar.' }];
+        setMessages(err); persistMessages(currentId, err);
+      }
+    } finally {
+      abortRef.current = null;
+      setLoading(false); setThinkingSteps([]); setReasoningText(''); textareaRef.current?.focus();
+    }
+  }
+
+  // Regenerar la última respuesta del agente. A diferencia de la versión
+  // vieja, MANTIENE el user message visible (sin parpadeo): solo se quita
+  // la respuesta del asistente y se vuelve a streamear desde el mismo user.
+  async function regenerateLast() {
+    if (loading) return;
+    let lastUserIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') { lastUserIdx = i; break; }
+    }
+    if (lastUserIdx === -1) return;
+    // Reset feedback de los mensajes assistant que se van a borrar
+    const newFb = {};
+    Object.entries(feedback).forEach(([k, v]) => { if (Number(k) <= lastUserIdx) newFb[k] = v; });
+    setFeedback(newFb);
+    // INCLUIR el user message (slice +1) — así no parpadea
+    const kept = messages.slice(0, lastUserIdx + 1);
+    setMessages(kept);
+    const currentId = activeId || genId();
+    if (!activeId) setActiveId(currentId);
+    await streamFromMessages(kept, currentId, buildDocContext());
+  }
+
+  // Editar un mensaje del usuario (estilo Gemini): reemplaza el texto,
+  // preserva las imágenes que tenía adjuntas, trunca todo lo posterior y
+  // re-streamea desde ese punto.
+  async function editMessage(idx, newText) {
+    if (loading) return;
+    if (idx < 0 || idx >= messages.length) return;
+    const orig = messages[idx];
+    if (orig.role !== 'user') return;
+    const cleaned = (newText || '').trim();
+    if (!cleaned && (typeof orig.content === 'string' || !orig.content.some(b => b.type === 'image'))) {
+      // Si quedó vacío y no hay imágenes que justifiquen el mensaje → cancelar
+      setEditingMessageIdx(null); setEditDraft(''); return;
+    }
+    // Construir nuevo content: si el original tenía imágenes, preservarlas
+    let newContent;
+    if (typeof orig.content === 'string') {
+      newContent = cleaned;
+    } else {
+      const imgs = orig.content.filter(b => b.type === 'image');
+      if (imgs.length) {
+        newContent = cleaned
+          ? [...imgs, { type: 'text', text: cleaned }]
+          : imgs;
+      } else {
+        newContent = cleaned;
+      }
+    }
+    // Truncar todo lo que viene después del índice editado y reemplazar el user
+    const kept = [...messages.slice(0, idx), { role: 'user', content: newContent }];
+    // Reset feedback de mensajes posteriores
+    const newFb = {};
+    Object.entries(feedback).forEach(([k, v]) => { if (Number(k) < idx) newFb[k] = v; });
+    setFeedback(newFb);
+    setMessages(kept);
+    setEditingMessageIdx(null);
+    setEditDraft('');
+    const currentId = activeId || genId();
+    if (!activeId) setActiveId(currentId);
+    await streamFromMessages(kept, currentId, buildDocContext());
+  }
+
+  // Wrapper: arma el mensaje del user desde el composer (input + adjuntos)
+  // y dispara el stream. Esta es la API pública usada por el botón Enviar.
+  async function sendMessage(text) {
+    text = (text || input).trim();
+    if ((!text && !pendingImgs.length && !pendingDocs.length) || loading) return;
+    // Indicar visualmente al usuario qué documentos van adjuntos en este turno
+    const docNote = pendingDocs.length
+      ? `\n\n📎 Adjunto: ${pendingDocs.map(d => d.filename).join(', ')}`
+      : '';
+    const visibleText = text + docNote;
+
+    // Armar content: si hay imágenes, content es array con N images + texto.
+    // Si no hay imágenes, content es string plano (compat con el formato actual).
+    let content;
+    if (pendingImgs.length) {
+      const imgBlocks = pendingImgs.map(img => ({
+        type: 'image',
+        source: { type: 'base64', media_type: img.mediaType, data: img.data },
+      }));
+      content = visibleText
+        ? [...imgBlocks, { type: 'text', text: visibleText }]
+        : imgBlocks;
+    } else {
+      content = visibleText;
+    }
+
+    const docContext = buildDocContext();
+    const newMessages = [...messages, { role: 'user', content }];
+    const currentId = activeId || genId();
+    if (!activeId) setActiveId(currentId);
+    setMessages(newMessages); setInput(''); setPendingImgs([]); setPendingDocs([]);
+    await streamFromMessages(newMessages, currentId, docContext);
   }
 
   const _q = sidebarQuery.trim().toLowerCase();
@@ -3301,7 +4851,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const userLabel = (username || 'Usuario').toUpperCase();
     const header = [
       '═══════════════════════════════════════════════════════════════',
-      '  DEMO COMPANY · CORTEX',
+      '  CORTEX',
       `  Conversación: ${chatTitle}`,
       `  Usuario: ${username || '—'}`,
       `  Exportado: ${dateStr}`,
@@ -3330,7 +4880,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
         .replace(/^#{1,6}\s+/gm, '')                // headings
         .replace(/^\s*[-*]\s+/gm, ' • ')            // listas
         .replace(/\n{3,}/g, '\n\n');                // colapsar saltos múltiples
-      const who = m.role === 'user' ? userLabel : 'DEMO COMPANY CORTEX';
+      const who = m.role === 'user' ? userLabel : 'CORTEX';
       return `[ ${who} ]\n${'─'.repeat(64)}\n${clean.trim()}`;
     });
 
@@ -3338,7 +4888,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
       '',
       '═══════════════════════════════════════════════════════════════',
       '  Fin de la conversación',
-      '  Generado por Demo Company S.A. — Agente Consultor',
+      '  Generado por Cortex — Asistente',
       '═══════════════════════════════════════════════════════════════',
     ].join('\n');
 
@@ -3351,7 +4901,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const safeTitle = (chatTitle || 'conversacion').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_').slice(0, 40) || 'conversacion';
     const dateTag   = now.toISOString().slice(0, 10);
     a.href     = url;
-    a.download = `demo_company_${dateTag}_${safeTitle}.txt`;
+    a.download = `cortex_${dateTag}_${safeTitle}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3359,9 +4909,9 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     setToast('✓ Conversación exportada como .txt');
   }
   const SUGGESTED_PROMPTS = [
-    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué productos del catálogo tenés para [aplicación]?' },
-    { icon: 'Sensor', cat: 'Sensores',             text: 'Recomendá un producto para [caso de uso]' },
-    { icon: 'Wrench', cat: 'Selección',            text: 'Ayudame a elegir el producto adecuado para [requisito técnico]' },
+    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué válvulas BERMAD tienen disponibles?' },
+    { icon: 'Sensor', cat: 'Sensores',             text: 'Sensores de nivel NIVELCO para tanque de 6m' },
+    { icon: 'Wrench', cat: 'Selección',            text: 'Actuador neumático NUTORK para válvula DN150' },
     { icon: 'Book',   cat: 'Normativas',           text: '¿Qué norma aplica para válvulas API 600?' },
     { icon: 'Valve',  cat: 'Comparativa',          text: '¿Diferencia entre válvula de bola y compuerta?' },
     { icon: 'Wrench', cat: 'Recomendación',        text: 'Válvula para fluido corrosivo a 80°C — ¿qué recomendás?' },
@@ -3388,7 +4938,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
           <Icon.Menu />
         </button>
         <div className="brand">
-          <span className="brand-logo">Demo Company</span>
+          <span className="brand-logo">Cortex</span>
           <span className="brand-cortex">Cortex</span>
         </div>
         <div className="topbar-spacer" />
@@ -3418,7 +4968,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                 onClick={() => setAgentMenuOpen(o => !o)}
                 title="Cambiar asistente"
               >
-                <span className="agent-icon">{currentAgent?.icon || '🤖'}</span>
+                <AgentIcon iconUrl={currentAgent?.icon_url} emoji={currentAgent?.icon} size={20} />
                 <span className="agent-name">{currentAgent?.name || 'Asistente'}</span>
                 <span className="agent-chevron">{agentMenuOpen ? '▲' : '▼'}</span>
               </button>
@@ -3430,7 +4980,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                       className={"agent-option" + (a.id === currentAgentId ? ' active' : '')}
                       onClick={() => switchAgent(a.id)}
                     >
-                      <span className="agent-icon">{a.icon || '🤖'}</span>
+                      <AgentIcon iconUrl={a.icon_url} emoji={a.icon} size={22} />
                       <div className="agent-option-text">
                         <div className="agent-option-name">{a.name}</div>
                         {a.description && <div className="agent-option-desc">{a.description}</div>}
@@ -3514,22 +5064,31 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
             <div className="messages-area">
             {messages.length === 0 ? (
               <div className="welcome">
-                <div className="welcome-mark">
-                  {currentAgent?.icon ? (
-                    <span style={{ fontSize: 32 }}>{currentAgent.icon}</span>
+                <div className="welcome-mark" style={{ background: 'transparent', border: 'none' }}>
+                  {(currentAgent?.icon_url || currentAgent?.icon) ? (
+                    <AgentIcon iconUrl={currentAgent?.icon_url} emoji={currentAgent?.icon} size={88} />
                   ) : (
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="M12 7v-3M12 20v-3"/>
                     </svg>
                   )}
                 </div>
-                <h1 className="welcome-title">Buenas, {username || 'usuario'}.</h1>
-                <p className="welcome-subtitle">
-                  {currentAgent
-                    ? <>Estás hablando con <b>{currentAgent.name}</b>{currentAgent.description ? ` — ${currentAgent.description}` : ''}</>
-                    : <>¿Qué necesitás <b>encontrar</b> hoy?</>
-                  }
-                </p>
+                <h1 className="welcome-title">{greeting}</h1>
+                {examples.length > 0 && (
+                  <div className="welcome-examples">
+                    {examples.map((ex, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        className="welcome-example"
+                        onClick={() => pickExample(ex)}
+                      >
+                        <span>{ex}</span>
+                        <span className="welcome-example-arrow">→</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -3540,13 +5099,65 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                   return (
                     <div key={i} className={`message-row ${m.role}`}>
                       <div className="message-block">
-                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Demo Company Cortex')}</div>
+                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Cortex')}</div>
                         {isUser ? (
-                          <div className="user-bubble"><UserContent content={m.content} /></div>
+                          editingMessageIdx === i ? (
+                            <form
+                              className="msg-edit-form"
+                              onSubmit={(e) => { e.preventDefault(); editMessage(i, editDraft); }}
+                            >
+                              <textarea
+                                className="msg-edit-textarea"
+                                value={editDraft}
+                                autoFocus
+                                onChange={(e) => setEditDraft(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    setEditingMessageIdx(null);
+                                    setEditDraft('');
+                                  } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                                    e.preventDefault();
+                                    editMessage(i, editDraft);
+                                  }
+                                }}
+                              />
+                              <div className="msg-edit-actions">
+                                <button
+                                  type="button"
+                                  onClick={() => { setEditingMessageIdx(null); setEditDraft(''); }}
+                                >
+                                  Cancelar
+                                </button>
+                                <button type="submit" className="primary" disabled={loading}>
+                                  Guardar y regenerar
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="user-bubble-wrap">
+                              <div className="user-bubble"><UserContent content={m.content} /></div>
+                              {!loading && (
+                                <button
+                                  className="msg-edit-btn"
+                                  title="Editar mensaje"
+                                  onClick={() => {
+                                    const txt = typeof m.content === 'string'
+                                      ? m.content
+                                      : (m.content.find(b => b.type === 'text')?.text || '');
+                                    setEditDraft(txt);
+                                    setEditingMessageIdx(i);
+                                  }}
+                                >
+                                  <Icon.Edit width="14" height="14" />
+                                </button>
+                              )}
+                            </div>
+                          )
                         ) : (
                           <>
                             <div className="assistant-card">
-                              <AssistantMd content={m.content} />
+                              <AssistantMd content={m.content} onProtectedDownload={downloadProtectedFile} />
                               {isStreaming && <span className="streaming-cursor" />}
                             </div>
                             {!isStreaming && !loading && (
@@ -3594,6 +5205,9 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                     <div className="progress-bar-track"><div className="progress-bar-fill" /></div>
                   </div>
                 )}
+                {loading && reasoningText && (
+                  <ReasoningPanel text={reasoningText} />
+                )}
                 <div ref={bottomRef} />
               </>
             )}
@@ -3602,53 +5216,75 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
         </div>
 
         <div className="composer-wrap">
-          {pendingImg && (
-            <div className="composer-attachment-preview">
-              <img src={pendingImg.previewUrl} className="composer-attachment-thumb" alt="" />
-              <span className="composer-attachment-name">{pendingImg.name}</span>
-              <button className="composer-attachment-remove" onClick={() => setPendingImg(null)} title="Quitar imagen">
-                <Icon.X width="14" height="14" />
-              </button>
-            </div>
-          )}
-          {pendingDocs.map((d, i) => (
-            <div key={i} className="composer-attachment-preview">
-              <div className="composer-attachment-doc-icon">📄</div>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                <span className="composer-attachment-name">{d.filename}</span>
-                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{d.char_count.toLocaleString()} caracteres extraídos</span>
-              </div>
-              <button className="composer-attachment-remove" onClick={() => removeDoc(i)} title="Quitar documento">
-                <Icon.X width="14" height="14" />
-              </button>
-            </div>
-          ))}
-          {uploadingDoc && (
-            <div className="composer-attachment-preview">
-              <span className="thinking-spinner" />
-              <span className="composer-attachment-name">Procesando documento…</span>
+          {/* Previews de los adjuntos pendientes (imágenes + docs) */}
+          {(pendingImgs.length > 0 || pendingDocs.length > 0 || uploadingDoc) && (
+            <div className="composer-attachments-row">
+              {pendingImgs.map((img, i) => (
+                <div key={`img-${i}`} className="composer-attachment-preview">
+                  <img src={img.previewUrl} className="composer-attachment-thumb" alt="" />
+                  <span className="composer-attachment-name">{img.name}</span>
+                  <button className="composer-attachment-remove" onClick={() => removeImg(i)} title="Quitar imagen">
+                    <Icon.X width="14" height="14" />
+                  </button>
+                </div>
+              ))}
+              {pendingDocs.map((d, i) => (
+                <div key={`doc-${i}`} className="composer-attachment-preview">
+                  <div className="composer-attachment-doc-icon">📄</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                    <span className="composer-attachment-name">{d.filename}</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{d.char_count.toLocaleString()} caracteres extraídos</span>
+                  </div>
+                  <button className="composer-attachment-remove" onClick={() => removeDoc(i)} title="Quitar documento">
+                    <Icon.X width="14" height="14" />
+                  </button>
+                </div>
+              ))}
+              {uploadingDoc && (
+                <div className="composer-attachment-preview">
+                  <span className="thinking-spinner" />
+                  <span className="composer-attachment-name">Procesando documento…</span>
+                </div>
+              )}
+              {(pendingImgs.length + pendingDocs.length) > 0 && (
+                <div className="composer-attachments-count">
+                  {pendingImgs.length + pendingDocs.length} / {MAX_ATTACHMENTS} adjuntos
+                </div>
+              )}
             </div>
           )}
           <div className="composer">
             <div className="composer-tools">
-              <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
-              <input ref={docFileRef} type="file" accept=".pdf,.docx,.pptx,.xlsx,.xlsm,.csv,.txt,.md,application/pdf" style={{ display: 'none' }} onChange={handleDocFileChange} />
-              <button className="composer-icon-btn" onClick={() => fileRef.current?.click()} disabled={loading || uploadingDoc} title="Adjuntar imagen">
+              {/* Un solo input acepta imágenes y documentos. El handler
+                  dispatch por tipo. Podés seleccionar varios archivos a la vez
+                  (Ctrl/Shift en el dialog de selección). */}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*,.pdf,.docx,.pptx,.xlsx,.xlsm,.csv,.txt,.md,application/pdf"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleAnyFileChange}
+              />
+              <button
+                className="composer-icon-btn"
+                onClick={() => fileRef.current?.click()}
+                disabled={loading || uploadingDoc || attachmentsCount() >= MAX_ATTACHMENTS}
+                title={attachmentsCount() >= MAX_ATTACHMENTS
+                  ? `Máximo ${MAX_ATTACHMENTS} adjuntos`
+                  : 'Adjuntar imágenes o documentos (podés seleccionar varios)'}
+              >
                 <Icon.Paperclip />
-              </button>
-              <button className="composer-icon-btn" onClick={() => docFileRef.current?.click()} disabled={loading || uploadingDoc} title="Adjuntar documento (PDF, Word, Excel, PowerPoint)">
-                <Icon.Doc />
               </button>
             </div>
             <textarea
               ref={textareaRef} rows={1}
               className="composer-input"
-              placeholder={pendingImg ? "Agregá una descripción (opcional)…" : "Consultá productos o pegá una imagen con Ctrl+V…"}
+              placeholder={pendingImgs.length ? "Agregá una descripción (opcional)…" : "Consultá productos o pegá una imagen con Ctrl+V…"}
               value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               onPaste={handlePaste}
               disabled={loading}
-              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'; }}
             />
             {HAS_SPEECH && (
               <div className="composer-tools">
@@ -3662,18 +5298,30 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                 </button>
               </div>
             )}
-            <button
-              className={`composer-send${loading ? ' is-loading' : ''}`}
-              onClick={() => sendMessage()}
-              disabled={loading || (!input.trim() && !pendingImg)}
-              title={loading ? 'Trabajando…' : 'Enviar (Enter)'}
-            >
-              {loading ? <span className="composer-send-spinner" /> : <Icon.ArrowUp />}
-            </button>
+            {loading ? (
+              <button
+                className="composer-send is-stop"
+                onClick={stopGeneration}
+                title="Detener generación"
+                aria-label="Detener generación"
+              >
+                <Icon.Stop />
+              </button>
+            ) : (
+              <button
+                className="composer-send"
+                onClick={() => sendMessage()}
+                disabled={!input.trim() && !pendingImgs.length}
+                title="Enviar (Enter)"
+                aria-label="Enviar mensaje"
+              >
+                <Icon.ArrowUp />
+              </button>
+            )}
           </div>
           <div className="composer-hint">
             <span className="composer-hint-text">
-              Cortex puede cometer errores. Por favor, chequeá todas sus respuestas.
+              El Cortex es IA y puede cometer errores. Siempre chequeá sus respuestas.
             </span>
             <span className="powered-by">powered by <b>AgentX</b></span>
           </div>
@@ -3686,28 +5334,72 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
 function App() {
   const [token, setTokenSt]    = useState(getToken);
   const [username, setUserSt]  = useState(getUsername);
-  const [theme, setThemeSt]    = useState(() => localStorage.getItem('demo_company_theme') || 'light');
+  const [theme, setThemeSt]    = useState(() => localStorage.getItem('cortex_theme') || 'light');
 
   // Aplicar tema al documento + persistir
   useEffect(() => {
     if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('demo_company_theme', theme);
+    localStorage.setItem('cortex_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setThemeSt(t => t === 'dark' ? 'light' : 'dark');
 
-  if (!token) return <Login onLogin={(t, u) => { setTokenSt(t); setUserSt(u); }} />;
-  return <Chat
-    token={token}
-    username={username}
-    theme={theme}
-    onToggleTheme={toggleTheme}
-    onLogout={() => { clearToken(); clearUsername(); setTokenSt(null); setUserSt(''); }}
-  />;
+  // UpdateBanner se monta SIEMPRE (también en el login) para que si hay
+  // un release nuevo mientras alguien está parado en login, se entere.
+  // Como fragment para no introducir un wrapper que rompa el layout.
+  if (!token) return (
+    <>
+      <UpdateBanner />
+      <Login onLogin={(t, u) => { setTokenSt(t); setUserSt(u); }} />
+    </>
+  );
+  return (
+    <>
+      <UpdateBanner />
+      <Chat
+        token={token}
+        username={username}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogout={() => { clearToken(); clearUsername(); setTokenSt(null); setUserSt(''); }}
+      />
+    </>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<!-- PWA: registrar Service Worker para que la app sea installable -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then((reg) => {
+          // Activar update inmediato si hay una versión nueva esperando
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                nw.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
+        })
+        .catch((err) => console.warn('SW registration failed:', err));
+
+      // Cuando se activa un SW nuevo, recargar para usar la versión actualizada
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading) return;
+        reloading = true;
+        window.location.reload();
+      });
+    });
+  }
 </script>
 </body>
 </html>

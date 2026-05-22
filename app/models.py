@@ -27,6 +27,7 @@ class AgentUpsertRequest(BaseModel):
     name: str = Field(min_length=1, max_length=80)
     description: str = Field(default="", max_length=300)
     icon: str = Field(default="🤖", max_length=8)
+    icon_url: str = Field(default="", max_length=200)
     allowed_tools: list[str] = Field(default_factory=list, max_length=20)
     default_tier: str = Field(default="auto", pattern=r"^(auto|pro|flash|lite)$")
     visibility: str = Field(default="public", pattern=r"^(public|private|users)$")

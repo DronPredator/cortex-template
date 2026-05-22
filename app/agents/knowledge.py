@@ -102,3 +102,108 @@ def invalidate_cache(agent_id: str | None = None) -> None:
         _cache.clear()
     else:
         _cache.pop(agent_id, None)
+
+
+# ── CRUD para el panel admin ─────────────────────────────────────────
+
+
+def list_knowledge_files_meta(agent_id: str) -> list[dict]:
+    """Lista archivos de conocimiento con metadata (nombre, tamaño, mtime).
+
+    Incluye archivos que empiezan con `_` para que el admin los vea (aunque
+    no se carguen al prompt). Marcados con `loaded=False`.
+    """
+    d = _agent_knowledge_dir(agent_id)
+    if not d.exists():
+        return []
+    out: list[dict] = []
+    for f in sorted(d.glob("*.md")):
+        try:
+            st = f.stat()
+            out.append({
+                "filename": f.name,
+                "size_bytes": st.st_size,
+                "mtime": st.st_mtime,
+                "loaded": not (f.name.startswith("_") or f.name.startswith(".")),
+            })
+        except Exception as e:
+            logger.warning("knowledge_file_stat_failed | {} | err={}", f.name, e)
+    return out
+
+
+def read_knowledge_file(agent_id: str, filename: str) -> str | None:
+    """Lee el contenido de un knowledge file específico. None si no existe."""
+    path = _safe_knowledge_path(agent_id, filename)
+    if path is None or not path.exists():
+        return None
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception as e:
+        logger.error("knowledge_read_failed | agent={} file={} err={}", agent_id, filename, e)
+        return None
+
+
+def save_knowledge_file(agent_id: str, filename: str, content: str) -> bool:
+    """Crea o sobrescribe un knowledge file. Devuelve True si OK."""
+    from app.security.files import safe_filename
+    from app.storage.atomic import atomic_write
+
+    # Sanitizar nombre y forzar extensión .md
+    clean = safe_filename(filename, default="documento.md")
+    if not clean.lower().endswith(".md"):
+        clean = clean + ".md"
+
+    d = _agent_knowledge_dir(agent_id)
+    d.mkdir(parents=True, exist_ok=True)
+    target = d / clean
+
+    # Verificar que el path final cae dentro del dir del agente (anti-traversal)
+    try:
+        if d.resolve() not in target.resolve().parents:
+            logger.warning("knowledge_save_blocked_traversal | agent={} name={}", agent_id, filename)
+            return False
+    except Exception:
+        return False
+
+    atomic_write(target, content)
+    invalidate_cache(agent_id)
+    logger.info("knowledge_file_saved | agent={} file={} bytes={}", agent_id, clean, len(content))
+    return True
+
+
+def delete_knowledge_file(agent_id: str, filename: str) -> bool:
+    """Borra un knowledge file. Devuelve True si se borró."""
+    path = _safe_knowledge_path(agent_id, filename)
+    if path is None or not path.exists():
+        return False
+    try:
+        path.unlink()
+        invalidate_cache(agent_id)
+        logger.info("knowledge_file_deleted | agent={} file={}", agent_id, filename)
+        return True
+    except Exception as e:
+        logger.error("knowledge_delete_failed | agent={} file={} err={}", agent_id, filename, e)
+        return False
+
+
+def _safe_knowledge_path(agent_id: str, filename: str):
+    """Resuelve la ruta de un knowledge file y valida anti path traversal.
+
+    Devuelve `Path` solo si el archivo está dentro del dir del agente y
+    es un `.md`. Si no, devuelve `None`.
+    """
+    from app.security.files import safe_filename
+
+    if not filename.lower().endswith(".md"):
+        return None
+    clean = safe_filename(filename, default="")
+    if not clean:
+        return None
+    d = _agent_knowledge_dir(agent_id)
+    target = d / clean
+    try:
+        if d.resolve() not in target.resolve().parents:
+            return None
+    except Exception:
+        return None
+    return target

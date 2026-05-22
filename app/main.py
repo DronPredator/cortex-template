@@ -7,7 +7,17 @@ y servir el frontend estático. NO contiene lógica de negocio.
 from __future__ import annotations
 
 import asyncio
+import os
 from contextlib import asynccontextmanager
+
+# B4: defusa los parsers XML de la stdlib (xml.etree, xml.sax, xml.dom,
+# minidom, pulldom, expat). Hardening defensivo contra entity expansion,
+# external entity reference, decompression bomb. lxml 6.x ya tiene
+# defaults seguros, pero esto cubre toda la stack incluyendo libs
+# transitivas que puedan caer en stdlib XML.
+# Tiene que estar ANTES de cualquier import que use parsers XML.
+import defusedxml
+defusedxml.defuse_stdlib()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,6 +33,7 @@ from app.security.rate_limit import limiter
 
 from app.config import DATASHEETS_DIR, DOCUMENTS_DIR, STATIC_DIR, settings
 from app.errors import register_error_handlers
+from app.version import __version__
 from app.logging_config import setup_logging
 from app.agents.registry import ensure_agents_file
 from app.routes import (
@@ -36,12 +47,18 @@ from app.routes import (
     auth,
     catalog,
     chat,
+    downloads,
     health,
     upload,
 )
 from app.storage.backups import backup_loop
 from app.storage.memory import memory_refresh_loop
 from app.storage.users import ensure_users_file
+
+
+# Swagger UI y OpenAPI schema desactivados por default — exponen el mapa
+# completo del API sin auth. Activar SOLO en dev/staging con DOCS_ENABLED=true.
+_DOCS_ENABLED = os.environ.get("DOCS_ENABLED", "false").lower() == "true"
 
 
 @asynccontextmanager
@@ -69,7 +86,17 @@ async def lifespan(_app: FastAPI):
     logger.info("app_shutdown")
 
 
-app = FastAPI(title="Cortex API", version="2.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="Fidemar Cortex API",
+    version=__version__,
+    lifespan=lifespan,
+    # Discovery surface mínima en producción. /docs y /openapi.json revelan
+    # la lista completa de endpoints, body schemas y validation errors —
+    # útil para devs, peligroso para atacantes. Se reactiva con DOCS_ENABLED=true.
+    docs_url="/docs" if _DOCS_ENABLED else None,
+    redoc_url="/redoc" if _DOCS_ENABLED else None,
+    openapi_url="/openapi.json" if _DOCS_ENABLED else None,
+)
 
 # Rate limiting (slowapi) — anti brute-force y anti abuse
 app.state.limiter = limiter
@@ -106,6 +133,7 @@ app.include_router(admin_memory.router)
 app.include_router(admin_conversations.router)
 app.include_router(upload.router)
 app.include_router(catalog.router)
+app.include_router(downloads.router)
 
 # Frontend estático (debe ir al final — captura todo lo que no matcheó arriba)
 app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")

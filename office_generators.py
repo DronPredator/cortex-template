@@ -1,4 +1,4 @@
-"""Generadores de Word (.docx) y Excel (.xlsx) con branding del cliente.
+"""Generadores de Word (.docx) y Excel (.xlsx) con branding Fidemar S.A.
 
 Ambas funciones reciben datos estructurados (sections/sheets) y devuelven
 {filename, url, size_bytes}. Diseñados para ser tolerantes a entradas malformadas
@@ -13,23 +13,28 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-BRAND_HEX  = "1A4EA0"  # personalizar por instancia si querés otro color
+BRAND_HEX  = "1A4EA0"
 BRAND_RGB  = (0x1A, 0x4E, 0xA0)
 TEXT_HEX   = "1D1D1F"
 SUBT_HEX   = "515154"
-
-
-def _company_name() -> str:
-    """Lee el nombre desde settings (no hardcoded)."""
-    try:
-        from app.config import settings
-        return settings.company_full_name
-    except Exception:
-        return "Demo Company S.A."
+COMPANY    = "Fidemar S.A."
 
 
 def _safe_filename(prefix: str, title: str, ext: str) -> str:
-    base = "".join(c if c.isalnum() else "_" for c in (title or "documento"))
+    """Genera un filename ASCII-only que sobreviva al round-trip por URL +
+    `safe_filename()` del endpoint de download.
+
+    BUG-FIX (v1.3.1): antes usábamos `c.isalnum()` que en Python con strings
+    Unicode acepta tildes y eñes como alfanumeric. Eso producía filenames
+    tipo `fidemar_Informe_Técnico_a1b2c3.docx` que el endpoint
+    `/documents/{filename}` rechazaba con 400 porque su `safe_filename()`
+    normaliza NFKD y la `é` se descomponía a `e + ́` (combining acute),
+    rompiendo la igualdad `clean == filename`.
+
+    Solución: solo aceptar `[A-Za-z0-9]` en el stem. Tildes, eñes y demás
+    se reemplazan por `_`.
+    """
+    base = "".join(c if (c.isascii() and c.isalnum()) else "_" for c in (title or "documento"))
     base = (base.strip("_") or "documento")[:40]
     rand = secrets.token_hex(3)
     return f"{prefix}_{base}_{rand}.{ext}"
@@ -182,10 +187,8 @@ def generate_word_document(
     title: str,
     sections: Any,
     subtitle: str = "",
-    author: str | None = None,
+    author: str = COMPANY,
 ) -> dict:
-    if author is None:
-        author = _company_name()
     """Genera un .docx con secciones tipadas.
 
     `sections` puede venir como list o como JSON-string. Cada item tiene `type`:
@@ -217,7 +220,7 @@ def generate_word_document(
     # Banner / título
     head = doc.add_paragraph()
     head.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run = head.add_run(_company_name())
+    run = head.add_run(COMPANY)
     run.font.size = Pt(10)
     run.font.color.rgb = RGBColor(*BRAND_RGB)
     run.bold = True
@@ -304,7 +307,7 @@ def generate_word_document(
     rf.font.color.rgb = RGBColor(0x86, 0x86, 0x8B)
     rf.italic = True
 
-    filename = _safe_filename("cortex", title, "docx")
+    filename = _safe_filename("fidemar", title, "docx")
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / filename
     doc.save(out_path)
@@ -403,7 +406,7 @@ def generate_excel_spreadsheet(
                     max_len = max(max_len, min(40, len(str(r[ci-1]))))
             ws.column_dimensions[letter].width = max_len + 2
 
-    filename = _safe_filename("cortex", title, "xlsx")
+    filename = _safe_filename("fidemar", title, "xlsx")
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / filename
     wb.save(out_path)
