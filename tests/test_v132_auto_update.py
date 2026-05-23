@@ -96,7 +96,7 @@ def test_reset_cache_page_servible(client):
     r = client.get("/reset-cache.html")
     assert r.status_code == 200
     assert "text/html" in r.headers.get("content-type", "")
-    assert "Reseteando Fidemar Cortex" in r.text
+    assert "Reseteando Cortex" in r.text
 
 
 # ── Service Worker ────────────────────────────────────────────────────

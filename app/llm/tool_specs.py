@@ -1,7 +1,7 @@
-"""Especificaciones de tools del LLM en formato Anthropic.
+"""LLM tool specifications (Anthropic-compatible format).
 
-Estas specs se le pasan al modelo. El handler real (qué hace cuando se
-llama una tool) está en `app/routes/chat.py` y `app/routes/admin_chat.py`.
+These specs are passed to the model. The actual handlers (what runs when
+a tool is called) live in `app/routes/chat.py` and `app/routes/admin_chat.py`.
 """
 
 from __future__ import annotations
@@ -12,25 +12,24 @@ from app.config import settings
 CATALOG_TOOL = {
     "name": "catalog_search",
     "description": (
-        "Busca ítems en el catálogo completo de Fidemar S.A. (12.500 ítems). "
-        f"Devuelve hasta {settings.catalog_result_limit} resultados ranqueados por relevancia "
-        "+ el total real de coincidencias. "
-        "Para ver más allá de los primeros 200, pasar `offset: 200`, `offset: 400`, etc. "
-        "Llamar múltiples veces con diferentes términos para búsquedas exhaustivas. "
-        "Usar términos técnicos: marca (NUTORK, BERMAD, NIVELCO...), tipo de componente "
-        "(valvula, actuador, sensor, manometro...), tamaño (DN100, 2 pulgadas, 1/2...), "
-        "material (acero, SS316...), norma (API, ANSI, DIN...) o código de producto."
+        "Search the product catalog. "
+        f"Returns up to {settings.catalog_result_limit} results ranked by "
+        "relevance plus the real total of matches. "
+        "To page beyond the first 200, pass `offset: 200`, `offset: 400`, etc. "
+        "Call multiple times with different terms for exhaustive searches. "
+        "Use technical terms: brand, component type, size, material, "
+        "standard, or product code."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "Términos de búsqueda. Ejemplos: 'NUTORK actuador electrico', 'BERMAD control hidraulico'",
+                "description": "Search terms. Example: 'BRAND component type'.",
             },
             "offset": {
                 "type": "integer",
-                "description": "Offset para paginación (default 0). Usar 200, 400... para páginas siguientes cuando hay >200 coincidencias.",
+                "description": "Pagination offset (default 0). Use 200, 400... for next pages when there are >200 matches.",
                 "default": 0,
             },
         },
@@ -41,15 +40,16 @@ CATALOG_TOOL = {
 FETCH_PAGE_TOOL = {
     "name": "fetch_product_data",
     "description": (
-        "Descarga una página web (HTML) y extrae el título, el texto principal limpio y las "
-        "tablas de especificaciones. Usar cuando NO encontraste un PDF descargable verificado "
-        "del fabricante, pero hay páginas con datos técnicos disponibles. "
-        "Devuelve {title, text, tables, char_count}."
+        "Download an HTML page and extract title, main clean text, and "
+        "specification tables. Use this when you couldn't find a verified "
+        "downloadable PDF datasheet from the manufacturer but there are "
+        "web pages with technical data. "
+        "Returns {title, text, tables, char_count}."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
-            "url": {"type": "string", "description": "URL de la página HTML a scrapear"}
+            "url": {"type": "string", "description": "URL of the HTML page to scrape"}
         },
         "required": ["url"],
     },
@@ -58,29 +58,29 @@ FETCH_PAGE_TOOL = {
 GENERATE_DATASHEET_TOOL = {
     "name": "generate_datasheet_pdf",
     "description": (
-        "Genera una ficha técnica PDF profesional con branding de Fidemar S.A. "
-        "Usar SOLO como ÚLTIMO RECURSO cuando NO existe un datasheet PDF oficial descargable. "
-        "Devuelve {filename, url} — usá la URL en tu respuesta al usuario."
+        "Generate a professional product datasheet PDF. "
+        "Use ONLY as a LAST RESORT when no official downloadable datasheet "
+        "PDF exists. Returns {filename, url} — show the URL to the user."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
-            "title": {"type": "string", "description": "Título del producto"},
-            "manufacturer": {"type": "string", "description": "Marca del fabricante"},
-            "model": {"type": "string", "description": "Modelo o código"},
-            "description": {"type": "string", "description": "Descripción técnica (1-3 párrafos)"},
+            "title": {"type": "string", "description": "Product title"},
+            "manufacturer": {"type": "string", "description": "Manufacturer brand"},
+            "model": {"type": "string", "description": "Model or code"},
+            "description": {"type": "string", "description": "Technical description (1-3 paragraphs)"},
             "specifications": {
                 "type": "object",
                 "description": (
-                    "Specs técnicas como pares clave-valor. Pasar como JSON-encoded string. "
-                    'Ejemplo: {"Presión nominal":"PN16","Material":"Hierro dúctil"}'
+                    "Technical specs as key-value pairs. Pass as a JSON-encoded string. "
+                    'Example: {"Nominal pressure":"PN16","Material":"Ductile iron"}'
                 ),
             },
-            "applications": {"type": "string", "description": "Aplicaciones típicas"},
+            "applications": {"type": "string", "description": "Typical applications"},
             "source_urls": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": "URLs oficiales consultadas",
+                "description": "Official URLs consulted",
             },
         },
         "required": ["title", "manufacturer", "model", "specifications"],
@@ -90,19 +90,19 @@ GENERATE_DATASHEET_TOOL = {
 GENERATE_WORD_TOOL = {
     "name": "generate_word_document",
     "description": (
-        "Genera un documento Word (.docx) con branding Fidemar. "
-        "Usar cuando el usuario pide informes, propuestas, cotizaciones, memorias técnicas. "
-        "Soporta títulos, párrafos, tablas y listas."
+        "Generate a Word (.docx) document with deployment branding. "
+        "Use when the user requests reports, proposals, quotes, or technical "
+        "memos. Supports titles, paragraphs, tables, and lists."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
-            "title": {"type": "string", "description": "Título principal"},
-            "subtitle": {"type": "string", "description": "Subtítulo opcional"},
+            "title": {"type": "string", "description": "Main title"},
+            "subtitle": {"type": "string", "description": "Optional subtitle"},
             "sections": {
                 "type": "string",
                 "description": (
-                    "JSON-string con lista de secciones. Cada una uno de:\n"
+                    "JSON-string with a list of sections. Each one of:\n"
                     '{"type":"heading","level":1|2|3,"text":"..."}\n'
                     '{"type":"paragraph","text":"..."}\n'
                     '{"type":"bullet","items":["a","b"]}\n'
@@ -118,18 +118,18 @@ GENERATE_WORD_TOOL = {
 GENERATE_EXCEL_TOOL = {
     "name": "generate_excel_spreadsheet",
     "description": (
-        "Genera planilla Excel (.xlsx) con una o más hojas. "
-        "Usar para listados, comparativas, cotizaciones tabulares, inventarios."
+        "Generate an Excel (.xlsx) spreadsheet with one or more sheets. "
+        "Use for lists, comparison tables, tabular quotes, or inventories."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
-            "title": {"type": "string", "description": "Nombre del archivo"},
+            "title": {"type": "string", "description": "File name"},
             "sheets": {
                 "type": "string",
                 "description": (
-                    "JSON-string con lista de hojas. Cada una:\n"
-                    '{"name":"NombreHoja","headers":["Col1","Col2"],"rows":[["v1","v2"]]}'
+                    "JSON-string with a list of sheets. Each one:\n"
+                    '{"name":"SheetName","headers":["Col1","Col2"],"rows":[["v1","v2"]]}'
                 ),
             },
         },
@@ -140,22 +140,22 @@ GENERATE_EXCEL_TOOL = {
 VERIFY_PDF_TOOL = {
     "name": "verify_pdf_url",
     "description": (
-        "Verifica HTTP que una URL apunta a un PDF real "
-        "(responde 200 + Content-Type pdf + magic bytes %PDF). "
-        "Devuelve {valid, status, content_type, size_bytes, final_url, reason}. "
-        "REGLAS DE USO:\n"
-        "1) SIEMPRE llamala antes de citar al usuario una URL como datasheet/manual PDF.\n"
-        "2) Usá SOLO URLs verbatim de búsquedas — NO inventes ni modifiques URLs.\n"
-        "3) NO le agregues `.pdf` a URLs que no lo tienen — casi siempre da 404.\n"
-        "4) Si retorna valid=false, ESA URL NO EXISTE — descartala, NO intentes variantes.\n"
-        "5) Si retorna 'redirige a login' o 'no es PDF' — tampoco la cites."
+        "Verify via HTTP that a URL points to a real PDF "
+        "(responds 200 + Content-Type pdf + magic bytes %PDF). "
+        "Returns {valid, status, content_type, size_bytes, final_url, reason}. "
+        "USAGE RULES:\n"
+        "1) ALWAYS call this before citing a URL to the user as a datasheet/manual PDF.\n"
+        "2) Use ONLY verbatim URLs from search results — DO NOT invent or modify URLs.\n"
+        "3) DO NOT append `.pdf` to URLs that don't already have it — almost always 404.\n"
+        "4) If returns valid=false, THAT URL DOES NOT EXIST — discard it, don't try variants.\n"
+        "5) If it returns 'redirects to login' or 'not a PDF' — don't cite it either."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "url": {
                 "type": "string",
-                "description": "URL completa a verificar (http/https).",
+                "description": "Complete URL to verify (http/https).",
             }
         },
         "required": ["url"],
@@ -165,20 +165,20 @@ VERIFY_PDF_TOOL = {
 TAVILY_SEARCH_TOOL = {
     "name": "tavily_search",
     "description": (
-        "Búsqueda web avanzada con Tavily AI, optimizada para agentes. "
-        "Devuelve título, URL y contenido extraído. "
-        "Ideal para datasheets, manuales, fichas de fabricantes, distribuidores."
+        "Advanced web search via Tavily AI, optimized for agents. "
+        "Returns title, URL, and extracted content. "
+        "Ideal for datasheets, manuals, manufacturer pages, distributors."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "Consulta. Puede incluir filetype:pdf, site:dominio.com.",
+                "description": "Query. Can include filetype:pdf, site:domain.com.",
             },
             "search_depth": {
                 "type": "string",
-                "description": "'basic' (rápido) o 'advanced' (default, mejor para datasheets).",
+                "description": "'basic' (fast) or 'advanced' (default, better for datasheets).",
                 "default": "advanced",
             },
         },
@@ -189,35 +189,35 @@ TAVILY_SEARCH_TOOL = {
 SAVE_AGENT_PROMPT_TOOL = {
     "name": "save_agent_prompt",
     "description": (
-        "Actualiza el SYSTEM PROMPT completo de un agente específico. "
-        "Proporcionar el texto COMPLETO actualizado del prompt (markdown). "
-        "El prompt anterior se reemplaza por el nuevo (no se mergea). "
-        "Antes de llamar esta tool, confirmá al admin: 'voy a guardar el prompt "
-        "completo del agente X, vas a perder lo que estaba antes — ¿procedo?'."
+        "Replace a specific agent's full SYSTEM PROMPT. "
+        "Provide the COMPLETE updated prompt text (markdown). "
+        "The previous prompt is REPLACED (not merged). "
+        "Before calling this tool, confirm with the admin: 'I'm about to save "
+        "the complete prompt for agent X, you'll lose what was there — proceed?'."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "agent_id": {
                 "type": "string",
-                "description": "ID del agente a editar (ej: 'fidi', 'steamy_seg', 'generador_codigos').",
+                "description": "ID of the agent to edit (e.g.: 'demo_assistant').",
             },
             "new_prompt": {
                 "type": "string",
-                "description": "Texto markdown COMPLETO del nuevo prompt del agente.",
+                "description": "COMPLETE markdown text of the new agent prompt.",
             },
         },
         "required": ["agent_id", "new_prompt"],
     },
 }
 
-# DEPRECADO — se mantiene la spec por backward compat con sesiones de admin
-# que todavía no actualizaron al nuevo flujo. NO se exporta en ADMIN_CHAT_TOOLS.
+# DEPRECATED — spec kept for backward compat with admin sessions that
+# haven't updated to the new flow. NOT exported in ADMIN_CHAT_TOOLS.
 SAVE_BEHAVIOR_TOOL = {
     "name": "save_behavior",
     "description": (
-        "[DEPRECADO] Antes editaba un 'comportamiento global' que ya no existe. "
-        "Usar save_agent_prompt en su lugar."
+        "[DEPRECATED] Previously edited a 'global behavior' that no longer exists. "
+        "Use save_agent_prompt instead."
     ),
     "input_schema": {
         "type": "object",
@@ -229,7 +229,7 @@ SAVE_BEHAVIOR_TOOL = {
 }
 
 
-# Bundle de tools para cada tipo de chat
+# Tool bundle for each chat type
 CHAT_TOOLS = [
     CATALOG_TOOL,
     VERIFY_PDF_TOOL,
@@ -243,15 +243,15 @@ CHAT_TOOLS = [
 ADMIN_CHAT_TOOLS = [SAVE_AGENT_PROMPT_TOOL]
 
 
-# Lookup por nombre — para filtrar dinámicamente según el agente activo
+# Lookup by name — used to dynamically filter tools based on the active agent
 TOOLS_BY_NAME: dict[str, dict] = {t["name"]: t for t in CHAT_TOOLS}
 
 
 def filter_tools(allowed_names: list[str]) -> list[dict]:
-    """Devuelve solo las tools cuyo nombre está en `allowed_names`.
+    """Return only the tools whose name is in `allowed_names`.
 
-    Si `allowed_names` está vacío, devuelve lista vacía (agente sin tools).
-    Si una tool listada no existe en TOOLS_BY_NAME, se ignora silenciosamente
-    (forward-compat: permite que agentes referencien tools futuras).
+    If `allowed_names` is empty, returns an empty list (agent with no tools).
+    If a listed tool doesn't exist in TOOLS_BY_NAME, it's silently ignored
+    (forward-compat: allows agents to reference future tools).
     """
     return [TOOLS_BY_NAME[name] for name in allowed_names if name in TOOLS_BY_NAME]

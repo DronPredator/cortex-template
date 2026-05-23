@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Fidemar Cortex</title>
+  <title>Cortex</title>
 
   <!-- PWA: instalable como app en Chrome/Edge/iOS/Android -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1A4EA0" />
-  <meta name="application-name" content="Fidemar Cortex" />
-  <meta name="description" content="Plataforma agéntica interna de Fidemar S.A." />
+  <meta name="application-name" content="Cortex" />
+  <meta name="description" content="Plataforma agéntica interna de Cortex" />
 
   <!-- iOS / Safari (PWA en home screen) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -2174,7 +2174,7 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-const STORAGE_KEY = 'fidemar_chats';
+const STORAGE_KEY = 'cortex_chats';
 const HAS_SPEECH  = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
 function md(text) {
@@ -2278,18 +2278,18 @@ function copyTableToClipboard(table, btn) {
     flash(false);
   }
 }
-function getToken()    { return localStorage.getItem('fidemar_token'); }
-function setToken(t)   { localStorage.setItem('fidemar_token', t); }
-function clearToken()  { localStorage.removeItem('fidemar_token'); }
-function getUsername() { return localStorage.getItem('fidemar_user') || ''; }
-function setUsername(u){ localStorage.setItem('fidemar_user', u); }
-function clearUsername(){ localStorage.removeItem('fidemar_user'); }
-function getAdminTok() { return sessionStorage.getItem('fidemar_admin_token'); }
-function setAdminTok(t){ sessionStorage.setItem('fidemar_admin_token', t); }
-function clearAdminTok(){ sessionStorage.removeItem('fidemar_admin_token'); }
+function getToken()    { return localStorage.getItem('cortex_token'); }
+function setToken(t)   { localStorage.setItem('cortex_token', t); }
+function clearToken()  { localStorage.removeItem('cortex_token'); }
+function getUsername() { return localStorage.getItem('cortex_user') || ''; }
+function setUsername(u){ localStorage.setItem('cortex_user', u); }
+function clearUsername(){ localStorage.removeItem('cortex_user'); }
+function getAdminTok() { return sessionStorage.getItem('cortex_admin_token'); }
+function setAdminTok(t){ sessionStorage.setItem('cortex_admin_token', t); }
+function clearAdminTok(){ sessionStorage.removeItem('cortex_admin_token'); }
 function genId()       { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-function chatsKey(user) { return user ? `fidemar_chats_${user}` : STORAGE_KEY; }
+function chatsKey(user) { return user ? `cortex_chats_${user}` : STORAGE_KEY; }
 function loadChats(user) { try { return JSON.parse(localStorage.getItem(chatsKey(user)) || '[]'); } catch { return []; } }
 function saveChats(c, user) { try { localStorage.setItem(chatsKey(user), JSON.stringify(c)); } catch {} }
 
@@ -2460,7 +2460,7 @@ function WorkingChip({ steps, isStreaming, activeModel }) {
     sub = 'Redactando respuesta';
   }
   // Mostrar tier del modelo activo. Funciona para los 3 modos de selección:
-  //   - source = "auto:flash" → router automático eligió Flash (FIDI)
+  //   - source = "auto:flash" → router automático eligió Flash (Demo Assistant)
   //   - source = "agent:<id>"  → el agente tiene tier fijo (Steamy, Generador)
   //   - source = "manual"      → modelo override por config admin
   // Derivamos el tier del nombre del modelo (más robusto que del source).
@@ -2535,7 +2535,7 @@ function ReasoningPanel({ text }) {
    no técnico). Usa <details> nativo → el browser persiste el open/closed
    por instancia mientras la pestaña esté abierta.
 
-   Idioma: Gemini devuelve los thoughts en inglés por default (en Fidemar
+   Idioma: Gemini devuelve los thoughts en inglés por default (en Cortex
    forzamos español vía LANGUAGE_DIRECTIVE, así que acá los thoughts ya
    vienen traducidos cuando el deploy lo configura). Igual mostramos el
    chip "(inglés)" si detectamos signos típicos de inglés — heurística
@@ -2692,7 +2692,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Encontré en catálogo',
                 verify_pdf_url:       s.valid ? 'PDF verificado' : 'PDF NO válido',
                 fetch_product_data:   s.valid ? 'Datos scrapeados' : 'Fallo scraping',
-                generate_datasheet_pdf: s.valid ? 'PDF Fidemar generado' : 'Error generando PDF',
+                generate_datasheet_pdf: s.valid ? 'PDF Cortex generado' : 'Error generando PDF',
                 generate_word_document: s.valid ? 'Word generado' : 'Error generando Word',
                 generate_excel_spreadsheet: s.valid ? 'Excel generado' : 'Error generando Excel',
                 web_search:           'Encontré en la web',
@@ -2701,7 +2701,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Buscando en catálogo',
                 verify_pdf_url:       'Verificando PDF',
                 fetch_product_data:   'Scrapeando página',
-                generate_datasheet_pdf: 'Generando ficha técnica Fidemar',
+                generate_datasheet_pdf: 'Generando ficha técnica Cortex',
                 generate_word_document: 'Generando documento Word',
                 generate_excel_spreadsheet: 'Generando planilla Excel',
                 web_search:           'Buscando en la web',
@@ -3124,7 +3124,7 @@ function AdminChatTab({ adminToken, onSaved }) {
           const isStreaming = m.streaming && isLast;
           return (
             <div key={i} className={`admin-msg ${m.role}`}>
-              <div className="admin-msg-role">{m.role === 'user' ? 'Bruno' : 'Agente'}</div>
+              <div className="admin-msg-role">{m.role === 'user' ? 'User' : 'Agente'}</div>
               <div className="admin-msg-bubble">
                 {m.role === 'assistant'
                   ? <>
@@ -4048,7 +4048,7 @@ function AgentsTab({ adminToken, onSaved }) {
               style={{
                 width: '100%',
                 /* BUG-FIX v1.3.3: editor de prompts más grande para que
-                   los prompts largos (FIDI ~15KB) se puedan editar sin
+                   los prompts largos (Demo Assistant ~15KB) se puedan editar sin
                    scroll constante. Antes era rows=26 + sin minHeight. */
                 minHeight: '70vh',
                 padding: '14px 16px',
@@ -4171,7 +4171,7 @@ function AdminPanel({ adminToken, onClose }) {
       {toast && <div className="toast">{toast}</div>}
       <div className="admin-panel">
         <div className="admin-header">
-          <span className="admin-header-title">Fidemar Cortex · Admin</span>
+          <span className="admin-header-title">Cortex · Admin</span>
           <span className="admin-badge">ADMIN</span>
           <div className="admin-header-right">
             <button className="btn-ghost" style={{ color: 'rgba(255,255,255,.8)', borderColor: 'rgba(255,255,255,.3)' }} onClick={onClose}>Cerrar ✕</button>
@@ -4260,7 +4260,7 @@ function Login({ onLogin }) {
           </svg>
         </div>
         <div className="login-logo-wrap">
-          <span className="login-logo">Fidemar</span>
+          <span className="login-logo">Cortex</span>
           <span className="login-cortex">Cortex</span>
         </div>
         <div className="login-tagline">Plataforma agéntica interna</div>
@@ -4277,7 +4277,7 @@ function Login({ onLogin }) {
         </button>
         {err && <div className="error-msg">{err}</div>}
         <div className="login-footer">
-          Acceso interno · Fidemar S.A.
+          Acceso interno · Cortex
           <div style={{ marginTop: 10, fontSize: 9.5, opacity: 0.55, letterSpacing: '0.04em' }}>
             powered by <b style={{ fontWeight: 600 }}>AgentX</b>
           </div>
@@ -4310,7 +4310,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // ── Agentes ─────────────────────────────────────────────────────
   const [agents,         setAgents]         = useState([]);
   const [currentAgentId, setCurrentAgentId] = useState(() => {
-    try { return localStorage.getItem(`fidemar_agent_${username}`) || null; } catch { return null; }
+    try { return localStorage.getItem(`cortex_agent_${username}`) || null; } catch { return null; }
   });
   const [agentMenuOpen,  setAgentMenuOpen]  = useState(false);
 
@@ -4340,11 +4340,11 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   }, [input]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3000); return () => clearTimeout(t); }, [toast]);
 
-  // Migración: chats viejos (pre-multiusuario) estaban en 'fidemar_chats' sin namespace
+  // Migración: chats viejos (pre-multiusuario) estaban en 'cortex_chats' sin namespace
   useEffect(() => {
     if (!username) return;
     try {
-      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'fidemar_chats'
+      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'cortex_chats'
       const newRaw = localStorage.getItem(chatsKey(username));
       const hasOld = oldRaw && oldRaw !== '[]' && oldRaw !== 'null';
       const hasNew = newRaw && newRaw !== '[]' && newRaw !== 'null';
@@ -4400,7 +4400,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // Persistir el agente activo
   useEffect(() => {
     if (!currentAgentId || !username) return;
-    try { localStorage.setItem(`fidemar_agent_${username}`, currentAgentId); } catch {}
+    try { localStorage.setItem(`cortex_agent_${username}`, currentAgentId); } catch {}
   }, [currentAgentId, username]);
 
   // Cerrar el menú al click afuera
@@ -4423,7 +4423,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // Razonamiento del modelo durante la generación (ephemeral). Se llena con
   // eventos `reasoning` del SSE; se limpia al empezar otro stream. La idea
   // es mostrar el "pensamiento" del modelo (Steamy, Generador) en vivo,
-  // como ya hacíamos con FIDI vía thinking events.
+  // como ya hacíamos con Demo Assistant vía thinking events.
   const [reasoningText, setReasoningText] = useState('');
   // Edición inline de mensaje del usuario (estilo Gemini). Cuando es null
   // no hay edición activa; cuando es un número, ese índice del array
@@ -5025,7 +5025,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const userLabel = (username || 'Usuario').toUpperCase();
     const header = [
       '═══════════════════════════════════════════════════════════════',
-      '  FIDEMAR · CORTEX',
+      '  CORTEX · CORTEX',
       `  Conversación: ${chatTitle}`,
       `  Usuario: ${username || '—'}`,
       `  Exportado: ${dateStr}`,
@@ -5054,7 +5054,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
         .replace(/^#{1,6}\s+/gm, '')                // headings
         .replace(/^\s*[-*]\s+/gm, ' • ')            // listas
         .replace(/\n{3,}/g, '\n\n');                // colapsar saltos múltiples
-      const who = m.role === 'user' ? userLabel : 'FIDEMAR CORTEX';
+      const who = m.role === 'user' ? userLabel : 'CORTEX';
       return `[ ${who} ]\n${'─'.repeat(64)}\n${clean.trim()}`;
     });
 
@@ -5062,7 +5062,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
       '',
       '═══════════════════════════════════════════════════════════════',
       '  Fin de la conversación',
-      '  Generado por Fidemar S.A. — Agente Consultor',
+      '  Generado por Cortex — Agente Consultor',
       '═══════════════════════════════════════════════════════════════',
     ].join('\n');
 
@@ -5075,7 +5075,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const safeTitle = (chatTitle || 'conversacion').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_').slice(0, 40) || 'conversacion';
     const dateTag   = now.toISOString().slice(0, 10);
     a.href     = url;
-    a.download = `fidemar_${dateTag}_${safeTitle}.txt`;
+    a.download = `cortex_${dateTag}_${safeTitle}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -5112,7 +5112,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
           <Icon.Menu />
         </button>
         <div className="brand">
-          <span className="brand-logo">Fidemar</span>
+          <span className="brand-logo">Cortex</span>
           <span className="brand-cortex">Cortex</span>
         </div>
         <div className="topbar-spacer" />
@@ -5273,7 +5273,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                   return (
                     <div key={i} className={`message-row ${m.role}`}>
                       <div className="message-block">
-                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Fidemar Cortex')}</div>
+                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Cortex')}</div>
                         {isUser ? (
                           editingMessageIdx === i ? (
                             <form
@@ -5531,13 +5531,13 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
 function App() {
   const [token, setTokenSt]    = useState(getToken);
   const [username, setUserSt]  = useState(getUsername);
-  const [theme, setThemeSt]    = useState(() => localStorage.getItem('fidemar_theme') || 'light');
+  const [theme, setThemeSt]    = useState(() => localStorage.getItem('cortex_theme') || 'light');
 
   // Aplicar tema al documento + persistir
   useEffect(() => {
     if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('fidemar_theme', theme);
+    localStorage.setItem('cortex_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setThemeSt(t => t === 'dark' ? 'light' : 'dark');

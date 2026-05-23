@@ -6,9 +6,58 @@ Format: [Keep a Changelog](https://keepachangelog.com) · SemVer: `MAJOR.MINOR.P
 
 ---
 
+## [2.1.1] — 2026-05-22
+
+Public-release cleanup. No functional changes — only branding,
+terminology, and LLM-facing language alignment.
+
+### Removed — Client-specific brand references
+
+- All occurrences of the reference deployment's brand name removed from
+  the entire repo: backend Python (constants, FastAPI title, log
+  filenames, NSSM service name, color constants), frontend (localStorage
+  keys, document title, manifest, login screen, generated PDF headers),
+  scripts, and tests.
+- Reference-deployment agent names (used as placeholders in tests and
+  comments) replaced with the generic `demo_assistant`.
+- ~101 replacements across 17 files. Verified: 0 brand references
+  remain anywhere in the repo.
+
+### Changed — LLM-facing prompts translated to English
+
+Strings that the model actually reads (tool descriptions, system
+prompts, agent definitions, and the prompt-injection guard) are now in
+English for clarity in a public template. Deployments can override any
+of these in their `.env` / `agents.json` / `app/agents/definitions/*.md`
+with their own language.
+
+Files updated:
+- `app/llm/tool_specs.py` — all 9 tool descriptions and input schemas.
+- `app/prompts/system.md` — minimal admin-chat base prompt.
+- `app/prompts/admin.md` — administrator-mode chat prompt.
+- `app/agents/definitions/demo_assistant.md` — template demo agent.
+- `app/storage/memory.py` — memory-summary analysis prompt.
+- `app/routes/chat.py` — prompt-injection guard wrapper around uploaded
+  user content (the security-critical text that tells the model to
+  treat uploads as data, not instructions).
+
+### Note — UI strings & internal comments
+
+UI strings inside `static/index.html` (welcome screen, button labels,
+error toasts) and internal Python comments are left in the original
+language for now. Downstream deployments can translate or override per
+locale. The `LANGUAGE_DIRECTIVE` env var also gives deployments full
+control over the language of model outputs and internal thoughts.
+
+### Tests
+
+Suite unchanged structurally — **160/160 passing**.
+
+---
+
 ## [2.1.0] — 2026-05-22
 
-Sync from the reference deployment (Fidemar Cortex v1.4.1 → v1.5.0) — three
+Sync from the reference deployment (Cortex v1.4.1 → v1.5.0) — three
 operational improvements landed there that are generic enough to be useful
 to any deployment.
 

@@ -1,4 +1,4 @@
-/* Service Worker mínimo para Fidemar Cortex PWA.
+/* Service Worker mínimo para Cortex PWA.
  *
  * Estrategia:
  * - Estrategia network-first para assets estáticos (HTML/CSS/JS/iconos)

@@ -87,7 +87,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="Fidemar Cortex API",
+    title="Cortex API",
     version=__version__,
     lifespan=lifespan,
     # Discovery surface mínima en producción. /docs y /openapi.json revelan

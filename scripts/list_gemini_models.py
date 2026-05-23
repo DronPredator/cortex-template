@@ -80,7 +80,7 @@ def main():
     print("  1. Editar app/config.py")
     print("  2. Cambiar MODEL_TIER_PRO / MODEL_TIER_FLASH / MODEL_TIER_LITE")
     print("  3. Actualizar AVAILABLE_GEMINI_MODELS con el nuevo entry")
-    print("  4. nssm restart FidemarChat  (o restart manual del server)")
+    print("  4. nssm restart CortexChat  (o restart manual del server)")
 
 
 if __name__ == "__main__":

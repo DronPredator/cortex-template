@@ -1,8 +1,8 @@
 {
-  "name": "Fidemar Cortex",
+  "name": "Cortex",
   "short_name": "Cortex",
-  "description": "Plataforma agéntica interna de Fidemar S.A.",
-  "id": "fidemar-cortex",
+  "description": "Plataforma agéntica interna de Cortex",
+  "id": "cortex-cortex",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
