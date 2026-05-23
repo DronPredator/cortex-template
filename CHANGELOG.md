@@ -1,195 +1,103 @@
 # Changelog — Cortex Template
 
-Todos los cambios notables al blueprint base de Cortex se documentan acá.
-El template sirve como punto de partida para nuevos despliegues de la
-plataforma agéntica multi-agente.
+All notable changes to the base Cortex blueprint are documented here. This template serves as the starting point for new deployments of the multi-agent agentic platform.
 
-Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
-SemVer: `MAJOR.MINOR.PATCH`.
+Format: [Keep a Changelog](https://keepachangelog.com) · SemVer: `MAJOR.MINOR.PATCH`.
 
 ---
 
 ## [2.0.0] — 2026-05-21
 
-Sync masivo desde el despliegue de referencia que llevamos
-de v1.0 → v1.4.1 con muchas mejoras de seguridad, UX y estabilidad. Esta
-release importa **todas las mejoras genéricas** al blueprint, dejando
-afuera lo específico de la instancia de referencia.
+Massive sync from the reference deployment, carrying improvements from v1.0 → v1.4.1 across security, UX, and stability. This release imports all generic improvements into the blueprint, leaving out anything specific to the reference instance.
 
-### Added — Seguridad
+### Added — Security
 
-- **Discovery surface cerrada**: `/docs`, `/redoc`, `/openapi.json` ya no
-  responden por default. Se activan con `DOCS_ENABLED=true` en `.env`
-  (recomendado solo en dev). `/api/health` público minimizado a
-  `{status, version, timestamp}`. Nuevo `/api/admin/health` con auth
-  admin para el detalle profundo de checks.
-- **Zip-bomb protection** en `document_extract.py`: DOCX/PPTX/XLSX (que
-  son ZIPs) se validan antes de descomprimir. Max 5K entries, 200 MB
-  descomprimido, ratio 1000:1. Mitiga DoS por upload chico malicioso.
-- **Pin exacto de versiones CDN** en `static/index.html`: `react@18.3.1`,
-  `react-dom@18.3.1`, `@babel/standalone@7.29.4`, `marked@12.0.2`,
-  `dompurify@3.2.4`. Antes algunos usaban `@latest` → app rota si el
-  upstream publicaba breaking change.
-- **Subresource Integrity (SRI) hashes** en todos los `<script>` de CDN:
-  `integrity="sha384-..."` + `crossorigin="anonymous"`. Si unpkg sirve
-  JS modificado, el browser lo rechaza. Helper nuevo:
-  `scripts/sri_hashes.ps1` para regenerar los hashes cuando se suba
-  alguna versión.
-- **`defusedxml.defuse_stdlib()`** al startup (`app/main.py`): reemplaza
-  los parsers XML de la stdlib por versiones que rechazan entity
-  expansion / external entity / decompression bomb. Hardening defensivo.
-  Nueva dep: `defusedxml==0.7.1`.
-- **Audit log de `user_login_failed`** en `POST /api/login`: además del
-  `logger.warning` (que rota y se pierde), escribe al `audit_log.jsonl`
-  para forense de brute-force que sobrevive al rate-limit por rotación
-  de IPs.
-- **`.gitignore` con claves criptográficas**: `*.key`, `*.pem`, `*.p12`,
-  `*.pfx`, `id_rsa*`, `id_ed25519*`, `*.crt`. Defensivo.
+- **Discovery surface closed:** `/docs`, `/redoc`, `/openapi.json` no longer respond by default. Enable with `DOCS_ENABLED=true` in `.env` (recommended for dev only). `/api/health` public endpoint minimized to `{status, version, timestamp}`. New `/api/admin/health` with admin auth for detailed checks.
+- **Zip-bomb protection** in `document_extract.py`: DOCX/PPTX/XLSX (which are ZIPs) are validated before extraction. Max 5K entries, 200 MB uncompressed, 1000:1 ratio. Mitigates DoS via small malicious uploads.
+- **Exact CDN version pinning** in `static/index.html`: `react@18.3.1`, `react-dom@18.3.1`, `@babel/standalone@7.29.4`, `marked@12.0.2`, `dompurify@3.2.4`. Previously some used `@latest` → app could break on upstream breaking changes.
+- **Subresource Integrity (SRI) hashes** on all CDN `<script>` tags: `integrity="sha384-..."` + `crossorigin="anonymous"`. If unpkg serves modified JS, the browser rejects it. New helper: `scripts/sri_hashes.ps1` to regenerate hashes when bumping versions.
+- **`defusedxml.defuse_stdlib()`** at startup (`app/main.py`): replaces stdlib XML parsers with versions that reject entity expansion / external entity / decompression bomb attacks. New dep: `defusedxml==0.7.1`.
+- **Audit log for `user_login_failed`** on `POST /api/login`: in addition to `logger.warning`, writes to `audit_log.jsonl` for brute-force forensics that survives rate-limit bypass via IP rotation.
+- **`.gitignore` with cryptographic key patterns**: `*.key`, `*.pem`, `*.p12`, `*.pfx`, `id_rsa*`, `id_ed25519*`, `*.crt`.
 
-### Added — Razonamiento visible
+### Added — Visible reasoning
 
-- **Panel "Pensando…" colapsible** en el frontend (`ReasoningPanel`)
-  durante la generación. Muestra en vivo los thoughts internos del modelo
-  (Gemini `include_thoughts=True`). El backend emite un evento SSE nuevo
-  (`reasoning`) además de `text`/`thinking`/`done`/`error`. Es ephemeral:
-  no se persiste en el log ni en el body de la respuesta.
-- **Idioma configurable** (`LANGUAGE_DIRECTIVE` env var): el template
-  NO fuerza idioma por default (el modelo elige). Cuando el deploy
-  apunta a un público hispanohablante, setear en `.env`:
+- **Collapsible "Thinking…" panel** in the frontend (`ReasoningPanel`) during generation. Shows the model's internal thoughts live (Gemini `include_thoughts=True`). The backend emits a new SSE event (`reasoning`) alongside `text/thinking/done/error`. Ephemeral: not persisted in the log or response body.
+- **Configurable language** (`LANGUAGE_DIRECTIVE` env var): the template does **not** force a language by default (the model chooses). To target a specific language, set in `.env`:
   ```
-  LANGUAGE_DIRECTIVE="## IDIOMA\nRespondé SIEMPRE en español
-  rioplatense. Tus thoughts internos también deben ser en español."
+  LANGUAGE_DIRECTIVE="## LANGUAGE\nAlways respond in Spanish. Your internal thoughts must also be in Spanish."
   ```
-  Se prepend al system prompt → los thoughts del panel "Pensando…"
-  aparecen en español, no en inglés (default de Gemini).
+  Prepended to the system prompt → the "Thinking…" panel appears in the configured language instead of the model's default.
 
-### Added — UX del chat
+### Added — Chat UX
 
-- **Refactor `streamFromMessages`** (frontend): core de streaming
-  reusable entre `sendMessage`, `regenerateLast` y `editMessage`.
-- **Regenerar respuesta sin parpadeo**: el mensaje del user queda
-  visible, solo se rehace la respuesta del asistente.
-- **Editar mensaje del usuario inline** (estilo Gemini): botón ✏️ en
-  hover sobre el user-bubble, textarea inline, `Esc` cancela,
-  `Ctrl/Cmd+Enter` guarda. Trunca mensajes posteriores y re-streamea.
-- **Composer del chat más grande**: `min-height: 56px` base (antes 24px),
-  expande a `96px` al focus con transición suave (160ms),
-  `max-height: 240px` antes de habilitar scroll.
-- **Editor de prompts del admin más grande**: `rows={36}` + `minHeight:
-  70vh`. Antes `rows={26}` sin minHeight era muy chico para prompts
-  largos.
-- **Selector de agentes maneja 401 con auto-logout**: si el token JWT
-  expiraba (8h max) y `/api/agents` devolvía 401, el catch silencioso
-  dejaba `agents=[]` → selector desaparecía sin razón visible. Ahora
-  401 → `onLogout()` automático y otros errores → toast visible.
+- **Refactored `streamFromMessages`** (frontend): reusable streaming core shared between `sendMessage`, `regenerateLast`, and `editMessage`.
+- **Regenerate response without flicker**: the user's message stays visible; only the assistant's response is re-streamed.
+- **Inline user message editing** (Gemini-style): ✏️ button on hover over user bubbles, inline textarea, Esc to cancel, Ctrl/Cmd+Enter to save. Truncates subsequent messages and re-streams.
+- **Larger chat composer**: `min-height: 56px` base (was 24px), expands to 96px on focus with a smooth 160ms transition, `max-height: 240px` before scroll activates.
+- **Larger prompt editor in admin**: `rows={36}` + `minHeight: 70vh`. Previously `rows={26}` with no `minHeight`.
+- **Agent selector handles 401 with auto-logout**: if the JWT token expired and `/api/agents` returned 401, the silent catch left `agents=[]` with no visible feedback. Now 401 triggers automatic `onLogout()`; other errors show a visible toast.
 
-### Added — Modelos y badges
+### Added — Models and badges
 
-- **Modelos Gemini al día**: `gemini-3.5-flash` como tier balanced
-  default (antes `gemini-3-flash-preview`). `AVAILABLE_GEMINI_MODELS`
-  actualizado con 3.1 Pro / 3.5 Flash / 3.1 Flash-Lite + fallbacks
-  estables (3-flash-preview, 2.5 Flash, 2.0 Flash). Verificable vs la
-  API real con el nuevo script `scripts/list_gemini_models.py`.
-- **Badge Pro/Flash/Lite visible en TODOS los agentes** (no solo en el
-  que usa auto-router). Función `inferTier(modelName)` que detecta el
-  tier por nombre del modelo. Da feedback al usuario de cuánto se
-  está "esforzando" el sistema en su consulta.
-- **Registry de routers por agente** (`_AGENT_ROUTERS` en
-  `app/llm/router.py`): permite a cada deploy agregar su propia
-  heurística de routing para agentes específicos del dominio. El
-  template lo deja vacío con un ejemplo comentado.
+- **Gemini models updated**: `gemini-3.5-flash` as the default balanced tier (previously `gemini-3-flash-preview`). `AVAILABLE_GEMINI_MODELS` updated with 3.1 Pro / 3.5 Flash / 3.1 Flash-Lite + stable fallbacks. Verifiable against the real API with `scripts/list_gemini_models.py`.
+- **Pro/Flash/Lite badge visible on all agents** (not just the one using the auto-router). `inferTier(modelName)` detects the tier from the model name, giving users feedback on the effort level of each query.
+- **Per-agent router registry** (`_AGENT_ROUTERS` in `app/llm/router.py`): allows each deployment to add its own routing heuristic for domain-specific agents. The template ships with an empty, commented example.
 
-### Added — Infraestructura
+### Added — Infrastructure
 
-- **`UpdateBanner` (frontend)**: polling silencioso cada 60s al
-  `/api/version`. Cuando detecta versión nueva, muestra banner azul
-  flotante con botón "Recargar" que desregistra service workers, limpia
-  todos los caches y hace reload — sin que el usuario tenga que pasar
-  por DevTools.
-- **Página `/reset-cache.html`**: emergencia manual cuando el SW está
-  servido tan viejo que ni siquiera tiene el `UpdateBanner`. Navegar a
-  esa URL ejecuta limpieza automática y redirige a `/?fresh=<ts>`.
-  Excluida del intercept del SW para que el script siempre llegue.
-- **SW `CACHE_VERSION` bumpeado** + exclusión de `/reset-cache.html`
-  del fetch handler.
+- **`UpdateBanner`** (frontend): silent polling every 60s to `/api/version`. When a new version is detected, shows a floating blue banner with a "Reload" button that unregisters service workers, clears all caches, and reloads — no DevTools required.
+- **`/reset-cache.html`**: manual emergency page for when the SW is so outdated it doesn't include the `UpdateBanner`. Navigating there runs automatic cleanup and redirects to `/?fresh=<ts>`. Excluded from SW fetch interception so it always reaches the browser.
+- **SW `CACHE_VERSION` bumped** + `/reset-cache.html` excluded from the fetch handler.
 
-### Added — Upload de iconos custom desde admin
+### Added — Custom icon upload from admin
 
-- **`POST /api/admin/agents/{id}/icon`** (multipart): upload de PNG/JPG
-  con validación estricta de **magic bytes** (no se confía en la
-  extensión declarada — un EXE renombrado a `.png` se rechaza). Max
-  2 MB. Guarda como `static/agents/<id>.<ext>` con la extensión real
-  detectada. Borra logos previos del mismo agente. Actualiza `icon_url`
-  con cache-buster `?v=<ts>` → rompe cache negativo de 404 anteriores.
-- **`DELETE /api/admin/agents/{id}/icon`**: idempotente, limpia archivos
-  y `icon_url`.
-- **`IconSection`** en el editor del agente (admin panel): preview 72×72
-  + botones "Subir / Reemplazar / Quitar icono". Reemplaza el flujo
-  viejo de dropear PNGs manualmente en `static/agents/`.
-- Ambos endpoints están en el audit log (`agent_icon_uploaded` /
-  `agent_icon_deleted`).
+- **`POST /api/admin/agents/{id}/icon`** (multipart): PNG/JPG upload with strict magic-byte validation (file extension is not trusted). Max 2 MB. Saved as `static/agents/<id>.<ext>` with the real detected extension. Clears previous logos for the same agent. Updates `icon_url` with a cache-buster `?v=<ts>`.
+- **`DELETE /api/admin/agents/{id}/icon`**: idempotent, cleans files and `icon_url`.
+- **`IconSection`** in the agent editor (admin panel): 72×72 preview + "Upload / Replace / Remove icon" buttons. Replaces the old flow of manually dropping PNGs into `static/agents/`.
+- Both endpoints are recorded in the audit log (`agent_icon_uploaded` / `agent_icon_deleted`).
 
-### Changed — Configuración
+### Changed — Configuration
 
-- **`ctx_max`: 30K → 120K** caracteres en `ChatRequest.system_context`.
-  Antes era el doble de chico que `MAX_CHARS=60K` del extractor → al
-  adjuntar un Excel/PDF grande, Pydantic devolvía 422 "Validación de
-  datos falló". Ahora consistente con margen para múltiples adjuntos.
-- **Filename de Word ASCII-only** (`office_generators._safe_filename`):
-  tildes y eñes se reemplazan con `_` antes de guardar. Antes el round-
-  trip por URL con `safe_filename()` (que normaliza NFKD) fallaba con
-  400 al descargar Words con título acentuado.
+- **`ctx_max`: 30K → 120K** characters in `ChatRequest.system_context`. Previously it was smaller than `MAX_CHARS=60K` in the extractor → attaching a large Excel/PDF caused Pydantic to return 422. Now consistent with margin for multiple attachments.
+- **Word filename ASCII-only** (`office_generators._safe_filename`): accented characters are replaced with `_` before saving. Fixes a 400 error when downloading Word files with accented titles.
 
 ### Tests
 
-- **138 tests passing** (template antes tenía 80). Suite nueva:
-  - `test_security_backlog.py`: zip-bomb, defusedxml, SRI hashes, CDN pin.
-  - `test_v131_ux_bugs.py`: Word filename ASCII, composer grande.
-  - `test_v132_auto_update.py`: UpdateBanner, reset-cache.html, SW exclusion.
-  - `test_v133_bugs.py`: ctx_max consistente, editor prompts grande.
-  - `test_v134_agents_error_handling.py`: selector de agentes con 401.
-  - `test_v140_icon_upload.py`: 14 tests del upload de iconos
-    (magic bytes, size limits, happy path, replace, delete, audit).
-- Test `test_health.py` actualizado al endpoint público mínimo +
-  `/api/admin/health` detallado con auth.
+138 tests passing (previously 80). New suites:
 
-### Scripts nuevos
+- `test_security_backlog.py`: zip-bomb, defusedxml, SRI hashes, CDN pinning.
+- `test_v131_ux_bugs.py`: Word filename ASCII, larger composer.
+- `test_v132_auto_update.py`: UpdateBanner, reset-cache.html, SW exclusion.
+- `test_v133_bugs.py`: consistent ctx_max, larger prompt editor.
+- `test_v134_agents_error_handling.py`: agent selector with 401.
+- `test_v140_icon_upload.py`: 14 icon upload tests (magic bytes, size limits, happy path, replace, delete, audit).
+- `test_health.py` updated to minimal public endpoint + detailed `/api/admin/health` with auth.
 
-- `scripts/sri_hashes.ps1`: recalcula los SHA-384 SRI de los CDN scripts
-  cuando se suben versiones nuevas.
-- `scripts/list_gemini_models.py`: lista modelos Gemini disponibles en
-  la cuenta del proyecto (útil para verificar antes de bumpear el
-  default model).
-- `scripts/test_reasoning.py`: smoke test que verifica si un modelo
-  Gemini emite thoughts con `include_thoughts=True`.
+### New scripts
 
-### Lo que NO se importó (específico de la instancia de referencia)
+- `scripts/sri_hashes.ps1`: recalculates SHA-384 SRI hashes for CDN scripts when bumping versions.
+- `scripts/list_gemini_models.py`: lists Gemini models available in the project account.
+- `scripts/test_reasoning.py`: smoke test verifying that a Gemini model emits thoughts with `include_thoughts=True`.
 
-- Agente "Generador de Informes" + tool `generate_service_report_pdf`
-  + módulo `report_generators.py` — específico del cliente.
-- Knowledge files específicos de los agentes de la instancia de referencia.
-- Logo y branding del cliente en `static/branding/`.
-- Router específico de Steamy (`classify_task_tier_steamy`).
-- Catálogo BIT real.
-- Scripts `inspect_docx.py` y `extract_logo.py` (eran para reverse-
-  engineering de un .docx específico).
+### What was NOT imported (reference-instance specific)
+
+- "Report Generator" agent + `generate_service_report_pdf` tool
+- `report_generators.py` module — client-specific
+- Agent knowledge files from the reference instance
+- Client branding assets in `static/branding/`
+- Client-specific task routing heuristic
+- Real product catalog
+- Utility scripts for reverse-engineering client-specific document formats
 
 ### Migration notes
 
-Para deploys que vengan de la versión v1.0 del template:
+For deployments upgrading from template v1.0:
 
-1. **Backup** de `users.json`, `agents.json`, `conversations_log.jsonl`,
-   `audit_log.jsonl`, `memory.json` antes de actualizar.
-2. **`pip install -r requirements.txt`** para instalar `defusedxml`.
-3. **Revisar el `.env`**:
-   - Agregar opcionalmente `DOCS_ENABLED=true` si tu workflow usa
-     `/docs` para explorar el API. Si no, dejar sin esa variable.
-   - Agregar opcionalmente `LANGUAGE_DIRECTIVE="..."` si querés forzar
-     idioma de los thoughts.
-4. **Monitoring externo** que chequee `/api/health`: si dependía del
-   detalle (`llm_reachable`, `catalog_size`, etc.), mover a
-   `/api/admin/health` con token admin. Para uptime check,
-   `{status: "ok"}` del público sigue siendo suficiente.
-5. **Browsers de usuarios existentes**: van a tener cache viejo del SW.
-   La primera vez que carguen verán el `UpdateBanner` y al click se
-   actualiza automáticamente. Como emergencia tienen `/reset-cache.html`.
+1. Back up `users.json`, `agents.json`, `conversations_log.jsonl`, `audit_log.jsonl`, `memory.json` before updating.
+2. Run `pip install -r requirements.txt` to install `defusedxml`.
+3. Review `.env`:
+   - Optionally add `DOCS_ENABLED=true` if your workflow uses `/docs`. Otherwise leave it unset.
+   - Optionally add `LANGUAGE_DIRECTIVE="..."` to force the model's response language.
+4. External monitoring on `/api/health`: if it relied on detail fields (`llm_reachable`, `catalog_size`, etc.), move to `/api/admin/health` with an admin token. For uptime checks, `{status: "ok"}` from the public endpoint is sufficient.
+5. Existing user browsers will have stale SW cache. On first load they will see the `UpdateBanner`; clicking it auto-updates. As a fallback, `/reset-cache.html` is always available.
