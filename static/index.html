@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Cortex</title>
+  <title>Fidemar Cortex</title>
 
   <!-- PWA: instalable como app en Chrome/Edge/iOS/Android -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1A4EA0" />
-  <meta name="application-name" content="Cortex" />
-  <meta name="description" content="Plataforma agéntica multi-agente." />
+  <meta name="application-name" content="Fidemar Cortex" />
+  <meta name="description" content="Plataforma agéntica interna de Fidemar S.A." />
 
   <!-- iOS / Safari (PWA en home screen) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -972,6 +972,34 @@
     .msg-action-btn.active { color: var(--brand); }
     .msg-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+    /* BUG-FIX v1.4.1: aviso de respuesta truncada con CTA "Continuar". */
+    .msg-truncated-notice {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 165, 0, 0.06);
+      border: 1px solid rgba(255, 165, 0, 0.25);
+      border-radius: var(--r);
+      font-size: 13px;
+      color: var(--text-2);
+      max-width: 720px;
+    }
+    .msg-truncated-icon { color: #c87f00; font-size: 16px; flex-shrink: 0; }
+    .msg-truncated-text { flex: 1; line-height: 1.4; }
+    .msg-truncated-btn {
+      background: var(--brand);
+      color: white;
+      border: 0;
+      padding: 7px 14px;
+      border-radius: var(--r-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--d-fast) var(--ease-out);
+    }
+    .msg-truncated-btn:hover { background: var(--brand-deep); transform: translateY(-1px); }
+
     /* ── Thinking indicator (Apple-style) ─────────────────────── */
     .thinking-wrap { align-self: flex-start; width: 100%; max-width: 100%; }
     .thinking-details {
@@ -1162,6 +1190,66 @@
       line-height: 1.55;
       color: var(--text-2);
       max-height: 260px;
+      overflow-y: auto;
+    }
+
+    /* ── ThoughtsViewer (v1.5.0) ─────────────────────────────────
+       Bloque persistido con el razonamiento del agente. Vive con el
+       message — visible siempre que m.reasoning exista.
+       Diseño: sutil para no robar atención al lector no técnico,
+       claramente clickeable para el usuario técnico que quiere
+       inspeccionar. */
+    .thoughts-viewer {
+      margin: 8px 0 0;
+      max-width: 720px;
+      background: var(--bg-elev-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 12.5px;
+      color: var(--text-2);
+    }
+    .thoughts-viewer[open] {
+      background: var(--bg-elev-1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .thoughts-viewer-summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer; user-select: none;
+      list-style: none;
+      transition: background var(--d-fast) var(--ease-out);
+      border-radius: var(--r);
+    }
+    .thoughts-viewer-summary::-webkit-details-marker { display: none; }
+    .thoughts-viewer-summary::before {
+      content: '▸';
+      display: inline-block;
+      color: var(--text-3, var(--text-2));
+      font-size: 10px;
+      transition: transform .15s ease;
+    }
+    .thoughts-viewer[open] > .thoughts-viewer-summary::before {
+      transform: rotate(90deg);
+    }
+    .thoughts-viewer-summary:hover { background: var(--bg-hover); }
+    .thoughts-viewer-icon { font-size: 14px; opacity: 0.8; }
+    .thoughts-viewer-label { font-weight: 500; color: var(--text-2); }
+    .thoughts-viewer-meta {
+      font-size: 11px;
+      color: var(--text-3, var(--text-2));
+      margin-left: auto;
+      opacity: 0.8;
+    }
+    .thoughts-viewer-body {
+      margin: 0;
+      padding: 10px 14px 12px;
+      border-top: 1px dashed var(--border);
+      white-space: pre-wrap;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--text-2);
+      max-height: 400px;
       overflow-y: auto;
     }
 
@@ -2086,7 +2174,7 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-const STORAGE_KEY = 'cortex_chats';
+const STORAGE_KEY = 'fidemar_chats';
 const HAS_SPEECH  = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
 function md(text) {
@@ -2190,18 +2278,18 @@ function copyTableToClipboard(table, btn) {
     flash(false);
   }
 }
-function getToken()    { return localStorage.getItem('cortex_token'); }
-function setToken(t)   { localStorage.setItem('cortex_token', t); }
-function clearToken()  { localStorage.removeItem('cortex_token'); }
-function getUsername() { return localStorage.getItem('cortex_user') || ''; }
-function setUsername(u){ localStorage.setItem('cortex_user', u); }
-function clearUsername(){ localStorage.removeItem('cortex_user'); }
-function getAdminTok() { return sessionStorage.getItem('cortex_admin_token'); }
-function setAdminTok(t){ sessionStorage.setItem('cortex_admin_token', t); }
-function clearAdminTok(){ sessionStorage.removeItem('cortex_admin_token'); }
+function getToken()    { return localStorage.getItem('fidemar_token'); }
+function setToken(t)   { localStorage.setItem('fidemar_token', t); }
+function clearToken()  { localStorage.removeItem('fidemar_token'); }
+function getUsername() { return localStorage.getItem('fidemar_user') || ''; }
+function setUsername(u){ localStorage.setItem('fidemar_user', u); }
+function clearUsername(){ localStorage.removeItem('fidemar_user'); }
+function getAdminTok() { return sessionStorage.getItem('fidemar_admin_token'); }
+function setAdminTok(t){ sessionStorage.setItem('fidemar_admin_token', t); }
+function clearAdminTok(){ sessionStorage.removeItem('fidemar_admin_token'); }
 function genId()       { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-function chatsKey(user) { return user ? `cortex_chats_${user}` : STORAGE_KEY; }
+function chatsKey(user) { return user ? `fidemar_chats_${user}` : STORAGE_KEY; }
 function loadChats(user) { try { return JSON.parse(localStorage.getItem(chatsKey(user)) || '[]'); } catch { return []; } }
 function saveChats(c, user) { try { localStorage.setItem(chatsKey(user), JSON.stringify(c)); } catch {} }
 
@@ -2372,8 +2460,8 @@ function WorkingChip({ steps, isStreaming, activeModel }) {
     sub = 'Redactando respuesta';
   }
   // Mostrar tier del modelo activo. Funciona para los 3 modos de selección:
-  //   - source = "auto:flash" → router automático eligió Flash
-  //   - source = "agent:<id>"  → el agente tiene tier fijo
+  //   - source = "auto:flash" → router automático eligió Flash (FIDI)
+  //   - source = "agent:<id>"  → el agente tiene tier fijo (Steamy, Generador)
   //   - source = "manual"      → modelo override por config admin
   // Derivamos el tier del nombre del modelo (más robusto que del source).
   function inferTier(modelName) {
@@ -2432,6 +2520,49 @@ function ReasoningPanel({ text }) {
         <div ref={ref} className="reasoning-body">{text}</div>
       </details>
     </div>
+  );
+}
+
+
+/* ── ThoughtsViewer (v1.5.0) ───────────────────────────────────────
+   Bloque colapsible que muestra el razonamiento del agente PERSISTIDO
+   junto con la respuesta. A diferencia de `ReasoningPanel` (que se
+   muestra solo durante la generación y es ephemeral), este vive con
+   el message guardado y sirve para que un usuario técnico pueda
+   auditar a posteriori cómo razonó el agente.
+
+   Estado del details: cerrado por default (no roba atención al lector
+   no técnico). Usa <details> nativo → el browser persiste el open/closed
+   por instancia mientras la pestaña esté abierta.
+
+   Idioma: Gemini devuelve los thoughts en inglés por default (en Fidemar
+   forzamos español vía LANGUAGE_DIRECTIVE, así que acá los thoughts ya
+   vienen traducidos cuando el deploy lo configura). Igual mostramos el
+   chip "(inglés)" si detectamos signos típicos de inglés — heurística
+   simple. */
+function ThoughtsViewer({ reasoning }) {
+  if (!reasoning || !reasoning.trim()) return null;
+
+  // Heurística rápida de idioma — palabras inglesas comunes en los thoughts
+  // de Gemini. Solo es informativo (no decide nada).
+  const lower = reasoning.slice(0, 2000).toLowerCase();
+  const looksEnglish =
+    /\b(the|i'm|i am|i'll|i'll|now|user|need|let me|first|focusing|considering|defining|analyzing)\b/.test(lower);
+
+  const charCount = reasoning.length.toLocaleString();
+  const langTag = looksEnglish ? ' · en inglés' : '';
+
+  return (
+    <details className="thoughts-viewer">
+      <summary className="thoughts-viewer-summary">
+        <span className="thoughts-viewer-icon">💭</span>
+        <span className="thoughts-viewer-label">Ver razonamiento del agente</span>
+        <span className="thoughts-viewer-meta">
+          ({charCount} caracteres{langTag})
+        </span>
+      </summary>
+      <div className="thoughts-viewer-body">{reasoning}</div>
+    </details>
   );
 }
 
@@ -2561,7 +2692,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Encontré en catálogo',
                 verify_pdf_url:       s.valid ? 'PDF verificado' : 'PDF NO válido',
                 fetch_product_data:   s.valid ? 'Datos scrapeados' : 'Fallo scraping',
-                generate_datasheet_pdf: s.valid ? 'PDF generado' : 'Error generando PDF',
+                generate_datasheet_pdf: s.valid ? 'PDF Fidemar generado' : 'Error generando PDF',
                 generate_word_document: s.valid ? 'Word generado' : 'Error generando Word',
                 generate_excel_spreadsheet: s.valid ? 'Excel generado' : 'Error generando Excel',
                 web_search:           'Encontré en la web',
@@ -2570,7 +2701,7 @@ function ThinkingIndicator({ steps, loading }) {
                 catalog_search:       'Buscando en catálogo',
                 verify_pdf_url:       'Verificando PDF',
                 fetch_product_data:   'Scrapeando página',
-                generate_datasheet_pdf: 'Generando ficha técnica',
+                generate_datasheet_pdf: 'Generando ficha técnica Fidemar',
                 generate_word_document: 'Generando documento Word',
                 generate_excel_spreadsheet: 'Generando planilla Excel',
                 web_search:           'Buscando en la web',
@@ -2993,7 +3124,7 @@ function AdminChatTab({ adminToken, onSaved }) {
           const isStreaming = m.streaming && isLast;
           return (
             <div key={i} className={`admin-msg ${m.role}`}>
-              <div className="admin-msg-role">{m.role === 'user' ? 'Admin' : 'Agente'}</div>
+              <div className="admin-msg-role">{m.role === 'user' ? 'Bruno' : 'Agente'}</div>
               <div className="admin-msg-bubble">
                 {m.role === 'assistant'
                   ? <>
@@ -3917,7 +4048,7 @@ function AgentsTab({ adminToken, onSaved }) {
               style={{
                 width: '100%',
                 /* BUG-FIX v1.3.3: editor de prompts más grande para que
-                   los prompts largos (~15KB típicos) se puedan editar sin
+                   los prompts largos (FIDI ~15KB) se puedan editar sin
                    scroll constante. Antes era rows=26 + sin minHeight. */
                 minHeight: '70vh',
                 padding: '14px 16px',
@@ -4021,9 +4152,6 @@ function AgentsTab({ adminToken, onSaved }) {
         })}
       </div>
 
-      <div style={{ marginTop: 16, padding: 12, border: '1px dashed var(--border)', borderRadius: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-        💡 La creación y eliminación de asistentes desde la UI llega en la próxima fase. Por ahora podés agregar nuevos editando <code>agents.json</code> manualmente.
-      </div>
     </div>
   );
 }
@@ -4043,7 +4171,7 @@ function AdminPanel({ adminToken, onClose }) {
       {toast && <div className="toast">{toast}</div>}
       <div className="admin-panel">
         <div className="admin-header">
-          <span className="admin-header-title">Cortex · Admin</span>
+          <span className="admin-header-title">Fidemar Cortex · Admin</span>
           <span className="admin-badge">ADMIN</span>
           <div className="admin-header-right">
             <button className="btn-ghost" style={{ color: 'rgba(255,255,255,.8)', borderColor: 'rgba(255,255,255,.3)' }} onClick={onClose}>Cerrar ✕</button>
@@ -4132,7 +4260,7 @@ function Login({ onLogin }) {
           </svg>
         </div>
         <div className="login-logo-wrap">
-          <span className="login-logo">Cortex</span>
+          <span className="login-logo">Fidemar</span>
           <span className="login-cortex">Cortex</span>
         </div>
         <div className="login-tagline">Plataforma agéntica interna</div>
@@ -4149,7 +4277,7 @@ function Login({ onLogin }) {
         </button>
         {err && <div className="error-msg">{err}</div>}
         <div className="login-footer">
-          Acceso interno
+          Acceso interno · Fidemar S.A.
           <div style={{ marginTop: 10, fontSize: 9.5, opacity: 0.55, letterSpacing: '0.04em' }}>
             powered by <b style={{ fontWeight: 600 }}>AgentX</b>
           </div>
@@ -4182,7 +4310,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // ── Agentes ─────────────────────────────────────────────────────
   const [agents,         setAgents]         = useState([]);
   const [currentAgentId, setCurrentAgentId] = useState(() => {
-    try { return localStorage.getItem(`cortex_agent_${username}`) || null; } catch { return null; }
+    try { return localStorage.getItem(`fidemar_agent_${username}`) || null; } catch { return null; }
   });
   const [agentMenuOpen,  setAgentMenuOpen]  = useState(false);
 
@@ -4212,11 +4340,11 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   }, [input]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3000); return () => clearTimeout(t); }, [toast]);
 
-  // Migración: chats viejos (pre-multiusuario) estaban en 'cortex_chats' sin namespace
+  // Migración: chats viejos (pre-multiusuario) estaban en 'fidemar_chats' sin namespace
   useEffect(() => {
     if (!username) return;
     try {
-      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'cortex_chats'
+      const oldRaw = localStorage.getItem(STORAGE_KEY); // 'fidemar_chats'
       const newRaw = localStorage.getItem(chatsKey(username));
       const hasOld = oldRaw && oldRaw !== '[]' && oldRaw !== 'null';
       const hasNew = newRaw && newRaw !== '[]' && newRaw !== 'null';
@@ -4272,7 +4400,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   // Persistir el agente activo
   useEffect(() => {
     if (!currentAgentId || !username) return;
-    try { localStorage.setItem(`cortex_agent_${username}`, currentAgentId); } catch {}
+    try { localStorage.setItem(`fidemar_agent_${username}`, currentAgentId); } catch {}
   }, [currentAgentId, username]);
 
   // Cerrar el menú al click afuera
@@ -4294,8 +4422,8 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
   const [examples, setExamples] = useState([]);
   // Razonamiento del modelo durante la generación (ephemeral). Se llena con
   // eventos `reasoning` del SSE; se limpia al empezar otro stream. La idea
-  // es mostrar el "pensamiento" del modelo en vivo,
-  // para todos los agentes vía thinking events.
+  // es mostrar el "pensamiento" del modelo (Steamy, Generador) en vivo,
+  // como ya hacíamos con FIDI vía thinking events.
   const [reasoningText, setReasoningText] = useState('');
   // Edición inline de mensaje del usuario (estilo Gemini). Cuando es null
   // no hay edición activa; cuando es un número, ese índice del array
@@ -4656,6 +4784,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     let streamedText = '';
     let assistantAdded = false;
     let reasoningBuf = '';
+    let wasTruncated = false;  // BUG-FIX v1.4.1: marcar si el modelo cortó por MAX_TOKENS
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -4703,8 +4832,27 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
               return updated;
             });
           }
+        } else if (evt.type === 'truncated') {
+          // El modelo cortó por MAX_TOKENS — marcar el message para que
+          // el frontend muestre el botón "Continuar generación".
+          wasTruncated = true;
         } else if (evt.type === 'done') {
-          const final = [...messagesToSend, { role: 'assistant', content: streamedText || '(Sin respuesta del modelo)' }];
+          // FEATURE v1.5.0: persistir los thoughts del modelo (reasoning)
+          // junto con el message para que el usuario los pueda revisar
+          // después en un bloque colapsible. Cap a 30K chars por message
+          // para no inflar el localStorage en sesiones largas.
+          const REASONING_CAP = 30_000;
+          let savedReasoning = reasoningBuf.trim();
+          if (savedReasoning.length > REASONING_CAP) {
+            savedReasoning = savedReasoning.slice(0, REASONING_CAP) +
+              `\n\n[...truncado en ${REASONING_CAP.toLocaleString()} caracteres]`;
+          }
+          const final = [...messagesToSend, {
+            role: 'assistant',
+            content: streamedText || '(Sin respuesta del modelo)',
+            truncated: wasTruncated,
+            reasoning: savedReasoning || undefined,  // Solo si hubo thoughts
+          }];
           setMessages(final); persistMessages(currentId, final);
         } else if (evt.type === 'error') {
           const err = [...messagesToSend, { role: 'assistant', content: `⚠️ Error: ${evt.message}` }];
@@ -4750,6 +4898,32 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const currentId = activeId || genId();
     if (!activeId) setActiveId(currentId);
     await streamFromMessages(kept, currentId, buildDocContext());
+  }
+
+  // BUG-FIX v1.4.1: continuar una respuesta truncada (cortada por MAX_TOKENS).
+  // A diferencia de regenerateLast (que rehace todo el último turno), esta
+  // función AGREGA un user message sintético "continuá" y deja que el modelo
+  // siga desde donde quedó. La respuesta nueva se appendea como otro
+  // assistant message — al usuario le queda un flujo continuo.
+  async function continueGeneration() {
+    if (loading) return;
+    if (messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.role !== 'assistant') return;  // solo si el último es del asistente
+    // Limpiamos el flag truncated del último para que el botón desaparezca
+    // (si la continuación queda también truncada, el nuevo message lo tendrá).
+    const withoutFlag = messages.map((m, i) =>
+      i === messages.length - 1 ? { ...m, truncated: false } : m
+    );
+    // Agregar user message sintético + lanzar stream
+    const messagesToSend = [
+      ...withoutFlag,
+      { role: 'user', content: 'continuá' },
+    ];
+    setMessages(messagesToSend);
+    const currentId = activeId || genId();
+    if (!activeId) setActiveId(currentId);
+    await streamFromMessages(messagesToSend, currentId, buildDocContext());
   }
 
   // Editar un mensaje del usuario (estilo Gemini): reemplaza el texto,
@@ -4851,7 +5025,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const userLabel = (username || 'Usuario').toUpperCase();
     const header = [
       '═══════════════════════════════════════════════════════════════',
-      '  CORTEX',
+      '  FIDEMAR · CORTEX',
       `  Conversación: ${chatTitle}`,
       `  Usuario: ${username || '—'}`,
       `  Exportado: ${dateStr}`,
@@ -4880,7 +5054,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
         .replace(/^#{1,6}\s+/gm, '')                // headings
         .replace(/^\s*[-*]\s+/gm, ' • ')            // listas
         .replace(/\n{3,}/g, '\n\n');                // colapsar saltos múltiples
-      const who = m.role === 'user' ? userLabel : 'CORTEX';
+      const who = m.role === 'user' ? userLabel : 'FIDEMAR CORTEX';
       return `[ ${who} ]\n${'─'.repeat(64)}\n${clean.trim()}`;
     });
 
@@ -4888,7 +5062,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
       '',
       '═══════════════════════════════════════════════════════════════',
       '  Fin de la conversación',
-      '  Generado por Cortex — Asistente',
+      '  Generado por Fidemar S.A. — Agente Consultor',
       '═══════════════════════════════════════════════════════════════',
     ].join('\n');
 
@@ -4901,7 +5075,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const safeTitle = (chatTitle || 'conversacion').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_').slice(0, 40) || 'conversacion';
     const dateTag   = now.toISOString().slice(0, 10);
     a.href     = url;
-    a.download = `cortex_${dateTag}_${safeTitle}.txt`;
+    a.download = `fidemar_${dateTag}_${safeTitle}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -4938,7 +5112,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
           <Icon.Menu />
         </button>
         <div className="brand">
-          <span className="brand-logo">Cortex</span>
+          <span className="brand-logo">Fidemar</span>
           <span className="brand-cortex">Cortex</span>
         </div>
         <div className="topbar-spacer" />
@@ -5099,7 +5273,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                   return (
                     <div key={i} className={`message-row ${m.role}`}>
                       <div className="message-block">
-                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Cortex')}</div>
+                        <div className="message-meta">{isUser ? (username || 'Usuario') : (currentAgent?.name || 'Fidemar Cortex')}</div>
                         {isUser ? (
                           editingMessageIdx === i ? (
                             <form
@@ -5160,6 +5334,29 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
                               <AssistantMd content={m.content} onProtectedDownload={downloadProtectedFile} />
                               {isStreaming && <span className="streaming-cursor" />}
                             </div>
+                            {/* FEATURE v1.5.0: bloque colapsible con los thoughts
+                                persistidos. Cerrado por default, abre con click.
+                                Sirve para auditar a posteriori cómo razonó el agente. */}
+                            {m.reasoning && !isStreaming && (
+                              <ThoughtsViewer reasoning={m.reasoning} />
+                            )}
+                            {/* BUG-FIX v1.4.1: aviso + botón "Continuar" cuando el modelo
+                                cortó por MAX_TOKENS. Solo aparece en el último mensaje. */}
+                            {m.truncated && isLast && !loading && (
+                              <div className="msg-truncated-notice">
+                                <span className="msg-truncated-icon">⚠</span>
+                                <span className="msg-truncated-text">
+                                  La respuesta quedó cortada porque alcanzó el límite de tokens.
+                                </span>
+                                <button
+                                  className="msg-truncated-btn"
+                                  onClick={continueGeneration}
+                                  title="El modelo continúa desde donde quedó"
+                                >
+                                  Continuar generación →
+                                </button>
+                              </div>
+                            )}
                             {!isStreaming && !loading && (
                               <div className="msg-actions">
                                 {isLast && (
@@ -5334,16 +5531,83 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
 function App() {
   const [token, setTokenSt]    = useState(getToken);
   const [username, setUserSt]  = useState(getUsername);
-  const [theme, setThemeSt]    = useState(() => localStorage.getItem('cortex_theme') || 'light');
+  const [theme, setThemeSt]    = useState(() => localStorage.getItem('fidemar_theme') || 'light');
 
   // Aplicar tema al documento + persistir
   useEffect(() => {
     if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('cortex_theme', theme);
+    localStorage.setItem('fidemar_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setThemeSt(t => t === 'dark' ? 'light' : 'dark');
+
+  // BUG-FIX v1.4.1: refresh automático del JWT cada 6h.
+  // El token dura 24h (config.jwt_expire_hours), pero el frontend renueva
+  // silenciosamente cada 6h para que el usuario NUNCA se desconecte
+  // mientras esté la pestaña abierta y la sesión activa. Estilo Gmail.
+  // Si el token ya expiró (jornada larga + pestaña cerrada toda la noche),
+  // el refresh falla con 401 → onLogout natural.
+  //
+  // También renovamos el adminToken (si existe en sessionStorage). Sin esto,
+  // el admin token también expiraba en 24h y el panel admin se quedaba sin
+  // info silenciosamente (era el bug del screenshot del usuario).
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    async function refreshOne(currentToken, kind) {
+      try {
+        const r = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${currentToken}` },
+        });
+        if (cancelled) return null;
+        if (r.status === 401) return 'expired';
+        if (!r.ok) return null;
+        const d = await r.json();
+        return d?.token || null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function doRefresh() {
+      if (cancelled) return;
+      // 1. Token regular (user)
+      const newUser = await refreshOne(token, 'user');
+      if (cancelled) return;
+      if (newUser === 'expired') {
+        clearToken(); clearUsername();
+        setTokenSt(null); setUserSt('');
+        return;  // Si el regular expiró, no tiene sentido seguir con admin
+      } else if (newUser) {
+        setTokenSt(newUser);
+      }
+      // 2. Token admin (si existe en sessionStorage). Es separado del regular.
+      const adminTok = getAdminTok();
+      if (adminTok) {
+        const newAdmin = await refreshOne(adminTok, 'admin');
+        if (cancelled) return;
+        if (newAdmin === 'expired') {
+          // Admin expiró: limpiar para que el próximo click en el icono ⚙️
+          // pida re-login admin. NO afecta la sesión user.
+          clearAdminTok();
+        } else if (newAdmin) {
+          setAdminTok(newAdmin);
+        }
+      }
+    }
+
+    // Renovar cada 6h (1/4 del JWT_EXPIRE_HOURS=24)
+    const id = setInterval(doRefresh, 6 * 60 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [token]);
+
+  // Persistir token cuando cambia (login + refresh)
+  useEffect(() => {
+    if (token) setToken(token);
+  }, [token]);
 
   // UpdateBanner se monta SIEMPRE (también en el login) para que si hay
   // un release nuevo mientras alguien está parado en login, se entere.

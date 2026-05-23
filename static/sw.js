@@ -14,10 +14,10 @@
  *   3. La página se recarga en el próximo navigation o al cerrar/abrir
  */
 
-// Bump esta versión cada vez que cambien static/index.html o assets críticos.
-// Al cambiar, el browser instala un SW nuevo, activate() limpia los caches
-// viejos y clients.claim() toma control inmediato sin requerir hard refresh.
-const CACHE_VERSION = 'cortex-v140';
+// Bump this version every time static/index.html or critical assets change.
+// On change, the browser installs a new SW, activate() clears the old caches,
+// and clients.claim() takes immediate control without requiring a hard refresh.
+const CACHE_VERSION = 'cortex-v210';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',

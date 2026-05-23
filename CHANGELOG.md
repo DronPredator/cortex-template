@@ -6,6 +6,105 @@ Format: [Keep a Changelog](https://keepachangelog.com) · SemVer: `MAJOR.MINOR.P
 
 ---
 
+## [2.1.0] — 2026-05-22
+
+Sync from the reference deployment (Fidemar Cortex v1.4.1 → v1.5.0) — three
+operational improvements landed there that are generic enough to be useful
+to any deployment.
+
+### Added — Persistent session (no more mid-shift logouts)
+
+- **`JWT_EXPIRE_HOURS` default raised from 8h → 24h.** 8h forced re-login
+  mid-shift (>9h workdays). 24h covers any normal workday. For longer
+  sessions, see refresh below. Configurable via env.
+- **New `POST /api/auth/refresh` endpoint.** Accepts a valid JWT and
+  returns a fresh one with renewed expiration. Preserves the original
+  token's `role` claim (admin → admin). Returns 401 if the token already
+  expired — frontend sends to login.
+- **Automatic background refresh every 6h** in the frontend (Gmail-style).
+  While the tab is open and the user is active, the JWT is renewed
+  silently — covering both the chat token (localStorage) AND the admin
+  token (sessionStorage). Closing the tab overnight means the next day
+  the user logs in normally.
+
+### Added — Long-response handling
+
+- **`max_output_tokens` raised from 4096 → 16384.** Gemini Flash supports
+  up to 65,536; 16K gives 4× headroom for detailed technical responses
+  without forcing the user to type "continue".
+- **`finish_reason=MAX_TOKENS` detection** in `gemini_engine.py`. When
+  the model hits the cap, emits a new SSE event `truncated` before
+  `done`. The frontend persists `truncated: true` on the message and
+  renders a **"Continue generation →" button** with a clear notice:
+  "The response was cut off because it reached the token limit." Clicking
+  appends a synthetic "continue" user message and streams from where the
+  model left off — single visible flow for the user, no manual typing.
+
+### Added — Persisted thoughts viewer
+
+- Model thoughts (Gemini's `include_thoughts=True` stream) are now
+  **persisted with each message** instead of being ephemeral.
+- New **`ThoughtsViewer` component**: collapsible block beneath each
+  assistant message, **closed by default** so it doesn't distract
+  non-technical readers. Uses native `<details>` (no React state — the
+  browser preserves open/closed per instance).
+- Header shows a 💭 icon + a chip with the thought size and detected
+  language (e.g. `(12,453 characters · in English)`). If the deployment
+  sets `LANGUAGE_DIRECTIVE` to force a non-English language, the chip
+  updates automatically.
+- **Cap of 30,000 characters** per message to avoid bloating localStorage
+  in long sessions. Excess is truncated with a clear marker.
+- Thoughts persist across page reloads (saved with the message in
+  localStorage) but are NOT written to `conversations_log.jsonl` on the
+  server — they remain a client-side audit asset.
+
+### Added — Configurable language directive (carried forward from v2.0)
+
+- Confirmed the `LANGUAGE_DIRECTIVE` env var is fully wired: when set,
+  `app/routes/chat.py` prepends it to the system prompt before each
+  Gemini call. Empty by default — the template forces no specific
+  language. Example for a Spanish deployment:
+  ```
+  LANGUAGE_DIRECTIVE="## LANGUAGE\nAlways respond in Spanish (Latin American).
+  Your internal thoughts must also be in Spanish, not English."
+  ```
+
+### Changed — Body limits
+
+- New `/api/auth/refresh` endpoint added to body-size limits with a 1 KB
+  cap (it only accepts a Bearer header, no body).
+
+### Service Worker
+
+- `CACHE_VERSION`: `cortex-v200` → `cortex-v210`. Existing clients
+  see the auto-update banner shortly after the deploy and can refresh
+  in one click.
+
+### Tests
+
+- Suite grew from **138 → 160** passing (+22):
+  - `test_v141_session_and_truncation.py` (13 tests): JWT default is 24h,
+    `/api/auth/refresh` requires bearer / rejects invalid tokens / returns
+    a new token / preserves admin role / the new token works on admin
+    endpoints. `max_output_tokens >= 16K`. `gemini_engine` emits
+    `truncated` events. `chat.py` forwards them. Frontend has the
+    "Continue" button + handler + periodic refresh.
+  - `test_v150_persisted_thoughts.py` (9 tests): message persists
+    `reasoning` field with 30K cap. `ThoughtsViewer` component exists,
+    uses native `<details>` (no `useState`), starts closed, mounts in
+    the assistant render with `!isStreaming` guard. CSS in place.
+
+### Migration notes
+
+- Tokens issued under the previous 8h policy are still valid until
+  they expire — no breaking change. The automatic refresh starts
+  running as soon as the new HTML loads.
+- Monitoring that polled `/api/health` for `llm_reachable` etc. should
+  move to `/api/admin/health` with an admin token (already documented
+  in v2.0.0 migration notes).
+
+---
+
 ## [2.0.0] — 2026-05-21
 
 Massive sync from the reference deployment, carrying improvements from v1.0 → v1.4.1 across security, UX, and stability. This release imports all generic improvements into the blueprint, leaving out anything specific to the reference instance.
