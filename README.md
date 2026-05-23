@@ -2,7 +2,6 @@
 
 > **Plantilla base para construir un Cortex para un cliente nuevo.**
 > Producto: Cortex by AgentX.
-> Origen: extraído de la primera instancia en producción (Fidemar Cortex).
 
 Este repo es el **molde**. Para crear el Cortex de un cliente nuevo,
 seguí este README paso a paso. Estimado: **1-2 días de personalización**
@@ -306,7 +305,6 @@ Ver `CLAUDE.md` para la estructura detallada de archivos y `CORTEX_BLUEPRINT.md`
 
 - Blueprint completo: `CORTEX_BLUEPRINT.md`
 - Issues/bugs: en este repo (privado)
-- Casos de referencia: Fidemar Cortex (primera instancia productiva)
 
 ---
 
