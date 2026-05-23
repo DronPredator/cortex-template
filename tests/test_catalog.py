@@ -12,7 +12,7 @@ def test_catalog_size_is_positive():
 def test_search_returns_items_for_common_query():
     from search import search_stock
 
-    data = search_stock("valvula", limit=10)
+    data = search_stock("service", limit=10)
     assert "items" in data
     assert "total" in data
     assert "truncated" in data
@@ -32,8 +32,8 @@ def test_search_empty_query_returns_empty():
 def test_search_pagination_with_offset():
     from search import search_stock
 
-    page1 = search_stock("valvula", limit=5, offset=0)
-    page2 = search_stock("valvula", limit=5, offset=5)
+    page1 = search_stock("service", limit=5, offset=0)
+    page2 = search_stock("service", limit=5, offset=5)
     assert len(page1["items"]) <= 5
     # Si hay >5 resultados, page2 debe traer items distintos a page1
     if page1["total"] > 5:
@@ -46,7 +46,7 @@ def test_search_truncated_flag_correct():
     from search import search_stock
 
     # Una búsqueda muy genérica seguro tiene más resultados que el limit
-    data = search_stock("valvula", limit=3)
+    data = search_stock("service", limit=3)
     if data["total"] > 3:
         assert data["truncated"] is True
     else:
@@ -54,11 +54,11 @@ def test_search_truncated_flag_correct():
 
 
 def test_search_with_specific_term():
-    """Template usa dataset demo. Cliente debe adaptar este test al dataset real."""
+    """Catálogo inicial del taller — código SRV-001 (service básico) debe estar."""
     from search import search_stock
 
-    data = search_stock("DEMO", limit=20)
-    assert data["total"] > 0, "DEMO debería estar en el catálogo del template"
+    data = search_stock("SRV-001", limit=20)
+    assert data["total"] > 0, "SRV-001 debería estar en el catálogo inicial"
 
 
 def test_format_catalog_result_returns_string():

@@ -142,21 +142,49 @@ def save_agent_prompt(agent: AgentDefinition, content: str) -> None:
 
 
 _INITIAL_AGENTS: list[AgentDefinition] = [
-    # Agente de demostración del template. Reemplazar con los agentes
-    # reales de la instancia (ver README del template).
+    # RR Mecánica Automotriz — agentes iniciales del taller.
     AgentDefinition(
-        id="demo_assistant",
-        name="Demo Assistant",
-        description="Asistente de demostración. Reemplazá este agente con el flagship de tu instancia.",
-        icon="🤖",
+        id="consultor_tecnico",
+        name="Consultor Técnico",
+        description="Consultor técnico, investigador y asesor automotriz. Diagnóstico, procedimientos, especificaciones y búsqueda técnica.",
+        icon="🔧",
         allowed_tools=[
-            "catalog_search",
-            "verify_pdf_url",
             "tavily_search",
+            "verify_pdf_url",
+            "fetch_product_data",
+            "catalog_search",
         ],
         default_tier="auto",
         visibility="public",
         is_default=True,
+        seed_examples=[
+            "Hilux 2.8 2018 tira humo blanco en frío, ¿por dónde arranco el diagnóstico?",
+            "¿Cuál es el torque de tapa de cilindros para un VW 1.6 8V?",
+            "Buscame el TSB de Ford Ranger 3.2 para falla de turbo.",
+            "Decodificá el código P0420 y qué pruebas hago.",
+        ],
+    ),
+    AgentDefinition(
+        id="generador_reportes",
+        name="Generador de Reportes",
+        description="Genera informes técnicos, presupuestos, órdenes de reparación y planillas de control en Word, Excel y PDF.",
+        icon="📋",
+        allowed_tools=[
+            "generate_word_document",
+            "generate_excel_spreadsheet",
+            "generate_datasheet_pdf",
+            "catalog_search",
+            "tavily_search",
+        ],
+        default_tier="auto",
+        visibility="public",
+        is_default=False,
+        seed_examples=[
+            "Armame un presupuesto en Excel con los repuestos y mano de obra de este service.",
+            "Generá un informe de diagnóstico en Word para el cliente.",
+            "Hacé una orden de reparación con checklist de las tareas pendientes.",
+            "Necesito una ficha técnica PDF del servicio realizado.",
+        ],
     ),
 ]
 

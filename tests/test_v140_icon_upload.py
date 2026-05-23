@@ -54,7 +54,7 @@ def _icon_dir():
     return d
 
 
-def _clean_test_icons(agent_id="demo_assistant"):
+def _clean_test_icons(agent_id="consultor_tecnico"):
     """Asegurar que no quedan archivos del agente entre tests."""
     d = _icon_dir()
     for ext in (".png", ".jpg", ".jpeg"):
@@ -84,7 +84,7 @@ def icon_sandbox():
     from app.agents.registry import get_agent, upsert_agent
 
     d = _icon_dir()
-    agent_ids = ["demo_assistant", "steamy_seg", "generador_codigos", "generador_informes"]
+    agent_ids = ["consultor_tecnico", "generador_reportes"]
 
     # Backup
     saved_files = {}
@@ -151,7 +151,7 @@ def test_sniff_rejects_renamed_exe():
 
 def test_upload_icon_requires_admin(client):
     """Sin token o con token de user normal → 401/403."""
-    r = client.post("/api/admin/agents/demo_assistant/icon", files={"file": ("a.png", _MIN_PNG, "image/png")})
+    r = client.post("/api/admin/agents/consultor_tecnico/icon", files={"file": ("a.png", _MIN_PNG, "image/png")})
     assert r.status_code in (401, 403)
 
 
@@ -166,7 +166,7 @@ def test_upload_icon_rejects_non_existing_agent(client, admin_token):
 
 def test_upload_icon_rejects_invalid_extension(client, admin_token):
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("malicious.exe", _MIN_PNG, "application/octet-stream")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -177,7 +177,7 @@ def test_upload_icon_rejects_invalid_extension(client, admin_token):
 def test_upload_icon_rejects_fake_png(client, admin_token):
     """Archivo con extensión .png pero contenido no es PNG → rechazado por magic bytes."""
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("fake.png", b"this is not a real png", "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -187,7 +187,7 @@ def test_upload_icon_rejects_fake_png(client, admin_token):
 
 def test_upload_icon_rejects_empty_file(client, admin_token):
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("empty.png", b"", "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -199,7 +199,7 @@ def test_upload_icon_rejects_too_large(client, admin_token):
     # PNG válido al inicio + padding hasta 3MB
     big = _MIN_PNG + b"\x00" * (3 * 1024 * 1024)
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("big.png", big, "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -208,73 +208,73 @@ def test_upload_icon_rejects_too_large(client, admin_token):
 
 def test_upload_icon_happy_path_png(client, admin_token, icon_sandbox):
     """Upload válido: guarda archivo, actualiza icon_url con cache-buster, audit log."""
-    _clean_test_icons("demo_assistant")
+    _clean_test_icons("consultor_tecnico")
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("anything.png", _MIN_PNG, "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200, r.text
     data = r.json()
     assert data["ok"] is True
-    assert data["filename"] == "demo_assistant.png"
+    assert data["filename"] == "consultor_tecnico.png"
     assert data["format"] == "png"
-    assert data["icon_url"].startswith("/agents/demo_assistant.png?v=")
+    assert data["icon_url"].startswith("/agents/consultor_tecnico.png?v=")
 
     # Archivo realmente guardado
-    out = _icon_dir() / "demo_assistant.png"
+    out = _icon_dir() / "consultor_tecnico.png"
     assert out.exists()
     assert out.read_bytes() == _MIN_PNG
 
     # agents.json refleja el nuevo icon_url
     from app.agents.registry import get_agent
-    agent = get_agent("demo_assistant")
+    agent = get_agent("consultor_tecnico")
     assert agent.icon_url == data["icon_url"]
 
 
 def test_upload_icon_replaces_previous(client, admin_token, icon_sandbox):
     """Subir un PNG y después un JPG borra el PNG viejo."""
-    _clean_test_icons("demo_assistant")
+    _clean_test_icons("consultor_tecnico")
     # 1. Subir PNG
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("a.png", _MIN_PNG, "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200
-    assert (_icon_dir() / "demo_assistant.png").exists()
+    assert (_icon_dir() / "consultor_tecnico.png").exists()
 
     # 2. Subir JPG (mismo agente) — borra PNG y crea JPG
     r = client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("a.jpg", _MIN_JPG, "image/jpeg")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200, r.text
     data = r.json()
-    assert data["filename"] == "demo_assistant.jpg"
-    assert not (_icon_dir() / "demo_assistant.png").exists(), "PNG viejo no fue borrado"
-    assert (_icon_dir() / "demo_assistant.jpg").exists()
+    assert data["filename"] == "consultor_tecnico.jpg"
+    assert not (_icon_dir() / "consultor_tecnico.png").exists(), "PNG viejo no fue borrado"
+    assert (_icon_dir() / "consultor_tecnico.jpg").exists()
 
 
 # ── DELETE endpoint ───────────────────────────────────────────────────
 
 
 def test_delete_icon_clears_files_and_url(client, admin_token, icon_sandbox):
-    _clean_test_icons("demo_assistant")
+    _clean_test_icons("consultor_tecnico")
     # 1. Subir
     client.post(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         files={"file": ("a.png", _MIN_PNG, "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
-    assert (_icon_dir() / "demo_assistant.png").exists()
+    assert (_icon_dir() / "consultor_tecnico.png").exists()
     from app.agents.registry import get_agent
-    assert get_agent("demo_assistant").icon_url != ""
+    assert get_agent("consultor_tecnico").icon_url != ""
 
     # 2. Borrar
     r = client.delete(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200
@@ -283,18 +283,18 @@ def test_delete_icon_clears_files_and_url(client, admin_token, icon_sandbox):
     assert data["files_deleted"] >= 1
 
     # Archivo borrado
-    assert not (_icon_dir() / "demo_assistant.png").exists()
+    assert not (_icon_dir() / "consultor_tecnico.png").exists()
 
     # icon_url limpio
-    assert get_agent("demo_assistant").icon_url == ""
+    assert get_agent("consultor_tecnico").icon_url == ""
 
 
 def test_delete_icon_idempotent(client, admin_token, icon_sandbox):
     """Borrar cuando no hay icono: igual responde 200."""
-    _clean_test_icons("demo_assistant")
+    _clean_test_icons("consultor_tecnico")
     # Sin subir nada antes
     r = client.delete(
-        "/api/admin/agents/demo_assistant/icon",
+        "/api/admin/agents/consultor_tecnico/icon",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200

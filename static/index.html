@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Cortex</title>
+  <title>RR Mecánica · Cortex</title>
 
   <!-- PWA: instalable como app en Chrome/Edge/iOS/Android -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1A4EA0" />
-  <meta name="application-name" content="Cortex" />
-  <meta name="description" content="Plataforma agéntica interna de Cortex" />
+  <meta name="application-name" content="RR Mecánica · Cortex" />
+  <meta name="description" content="Plataforma agéntica interna de RR Mecánica Automotriz" />
 
   <!-- iOS / Safari (PWA en home screen) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Cortex" />
+  <meta name="apple-mobile-web-app-title" content="RR Mecánica" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
 
   <!-- Favicon e iconos generales -->
@@ -2414,10 +2414,10 @@ function pickGreeting(username) {
 
 function pickConvIcon(title) {
   const t = (title || '').toLowerCase();
-  if (/valvula|valve|reductora|compuerta|mariposa|esferica|globo/.test(t))         return 'Valve';
-  if (/sensor|nivel|presion|caudal|transmisor|nivelco|banner|turck/.test(t))        return 'Sensor';
-  if (/actuador|wrench|herramient|repuesto|junta|kit/.test(t))                      return 'Wrench';
-  if (/norma|api |ansi|din|iso |awwa|nfpa|ul\/fm|catalog/.test(t))                  return 'Book';
+  if (/motor|cilindr|piston|biela|cigueñal|distribuc|valvula|junta|tapa/.test(t))   return 'Valve';
+  if (/sensor|obd|scanner|codigo|p0|dtc|inyec|map|maf|lambda|oxigeno/.test(t))       return 'Sensor';
+  if (/freno|embrague|suspens|amortig|alineacion|balanceo|servic|repuesto|kit/.test(t)) return 'Wrench';
+  if (/manual|tsb|recall|boletin|norma|especific|torque|capacidad/.test(t))         return 'Book';
   if (/imagen|foto|adjunto/.test(t))                                                return 'Image';
   if (/http|link|enlace|url/.test(t))                                               return 'Link';
   return 'Message';
@@ -4260,10 +4260,10 @@ function Login({ onLogin }) {
           </svg>
         </div>
         <div className="login-logo-wrap">
-          <span className="login-logo">Cortex</span>
+          <span className="login-logo">RR Mecánica</span>
           <span className="login-cortex">Cortex</span>
         </div>
-        <div className="login-tagline">Plataforma agéntica interna</div>
+        <div className="login-tagline">Plataforma agéntica del taller</div>
         <div className="field">
           <label>Usuario</label>
           <input type="text" value={u} onChange={e => setU(e.target.value)} autoFocus required placeholder="Tu usuario" />
@@ -4277,7 +4277,7 @@ function Login({ onLogin }) {
         </button>
         {err && <div className="error-msg">{err}</div>}
         <div className="login-footer">
-          Acceso interno · Cortex
+          Acceso interno · RR Mecánica Automotriz
           <div style={{ marginTop: 10, fontSize: 9.5, opacity: 0.55, letterSpacing: '0.04em' }}>
             powered by <b style={{ fontWeight: 600 }}>AgentX</b>
           </div>
@@ -5025,7 +5025,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     const userLabel = (username || 'Usuario').toUpperCase();
     const header = [
       '═══════════════════════════════════════════════════════════════',
-      '  CORTEX · CORTEX',
+      '  RR MECÁNICA AUTOMOTRIZ · CORTEX',
       `  Conversación: ${chatTitle}`,
       `  Usuario: ${username || '—'}`,
       `  Exportado: ${dateStr}`,
@@ -5062,7 +5062,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
       '',
       '═══════════════════════════════════════════════════════════════',
       '  Fin de la conversación',
-      '  Generado por Cortex — Agente Consultor',
+      '  Generado por RR Mecánica Automotriz — Cortex',
       '═══════════════════════════════════════════════════════════════',
     ].join('\n');
 
@@ -5083,12 +5083,12 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
     setToast('✓ Conversación exportada como .txt');
   }
   const SUGGESTED_PROMPTS = [
-    { icon: 'Valve',  cat: 'Búsqueda en catálogo', text: '¿Qué válvulas BERMAD tienen disponibles?' },
-    { icon: 'Sensor', cat: 'Sensores',             text: 'Sensores de nivel NIVELCO para tanque de 6m' },
-    { icon: 'Wrench', cat: 'Selección',            text: 'Actuador neumático NUTORK para válvula DN150' },
-    { icon: 'Book',   cat: 'Normativas',           text: '¿Qué norma aplica para válvulas API 600?' },
-    { icon: 'Valve',  cat: 'Comparativa',          text: '¿Diferencia entre válvula de bola y compuerta?' },
-    { icon: 'Wrench', cat: 'Recomendación',        text: 'Válvula para fluido corrosivo a 80°C — ¿qué recomendás?' },
+    { icon: 'Wrench',  cat: 'Diagnóstico',  text: 'Hilux 2.8 2018 tira humo blanco en frío — ¿plan de diagnóstico?' },
+    { icon: 'Sensor',  cat: 'Códigos OBD',  text: 'Decodificá el código P0420 y qué pruebas hago.' },
+    { icon: 'Book',    cat: 'Especificaciones', text: '¿Cuál es el torque de tapa de cilindros del VW 1.6 8V?' },
+    { icon: 'Wrench',  cat: 'Service',      text: '¿Cada cuánto se cambia el kit de distribución de un Amarok 2.0 TDI?' },
+    { icon: 'Message', cat: 'Reporte',      text: 'Armame un presupuesto en Excel para un service completo.' },
+    { icon: 'Message', cat: 'Reporte',      text: 'Generá un informe de diagnóstico en Word para el cliente.' },
   ];
 
   const userInitials = (username || 'U').slice(0, 2).toUpperCase();
@@ -5112,7 +5112,7 @@ function Chat({ token, username, theme, onToggleTheme, onLogout }) {
           <Icon.Menu />
         </button>
         <div className="brand">
-          <span className="brand-logo">Cortex</span>
+          <span className="brand-logo">RR Mecánica</span>
           <span className="brand-cortex">Cortex</span>
         </div>
         <div className="topbar-spacer" />

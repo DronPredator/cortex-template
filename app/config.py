@@ -41,7 +41,7 @@ BACKUPS_DIR = BASE_DIR / "backups"
 BACKUP_RETENTION_DAYS = 14
 
 # Default agent — used when the client does not send agent_id (backward compat)
-DEFAULT_AGENT_ID = "demo_assistant"
+DEFAULT_AGENT_ID = "consultor_tecnico"
 
 
 def _load_env() -> dict:

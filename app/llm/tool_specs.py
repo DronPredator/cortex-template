@@ -200,7 +200,7 @@ SAVE_AGENT_PROMPT_TOOL = {
         "properties": {
             "agent_id": {
                 "type": "string",
-                "description": "ID of the agent to edit (e.g.: 'demo_assistant').",
+                "description": "ID of the agent to edit (e.g.: 'consultor_tecnico').",
             },
             "new_prompt": {
                 "type": "string",
