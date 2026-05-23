@@ -16,8 +16,8 @@ def test_ensure_agents_file_creates_initial_agents(tmp_path, monkeypatch):
     assert fake_path.exists()
 
     agents = reg.load_agents()
-    assert "demo_assistant" in agents
-    assert agents["demo_assistant"].is_default is True
+    assert "consultor_tecnico" in agents
+    assert agents["consultor_tecnico"].is_default is True
 
 
 def test_get_agent_or_default_falls_back(tmp_path, monkeypatch):
@@ -29,11 +29,11 @@ def test_get_agent_or_default_falls_back(tmp_path, monkeypatch):
 
     # ID inexistente → cae al default
     agent = reg.get_agent_or_default("no_existe_xxx")
-    assert agent.id == "demo_assistant"
+    assert agent.id == "consultor_tecnico"
 
     # ID None → también cae al default
     agent2 = reg.get_agent_or_default(None)
-    assert agent2.id == "demo_assistant"
+    assert agent2.id == "consultor_tecnico"
 
 
 def test_upsert_and_delete_agent(tmp_path, monkeypatch):
@@ -71,7 +71,7 @@ def test_cannot_delete_default_agent(tmp_path, monkeypatch):
     reg.ensure_agents_file()
 
     with pytest.raises(ValueError):
-        reg.delete_agent("demo_assistant")
+        reg.delete_agent("consultor_tecnico")
 
 
 # ── Permisos ─────────────────────────────────────────────────────────
@@ -133,14 +133,14 @@ def test_agents_endpoint_returns_visible_only_for_user(client, user_token):
     assert "agents" in data
     # Usuario regular ve los públicos. Los 3 base son públicos.
     ids = {a["id"] for a in data["agents"]}
-    assert "demo_assistant" in ids
+    assert "consultor_tecnico" in ids
 
 
 def test_agents_endpoint_admin_sees_all(client, admin_token):
     r = client.get("/api/agents", headers={"Authorization": f"Bearer {admin_token}"})
     assert r.status_code == 200
     ids = {a["id"] for a in r.json()["agents"]}
-    assert "demo_assistant" in ids
+    assert "consultor_tecnico" in ids
 
 
 # ── Knowledge base ───────────────────────────────────────────────────
@@ -223,18 +223,18 @@ def test_admin_list_agents(client, admin_token):
     data = r.json()
     assert "agents" in data
     ids = {a["id"] for a in data["agents"]}
-    assert ids == {"demo_assistant"}
+    assert ids == {"consultor_tecnico", "generador_reportes"}
 
 
 def test_admin_get_agent_prompt(client, admin_token):
     r = client.get(
-        "/api/admin/agents/demo_assistant/prompt",
+        "/api/admin/agents/consultor_tecnico/prompt",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r.status_code == 200
     data = r.json()
-    assert data["agent_id"] == "demo_assistant"
-    assert "Demo Assistant" in data["content"] or "Cortex" in data["content"]
+    assert data["agent_id"] == "consultor_tecnico"
+    assert "Consultor Técnico" in data["content"] or "RR Mecánica" in data["content"]
 
 
 def test_admin_save_and_load_agent_prompt(client, admin_token, tmp_path, monkeypatch):
@@ -246,7 +246,7 @@ def test_admin_save_and_load_agent_prompt(client, admin_token, tmp_path, monkeyp
 
     new_content = "Sos un agente de prueba.\n\n## Reglas\nTesting only."
     r = client.put(
-        "/api/admin/agents/demo_assistant/prompt",
+        "/api/admin/agents/consultor_tecnico/prompt",
         json={"content": new_content},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -254,7 +254,7 @@ def test_admin_save_and_load_agent_prompt(client, admin_token, tmp_path, monkeyp
     assert r.json()["ok"] is True
 
     r2 = client.get(
-        "/api/admin/agents/demo_assistant/prompt",
+        "/api/admin/agents/consultor_tecnico/prompt",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert r2.json()["content"] == new_content

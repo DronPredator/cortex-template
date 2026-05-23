@@ -178,9 +178,9 @@ def _page_header_footer(canvas, doc):
     # Texto del header
     canvas.setFillColor(colors.white)
     canvas.setFont("Helvetica-Bold", 16)
-    canvas.drawString(2 * cm, A4[1] - 1.15 * cm, "CORTEX S.A.")
+    canvas.drawString(2 * cm, A4[1] - 1.15 * cm, "RR MECÁNICA AUTOMOTRIZ")
     canvas.setFont("Helvetica", 8.5)
-    canvas.drawString(2 * cm, A4[1] - 1.55 * cm, "Ingeniería de fluidos · Instrumentación · Automatización industrial")
+    canvas.drawString(2 * cm, A4[1] - 1.55 * cm, "Diagnóstico · Reparación · Mantenimiento automotor")
     canvas.setFont("Helvetica-Bold", 9)
     canvas.drawRightString(A4[0] - 2 * cm, A4[1] - 1.15 * cm, "FICHA TÉCNICA")
     canvas.setFont("Helvetica", 8)
@@ -190,7 +190,7 @@ def _page_header_footer(canvas, doc):
     canvas.setFillColor(_TEXT_GRAY)
     canvas.setFont("Helvetica", 8)
     canvas.drawString(2 * cm, 1.2 * cm,
-                       "Documento generado por Cortex en base a datos oficiales del fabricante.")
+                       "Documento generado por RR Mecánica Automotriz en base a datos oficiales del fabricante.")
     canvas.drawRightString(A4[0] - 2 * cm, 1.2 * cm, f"Página {doc.page}")
     # Línea separadora del footer
     canvas.setStrokeColor(_BRAND_BLUE)
@@ -290,10 +290,10 @@ def generate_datasheet_pdf(
     story.append(HRFlowable(width="100%", thickness=0.3, color=colors.HexColor("#c8d4e5")))
     story.append(Spacer(1, 6))
     disclaimer = (
-        "Esta ficha técnica fue elaborada por <b>Cortex</b> en base a información "
+        "Esta ficha técnica fue elaborada por <b>RR Mecánica Automotriz</b> en base a información "
         "publicada por el fabricante en sus canales oficiales o por distribuidores autorizados. "
         "Para confirmación de especificaciones críticas, normas de aplicación y compatibilidad, "
-        "consulte directamente al fabricante o contacte al área técnica de Cortex."
+        "consulte directamente al fabricante o contacte al área técnica del taller."
     )
     story.append(Paragraph(disclaimer, styles["footer"]))
 

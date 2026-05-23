@@ -17,7 +17,7 @@ BRAND_HEX  = "1A4EA0"
 BRAND_RGB  = (0x1A, 0x4E, 0xA0)
 TEXT_HEX   = "1D1D1F"
 SUBT_HEX   = "515154"
-COMPANY    = "Cortex"
+COMPANY    = "RR Mecánica Automotriz"
 
 
 def _safe_filename(prefix: str, title: str, ext: str) -> str:

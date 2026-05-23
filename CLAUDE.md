@@ -1,10 +1,17 @@
-# Cortex Template
+# RR Mecánica Cortex
 
-Base template for building a Cortex instance (multi-agent agentic platform). See `README.md` for step-by-step customization and `CORTEX_BLUEPRINT.md` (in the AgentX repo) for the complete architectural blueprint.
+Cortex instance for **RR Mecánica Automotriz** — automotive workshop. Built on top of the generic Cortex template (multi-agent agentic platform).
 
 **Product:** Cortex by AgentX
-**Type:** B2B agentic platform, per-client deployment
-**Origin:** extracted from the first production instance
+**Client:** RR Mecánica Automotriz (taller mecánico)
+**Language:** Spanish (rioplatense) — enforced via `LANGUAGE_DIRECTIVE` in `.env`
+
+## Initial agents
+
+- **Consultor Técnico** (`consultor_tecnico`, default) — diagnóstico, procedimientos, especificaciones, investigación técnica. Tools: `tavily_search`, `verify_pdf_url`, `fetch_product_data`, `catalog_search`.
+- **Generador de Reportes** (`generador_reportes`) — informes técnicos, presupuestos, órdenes de reparación, planillas. Tools: `generate_word_document`, `generate_excel_spreadsheet`, `generate_datasheet_pdf`, `catalog_search`, `tavily_search`.
+
+Definitions live in `app/agents/definitions/<id>.md` (editable from the admin panel or directly on disk; mtime-cached). Knowledge files (optional) in `app/agents/knowledge/<id>/*.md`.
 
 ## Tech stack
 
@@ -78,8 +85,11 @@ cortex-template/
 │   │   ├── permissions.py
 │   │   ├── knowledge.py     # concatenates per-agent docs into the prompt
 │   │   ├── definitions/     # one .md file per agent
-│   │   │   └── demo_assistant.md
+│   │   │   ├── consultor_tecnico.md
+│   │   │   └── generador_reportes.md
 │   │   └── knowledge/       # per-agent reference docs
+│   │       ├── consultor_tecnico/
+│   │       └── generador_reportes/
 │   │
 │   ├── llm/       # providers + router + tool_specs
 │   ├── tools/     # catalog, pdf_verify, tavily
