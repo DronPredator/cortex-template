@@ -7,7 +7,7 @@
 
 **Producto:** Cortex by AgentX
 **Tipo:** Plataforma agéntica B2B, deployment por cliente
-**Origen:** este template se extrajo de la primera instancia en producción (Fidemar Cortex)
+**Origen:** este template se extrajo de la primera instancia en producción
 
 ---
 
