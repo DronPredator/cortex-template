@@ -251,10 +251,11 @@ async def chat_stream(req: ChatRequest, request: Request, auth: dict = Depends(v
 
         system_str = _build_full_system_prompt(agent, req.system_context)
 
-        # Prepend directiva de idioma (opcional, configurable via LANGUAGE_DIRECTIVE
-        # en .env). Esto fuerza el idioma de los thoughts internos de Gemini —
-        # útil cuando el deploy es para hispanohablantes y querés que el panel
-        # "Pensando…" aparezca en español. Vacío por default → el modelo elige.
+        # Prepend optional language directive (configurable via LANGUAGE_DIRECTIVE
+        # in .env). This forces the language of Gemini's internal thoughts —
+        # useful when the deployment targets a non-English audience and you
+        # want the "Thinking…" panel to appear in the user's language. Empty
+        # by default → the model picks the language naturally.
         if settings.language_directive:
             system_str = settings.language_directive + "\n\n" + system_str
 
@@ -264,15 +265,15 @@ async def chat_stream(req: ChatRequest, request: Request, auth: dict = Depends(v
         if settings.llm_uses_gemini:
             full_text: list[str] = []
             has_docs = "=== Documento" in (req.system_context or "")
-            # Si el agente declaró un tier explícito (≠ "auto"), usamos ese
-            # modelo. Si es "auto", dejamos que el router decida.
+            # If the agent declared an explicit tier (≠ "auto"), use that
+            # model. If "auto", let the router decide based on the query.
             if agent.default_tier != "auto":
                 from app.llm.router import tier_to_model
                 chosen_model = tier_to_model(agent.default_tier)
                 model_source = f"agent:{agent.id}"
             else:
-                # Router puede ser específico del agente (Steamy: Flash/Pro
-                # según consulta general vs formulario certificado) o default.
+                # Router can be agent-specific (registered in _AGENT_ROUTERS)
+                # or fall back to the default heuristic classifier.
                 chosen_model, model_source = resolve_model_for_request(
                     last_user_msg, has_docs, agent_id=agent.id,
                 )
@@ -294,10 +295,16 @@ async def chat_stream(req: ChatRequest, request: Request, auth: dict = Depends(v
                     full_text.append(evt["text"])
                     yield f"data: {json.dumps({'type': 'text', 'text': evt['text']})}\n\n"
                 elif etype == "reasoning":
-                    # Razonamiento del modelo (Gemini thoughts) — el frontend
-                    # lo muestra en bloque colapsible, NO va al cuerpo de la
-                    # respuesta ni se persiste en el log.
+                    # Model thinking stream (Gemini thoughts). The frontend
+                    # shows it in a collapsible panel during generation and
+                    # persists it with the message for later inspection. NOT
+                    # included in the response body or the server log.
                     yield f"data: {json.dumps({'type': 'reasoning', 'text': evt.get('text', '')})}\n\n"
+                elif etype == "truncated":
+                    # Model cut off due to MAX_TOKENS. The frontend shows a
+                    # "Continue" button so the user doesn't have to type
+                    # "continue" manually to extend the response.
+                    yield f"data: {json.dumps({'type': 'truncated', 'reason': evt.get('reason', 'max_tokens')})}\n\n"
                 elif etype in ("tool_start", "tool_done"):
                     ev = await _gemini_thinking_event(
                         etype, evt["name"], evt.get("args", {}), evt.get("meta", {})

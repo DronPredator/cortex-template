@@ -1,7 +1,9 @@
-"""Gemini provider — streams text + function calls compatible con SSE del frontend.
+"""Gemini provider — streams text + function calls compatible with the frontend SSE protocol.
 
-Eventos que yieldea:
+Events yielded:
     {"type": "text", "text": "..."}
+    {"type": "reasoning", "text": "..."}                    # model's thoughts
+    {"type": "truncated", "reason": "max_tokens"}           # response cut off
     {"type": "tool_start", "name": "...", "args": {...}, "id": "..."}
     {"type": "tool_done",  "name": "...", "args": {...}, "id": "...", "meta": {...}}
     {"type": "done"}
@@ -14,16 +16,16 @@ from google import genai
 from google.genai import types
 
 
-# ── Conversión de formatos Anthropic ↔ Gemini ─────────────────────────────────
+# ── Anthropic ↔ Gemini format conversion ─────────────────────────────────────
 
 def _thinking_budget(level: str) -> int | None:
-    """Convierte el env var GEMINI_THINKING a thinking_budget."""
+    """Convert the GEMINI_THINKING env var to a thinking_budget value."""
     level = (level or "").lower().strip()
     if level == "off":
         return 0
     if level == "high":
         return 8192
-    # auto / dinámico → None (default del modelo)
+    # auto / dynamic → None (model default)
     return None
 
 
@@ -51,13 +53,13 @@ def _anth_schema_to_gemini(defn: dict) -> types.Schema:
         )
 
     if t == "OBJECT":
-        # Si tiene `properties`, convertimos recursivo. Si no, downgrade a STRING
-        # (Gemini exige al menos un propertie en OBJECT).
+        # If `properties` exists, convert recursively. Otherwise downgrade
+        # to STRING (Gemini requires at least one property in OBJECT).
         props = defn.get("properties") or {}
         if not props:
             return types.Schema(
                 type="STRING",
-                description=(desc + " (formato: JSON-encoded string)").strip(),
+                description=(desc + " (format: JSON-encoded string)").strip(),
             )
         gprops = {k: _anth_schema_to_gemini(v) for k, v in props.items()}
         return types.Schema(
@@ -90,7 +92,7 @@ def _convert_tool(tool: dict) -> types.FunctionDeclaration:
 
 
 def _convert_messages(messages: list[dict]) -> list[types.Content]:
-    """Lista de mensajes estilo Anthropic → list[types.Content] de Gemini."""
+    """Anthropic-style message list → Gemini list[types.Content]."""
     result: list[types.Content] = []
     for msg in messages:
         role = msg.get("role", "user")
@@ -130,7 +132,7 @@ def _convert_messages(messages: list[dict]) -> list[types.Content]:
                 elif btype == "tool_result":
                     raw_content = block.get("content", "")
                     if isinstance(raw_content, list):
-                        # Anthropic puede mandar listas de blocks; tomamos el texto
+                        # Anthropic may send a list of blocks; pull out the text
                         raw_content = " ".join(
                             b.get("text", "") for b in raw_content
                             if isinstance(b, dict) and b.get("type") == "text"
@@ -145,7 +147,7 @@ def _convert_messages(messages: list[dict]) -> list[types.Content]:
     return result
 
 
-# ── Streaming principal ───────────────────────────────────────────────────────
+# ── Main streaming loop ───────────────────────────────────────────────────────
 
 ToolHandler = Callable[[str, dict], Awaitable[tuple[str, dict]]]
 
@@ -170,17 +172,17 @@ async def stream_chat(
     client = genai.Client(api_key=api_key)
     contents = _convert_messages(messages)
 
-    # NOTA — Idioma de los thoughts:
-    # Gemini con include_thoughts=True razona en inglés por default. Si
-    # tu despliegue necesita forzar otro idioma (ej. español), prepend
-    # la directiva al `system` ANTES de llamar a esta función — desde
-    # `app/routes/chat.py` que ya tiene acceso a `settings`. Acá no
-    # acoplamos el engine a un idioma específico para que el template
-    # sea reusable.
+    # NOTE — Language of model thoughts:
+    # Gemini with `include_thoughts=True` reasons in English by default.
+    # If your deployment needs to force a specific language (e.g. Spanish),
+    # prepend the directive to `system` BEFORE calling this function —
+    # from `app/routes/chat.py` which has access to `settings`. We do not
+    # couple the engine to a specific language here, to keep the template
+    # reusable across deployments.
     #
-    # Ejemplo de uso desde chat.py:
-    #   if settings.language_directive:
-    #       system_str = settings.language_directive + "\n\n" + system_str
+    # Example usage from chat.py:
+    #     if settings.language_directive:
+    #         system_str = settings.language_directive + "\n\n" + system_str
 
     # Tools
     gemini_tools: list[types.Tool] = []
@@ -196,10 +198,10 @@ async def stream_chat(
             pass
 
     budget = _thinking_budget(thinking)
-    # include_thoughts=True hace que Gemini devuelva los "thoughts" (razonamiento
-    # del modelo) como parts separados con .thought=True. Los streameamos al
-    # frontend como evento "reasoning" para mostrarlos en vivo en el panel.
-    # Solo tiene sentido si el thinking está habilitado (budget != 0).
+    # include_thoughts=True makes Gemini return the model's thoughts as
+    # separate parts with .thought=True. We stream them to the frontend as
+    # "reasoning" events to show them live in the collapsible panel.
+    # Only makes sense when thinking is enabled (budget != 0).
     if budget == 0:
         thinking_cfg = types.ThinkingConfig(thinking_budget=0)
     elif budget is not None:
@@ -207,22 +209,27 @@ async def stream_chat(
     else:
         thinking_cfg = types.ThinkingConfig(include_thoughts=True)
 
-    # Cuando combinamos function_declarations + google_search,
-    # Gemini 3.x exige este flag para devolver las invocaciones de tools server-side.
+    # When combining function_declarations + google_search, Gemini 3.x
+    # requires this flag to return server-side tool invocations.
     tool_config = None
     if has_functions and enable_search:
         tool_config = types.ToolConfig(include_server_side_tool_invocations=True)
 
+    # max_output_tokens=16384 — large enough for detailed technical
+    # responses without forcing the user to type "continue" mid-answer.
+    # Gemini 3.5 Flash supports up to 65,536 output tokens; 16K is a
+    # safe default (the limit is a cap, not a target — short answers
+    # stay short).
     config = types.GenerateContentConfig(
         system_instruction=system or None,
         tools=gemini_tools or None,
         tool_config=tool_config,
         thinking_config=thinking_cfg,
-        max_output_tokens=4096,
+        max_output_tokens=16384,
     )
 
-    # Solo las tools que declaramos client-side se ejecutan vía tool_handler.
-    # Las built-in de Gemini (google_search, etc.) las maneja el servidor.
+    # Only the tools we declared client-side run via tool_handler.
+    # Gemini's built-in tools (google_search, etc.) are handled server-side.
     client_tool_names = {t["name"] for t in (tools or [])}
 
     iterations = 0
@@ -240,11 +247,19 @@ async def stream_chat(
             )
 
             emitted_search_queries: set[str] = set()
+            last_finish_reason: str = ""  # Track to detect MAX_TOKENS truncation
             async for chunk in stream:
                 cands = getattr(chunk, "candidates", None) or []
                 if not cands:
                     continue
-                # Surface Google Search queries del grounding_metadata
+                # Track finish_reason from the latest chunk. If it ended with
+                # MAX_TOKENS, the response was truncated and the frontend
+                # should show a "Continue" button instead of cutting off
+                # silently.
+                fr = getattr(cands[0], "finish_reason", None)
+                if fr is not None:
+                    last_finish_reason = str(fr).split(".")[-1]  # "MAX_TOKENS" / "STOP" / etc.
+                # Surface Google Search queries from grounding_metadata
                 gm = getattr(cands[0], "grounding_metadata", None)
                 if gm:
                     queries = getattr(gm, "web_search_queries", None) or []
@@ -257,10 +272,10 @@ async def stream_chat(
                     continue
                 for part in (content.parts or []):
                     text = getattr(part, "text", None)
-                    # Si el part es un "thought" (razonamiento interno del modelo),
-                    # lo emitimos como evento "reasoning" para que el frontend
-                    # lo muestre en el panel colapsible — NO va al cuerpo de la
-                    # respuesta visible.
+                    # If the part is a "thought" (model's internal reasoning),
+                    # emit it as a "reasoning" event so the frontend shows it
+                    # in the collapsible panel — does NOT go into the visible
+                    # response body.
                     is_thought = bool(getattr(part, "thought", False))
                     if text:
                         if is_thought:
@@ -269,23 +284,27 @@ async def stream_chat(
                             yield {"type": "text", "text": text}
                     fc = getattr(part, "function_call", None)
                     if fc and fc.name and fc.name in client_tool_names:
-                        # Tool declarada por nosotros → ejecutamos client-side
+                        # Client-declared tool → we run it via tool_handler
                         pending_calls.append(fc)
                     elif fc and fc.name:
-                        # Tool built-in de Gemini (google_search). Avisamos al frontend.
+                        # Gemini built-in tool (google_search). Notify frontend.
                         args = dict(fc.args) if fc.args else {}
                         q = args.get("query", args.get("queries", str(args))) if args else ""
                         if isinstance(q, list): q = ", ".join(map(str, q))
                         yield {"type": "thinking", "tool": "web_search", "query": str(q)[:120], "status": "done"}
-                    # Preservamos el part original (con su thought_signature si aplica)
-                    # para mandárselo a Gemini en el próximo turno.
+                    # Preserve the original part (with its thought_signature
+                    # if applicable) to send back to Gemini in the next turn.
                     assistant_parts.append(part)
 
             if not pending_calls:
+                # If the model was cut off by MAX_TOKENS, notify the frontend
+                # BEFORE done so it can render a "Continue" button.
+                if last_finish_reason == "MAX_TOKENS":
+                    yield {"type": "truncated", "reason": "max_tokens"}
                 yield {"type": "done"}
                 return
 
-            # Procesar todas las function calls de este turno
+            # Process all function calls from this turn
             tool_response_parts: list[types.Part] = []
             for idx, fc in enumerate(pending_calls):
                 args = dict(fc.args) if fc.args else {}
@@ -296,7 +315,7 @@ async def stream_chat(
                     try:
                         result_text, meta = await tool_handler(fc.name, args)
                     except Exception as e:
-                        result_text, meta = f"Error ejecutando {fc.name}: {e}", {"error": str(e)}
+                        result_text, meta = f"Error running {fc.name}: {e}", {"error": str(e)}
                 else:
                     result_text, meta = "OK", {}
 
@@ -307,13 +326,13 @@ async def stream_chat(
                     response={"result": str(result_text)},
                 )))
 
-            # Append turno del modelo (con sus function_calls) + nuestras respuestas
+            # Append the model's turn (with its function_calls) + our responses
             if assistant_parts:
                 contents.append(types.Content(role="model", parts=assistant_parts))
             contents.append(types.Content(role="user", parts=tool_response_parts))
-            # Continuar loop
+            # Continue the loop
 
-        yield {"type": "error", "message": "Máximo de iteraciones alcanzado en el agente."}
+        yield {"type": "error", "message": "Max agent iterations reached."}
 
     except Exception as e:
-        yield {"type": "error", "message": f"Error de Gemini: {e}"}
+        yield {"type": "error", "message": f"Gemini error: {e}"}
