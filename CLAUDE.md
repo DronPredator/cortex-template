@@ -1,279 +1,271 @@
 # Cortex Template
 
-> **Plantilla base para construir una instancia de Cortex** (plataforma
-> agéntica multi-agente). Ver `README.md` para personalización paso a
-> paso y `CORTEX_BLUEPRINT.md` (en el repo de AgentX) para el blueprint
-> arquitectónico completo.
+Base template for building a Cortex instance (multi-agent agentic platform). See `README.md` for step-by-step customization and `CORTEX_BLUEPRINT.md` (in the AgentX repo) for the complete architectural blueprint.
 
-**Producto:** Cortex by AgentX
-**Tipo:** Plataforma agéntica B2B, deployment por cliente
-**Origen:** este template se extrajo de la primera instancia en producción
+**Product:** Cortex by AgentX
+**Type:** B2B agentic platform, per-client deployment
+**Origin:** extracted from the first production instance
 
----
+## Tech stack
 
-## Stack técnico
+- **Backend:** FastAPI + Uvicorn + Python 3.11+
+- **LLM:** Google Gemini (default: `gemini-3-flash-preview`) — configurable to Anthropic Claude
+- **Catalog search:** pandas over CSV with relevance ranking + pagination
+- **Auth:** JWT (PBKDF2-SHA256 for passwords)
+- **Frontend:** React 18 via CDN + Babel standalone (no build step), single file `static/index.html`
+- **Rate limiting:** slowapi (in-memory)
+- **Agent tools:**
+  - `catalog_search(query, offset)` — searches the client's dataset
+  - `verify_pdf_url(url)` — verifies via HTTP that a URL serves a real PDF (with SSRF guard)
+  - `fetch_product_data(url)` — scrapes HTML pages (with SSRF guard)
+  - `generate_datasheet_pdf(...)` — generates a PDF spec sheet with client branding
+  - `generate_word_document` / `generate_excel_spreadsheet` — Office document generators
+  - `tavily_search` — web search (requires `TAVILY_API_KEY`)
 
-- **Backend**: FastAPI + Uvicorn + Python 3.11+
-- **LLM**: Google Gemini (default: `gemini-3-flash-preview`) — configurable a Anthropic Claude
-- **Búsqueda catálogo**: pandas sobre CSV con ranking por relevancia + paginación
-- **Auth**: JWT (PBKDF2-SHA256 para passwords)
-- **Frontend**: React 18 vía CDN + Babel standalone (sin build), un solo archivo `static/index.html`
-- **Rate limiting**: slowapi (in-memory)
-- **Tools del agente**:
-  - `catalog_search(query, offset)` — busca en el dataset del cliente
-  - `verify_pdf_url(url)` — verifica HTTP que una URL sea un PDF real (con SSRF guard)
-  - `fetch_product_data(url)` — scrapea páginas HTML (con SSRF guard)
-  - `generate_datasheet_pdf(...)` — genera ficha técnica PDF con branding del cliente
-  - `generate_word_document / generate_excel_spreadsheet` — generadores de Office
-  - `tavily_search` — búsqueda web (requiere TAVILY_API_KEY)
+## Quick setup on a new machine
 
----
-
-## Setup rápido en una PC nueva
-
-```powershell
-# 1. Verificar Python 3.11+
+```bash
+# 1. Verify Python 3.11+
 python --version
 
-# 2. Instalar dependencias
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Crear .env desde el template
+# 3. Create .env from the template
 copy .env.example .env
 
-# 4. Setear las claves de forma segura
-python set_secret.py JWT_SECRET        # >= 32 chars random
-python set_secret.py GOOGLE_API_KEY    # aistudio.google.com/apikey
+# 4. Set secrets securely
+python set_secret.py JWT_SECRET      # >= 32 random chars
+python set_secret.py GOOGLE_API_KEY  # aistudio.google.com/apikey
 python set_secret.py ADMIN_PASSWORD
 
-# 5. Personalizar identidad del cliente (.env):
-#    COMPANY_NAME=Acme
-#    COMPANY_FULL_NAME=Acme S.A.
-#    CORTEX_INSTANCE_ID=acme_cortex
+# 5. Set client identity in .env:
+# COMPANY_NAME=Acme
+# COMPANY_FULL_NAME=Acme S.A.
+# CORTEX_INSTANCE_ID=acme_cortex
 
-# 6. Arrancar
+# 6. Start
 python -m uvicorn main:app --host 0.0.0.0 --port 8000
-# o doble-click en start_server.bat
+# or double-click start_server.bat
 ```
 
-Después abrir `http://localhost:8000`.
+Then open `http://localhost:8000`.
 
----
-
-## Estructura del proyecto
+## Project structure
 
 ```
 cortex-template/
-├── main.py                      # entry point (solo `from app.main import app`)
-├── search.py                    # búsqueda en CSV (personalizar columnas si cambia el formato)
-├── stock.csv                    # dataset del cliente (placeholder en el template)
-├── gemini_engine.py             # provider Gemini (streaming + tool calling)
-├── datasheet_tools.py           # scraping HTML + generación PDF
-├── office_generators.py         # generadores Word + Excel
-├── document_extract.py          # extracción de texto de PDF/DOCX/PPTX
-├── set_secret.py                # helper para setear secrets vía getpass
+├── main.py               # entry point (just `from app.main import app`)
+├── search.py             # CSV search (customize columns if format changes)
+├── stock.csv             # client dataset (demo placeholder in the template)
+├── gemini_engine.py      # Gemini provider (streaming + tool calling)
+├── datasheet_tools.py    # HTML scraping + PDF generation
+├── office_generators.py  # Word + Excel generators
+├── document_extract.py   # text extraction from PDF/DOCX/PPTX
+├── set_secret.py         # helper to set secrets via getpass
 │
 ├── app/
-│   ├── main.py                  # FastAPI app + middlewares + routers
-│   ├── config.py                # Pydantic Settings (company_name, etc.)
-│   ├── auth.py                  # JWT helpers + dependencies
-│   ├── errors.py                # global exception handlers
-│   ├── models.py                # request models Pydantic
+│   ├── main.py           # FastAPI app + middlewares + routers
+│   ├── config.py         # Pydantic Settings (company_name, etc.)
+│   ├── auth.py           # JWT helpers + dependencies
+│   ├── errors.py         # global exception handlers
+│   ├── models.py         # Pydantic request models
 │   ├── logging_config.py
 │   │
 │   ├── agents/
-│   │   ├── base.py              # AgentDefinition dataclass
-│   │   ├── registry.py          # CRUD + _INITIAL_AGENTS
+│   │   ├── base.py          # AgentDefinition dataclass
+│   │   ├── registry.py      # CRUD + _INITIAL_AGENTS
 │   │   ├── permissions.py
-│   │   ├── knowledge.py         # concat de docs por agente al prompt
-│   │   ├── definitions/         # un .md por agente
+│   │   ├── knowledge.py     # concatenates per-agent docs into the prompt
+│   │   ├── definitions/     # one .md file per agent
 │   │   │   └── demo_assistant.md
-│   │   └── knowledge/           # docs de referencia por agente
+│   │   └── knowledge/       # per-agent reference docs
 │   │
-│   ├── llm/                     # providers + router + tool_specs
-│   ├── tools/                   # catalog, pdf_verify, tavily
-│   ├── prompts/                 # system.md, admin.md (chat admin)
-│   ├── routes/                  # endpoints (auth, chat, agents, admin_*)
-│   ├── security/                # rate_limit, url_safety, headers, body_limit, files, log_sanitize
-│   └── storage/                 # users, conversations, audit, memory, backups, atomic
+│   ├── llm/       # providers + router + tool_specs
+│   ├── tools/     # catalog, pdf_verify, tavily
+│   ├── prompts/   # system.md, admin.md (admin chat)
+│   ├── routes/    # endpoints (auth, chat, agents, admin_*)
+│   ├── security/  # rate_limit, url_safety, headers, body_limit, files, log_sanitize
+│   └── storage/   # users, conversations, audit, memory, backups, atomic
 │
 ├── static/
-│   ├── index.html               # frontend React (un solo archivo)
-│   ├── datasheets/              # PDFs generados (gitignored)
-│   └── documents/               # Word/Excel generados (gitignored)
+│   ├── index.html    # React frontend (single file)
+│   ├── datasheets/   # generated PDFs (gitignored)
+│   └── documents/    # generated Word/Excel (gitignored)
 │
-├── tests/                       # pytest
+├── tests/            # pytest
 └── (runtime — gitignored)
     ├── users.json, agents.json, conversations_log.jsonl, audit_log.jsonl
     ├── memory.json, runtime_config.json
     ├── backups/YYYY-MM-DD/, logs/
 ```
 
-### Archivos generados en runtime (gitignored)
+## Runtime files (gitignored)
 
-- `users.json` — usuarios registrados con hashes PBKDF2
-- `agents.json` — definiciones de asistentes (creado en primer startup desde `_INITIAL_AGENTS`)
-- `conversations_log.jsonl` — log append-only de cada Q&A (rotado a 5MB), incluye `agent_id`
-- `audit_log.jsonl` — log inmutable de acciones admin
-- `memory.json` — memoria diaria generada por análisis del log
-- `runtime_config.json` — overrides runtime
-- `backups/YYYY-MM-DD/` — snapshot diario automático de los archivos críticos
+| File | Description |
+|---|---|
+| `users.json` | registered users with PBKDF2 hashes |
+| `agents.json` | assistant definitions (created on first startup from `_INITIAL_AGENTS`) |
+| `conversations_log.jsonl` | append-only Q&A log (rotated at 5 MB), includes `agent_id` |
+| `audit_log.jsonl` | immutable admin action log |
+| `memory.json` | daily memory generated by log analysis |
+| `runtime_config.json` | runtime overrides |
+| `backups/YYYY-MM-DD/` | automatic daily snapshot of critical files |
 
----
+## Active security layers
 
-## Capas de seguridad activas
+- **Rate limiting** (slowapi): 5/min on login, 30/min on chat
+- **SSRF defense**: blocks fetches to private IPs, loopback, link-local, metadata services
+- **HTTP headers**: X-Content-Type-Options, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy
+- **Body size limits**: login 4 KB, chat 5 MB, admin 200 KB
+- **Password policy**: minimum 8 characters for new users
+- **Immutable audit log** of admin actions
+- **Filename sanitization** on uploads
+- **Log sanitization** of passwords/tokens in error messages
+- **Prompt injection guard** with `<<<USER_CONTEXT>>>` markers
+- **Automatic daily backups** (14-day retention)
 
-- **Rate limiting** (slowapi): 5/min en login, 30/min en chat
-- **SSRF defense**: bloquea fetches a IPs privadas, loopback, link-local, metadata services
-- **Headers HTTP**: X-Content-Type-Options, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy
-- **Body size limits**: login 4KB, chat 5MB, admin 200KB
-- **Password policy**: mínimo 8 caracteres en users nuevos
-- **Audit log inmutable** de acciones admin
-- **Filename sanitization** en uploads
-- **Log sanitization** de passwords/tokens en errores
-- **Prompt injection guard** con marcadores `<<<USER_CONTEXT>>>`
-- **Backups automáticos diarios** (retención 14 días)
+## Agent system
 
----
+- `app/agents/definitions/<id>.md` — prompts editable without restarting
+- `app/agents/knowledge/<id>/*.md` — reference docs concatenated into the system prompt
+- `app/agents/registry.py:_INITIAL_AGENTS` — agents created on first startup
+- Each agent declares `allowed_tools` → filters available tools for the model
+- `visibility: public / private / users` (granular list)
+- Admin sees and uses all. Regular users see only public ones + `users` entries they belong to
 
-## Sistema de agentes
+### Adding / editing agents
 
-- `app/agents/definitions/<id>.md` — prompts editables sin reiniciar
-- `app/agents/knowledge/<id>/*.md` — docs de referencia que se concatenan al prompt
-- `app/agents/registry.py:_INITIAL_AGENTS` — agentes que se crean en el primer startup
-- Cada agente declara `allowed_tools` → se filtran las disponibles al modelo
-- `visibility`: `public` / `private` / `users` (lista granular)
-- Admin ve y usa todos. Usuario regular ve solo públicos + los `users` donde está incluido
+**Option A — From the admin panel (recommended):**
 
-### Para agregar/editar agentes
+1. Log in as admin at `/api/admin/login`
+2. Tab "🤖 Assistants" → Edit prompt → save
 
-**Opción A — Desde el panel admin (recomendado)**:
-1. Login admin en `/api/admin/login`
-2. Tab "🤖 Asistentes" → Editar prompt → guardar
+**Option B — Editing files:**
 
-**Opción B — Editando archivos**:
-1. Crear `app/agents/definitions/<id>.md` con el prompt
-2. Agregar entry a `_INITIAL_AGENTS` en `registry.py` (o crearla por API)
-3. Si se necesita knowledge base: `app/agents/knowledge/<id>/*.md`
+1. Create `app/agents/definitions/<id>.md` with the prompt
+2. Add an entry to `_INITIAL_AGENTS` in `registry.py` (or create via API)
+3. If a knowledge base is needed: `app/agents/knowledge/<id>/*.md`
 
----
+## Environment variables
 
-## Variables de entorno (`.env`)
-
-| Variable | Default | Descripción |
+| Variable | Default | Description |
 |---|---|---|
-| `COMPANY_NAME` | `Demo Company` | Nombre corto del cliente (visible en PDFs/Word) |
-| `COMPANY_FULL_NAME` | `Demo Company S.A.` | Razón social |
-| `COMPANY_INDUSTRY` | `generic` | Industria (clasificación libre) |
-| `CORTEX_INSTANCE_ID` | `demo_cortex` | ID único de instancia |
-| `LLM_PROVIDER` | `gemini` | `gemini` o `anthropic` |
-| `GOOGLE_API_KEY` | — | Obligatorio si gemini |
-| `ANTHROPIC_API_KEY` | — | Obligatorio si anthropic |
-| `TAVILY_API_KEY` | — | Opcional. Habilita búsqueda web |
-| `GEMINI_MODEL` | `gemini-3-flash-preview` | Modelo activo |
-| `CHAT_USER` | `demo` | Usuario inicial (migrado a users.json en primer login) |
-| `CHAT_PASSWORD` | — | Password inicial |
-| `ADMIN_USER` | `admin` | Usuario del panel administrativo |
-| `ADMIN_PASSWORD` | — | Password admin |
-| `JWT_SECRET` | — | **Obligatorio**. >=32 chars random, único por instancia |
-| `CORS_ORIGINS` | `http://localhost:8000,...` | Lista CSV |
-| `MOCK_MODE` | `false` | Si `true`, responde simulado sin llamar al LLM |
-| `RATE_LIMIT_ENABLED` | `true` | Setear `false` solo en tests |
+| `COMPANY_NAME` | `Demo Company` | Short client name (visible in PDFs/Word) |
+| `COMPANY_FULL_NAME` | `Demo Company S.A.` | Legal name |
+| `COMPANY_INDUSTRY` | `generic` | Industry (free-form) |
+| `CORTEX_INSTANCE_ID` | `demo_cortex` | Unique instance ID |
+| `LLM_PROVIDER` | `gemini` | `gemini` or `anthropic` |
+| `GOOGLE_API_KEY` | — | Required if `gemini` |
+| `ANTHROPIC_API_KEY` | — | Required if `anthropic` |
+| `TAVILY_API_KEY` | — | Optional. Enables web search |
+| `GEMINI_MODEL` | `gemini-3-flash-preview` | Active model |
+| `CHAT_USER` | `demo` | Initial user (migrated to `users.json` on first login) |
+| `CHAT_PASSWORD` | — | Initial password |
+| `ADMIN_USER` | `admin` | Admin panel user |
+| `ADMIN_PASSWORD` | — | Admin password |
+| `JWT_SECRET` | — | Required. >= 32 random chars, unique per instance |
+| `CORS_ORIGINS` | `http://localhost:8000,...` | CSV list |
+| `MOCK_MODE` | `false` | If `true`, responds without calling the LLM |
+| `RATE_LIMIT_ENABLED` | `true` | Set to `false` only in tests |
 
-### ⚠️ Cómo NUNCA configurar secrets
+### ⚠️ How to NEVER configure secrets
 
-- ❌ No pegues secrets directamente en `.env` desde un terminal con history activo
-- ❌ No commitees `.env` (está en `.gitignore`)
-- ❌ No leas `.env` con `Read`/`cat` si después vas a pasarlo a otro contexto
-- ✅ Usá `python set_secret.py <VAR>` — usa `getpass`, no echoea
+```
+❌ Do not paste secrets directly into .env from a terminal with history enabled
+❌ Do not commit .env (it's in .gitignore)
+❌ Do not read .env with Read/cat if you'll pass it to another context
+✅ Use python set_secret.py <VAR> — uses getpass, does not echo
+```
 
----
+## Main API endpoints
 
-## Endpoints API principales
+### Public
 
-### Públicos
-- `POST /api/login` — auth usuarios regulares
-- `POST /api/admin/login` — auth del admin
+- `POST /api/login` — user auth
+- `POST /api/admin/login` — admin auth
 
-### Auth requerida (JWT)
-- `GET /api/agents` — lista los asistentes que el usuario puede ver/usar
-- `POST /api/chat/stream` — SSE streaming. Body: `{messages, system_context, agent_id?}`. Eventos: `text`, `thinking`, `done`, `error`, `model_selected`
-- `POST /api/reload-stock` — recarga el dataset CSV en memoria
-- `POST /api/upload-document` — subir documento para extraer texto al contexto
+### Auth required (JWT)
 
-### Admin requerido
-- `GET/POST /api/admin/system-prompt` — personalización global
-- `GET/POST /api/admin/model` — modelo Gemini activo
-- `GET/POST /api/admin/auto-route` — router automático on/off
+- `GET /api/agents` — list agents the user can see/use
+- `POST /api/chat/stream` — SSE streaming. Body: `{messages, system_context, agent_id?}`. Events: `text`, `thinking`, `done`, `error`, `model_selected`
+- `POST /api/reload-stock` — reload the CSV dataset in memory
+- `POST /api/upload-document` — upload a document to extract text into context
+
+### Admin required
+
+- `GET/POST /api/admin/system-prompt` — global customization
+- `GET/POST /api/admin/model` — active Gemini model
+- `GET/POST /api/admin/auto-route` — automatic router on/off
 - `GET/POST/DELETE /api/admin/users[/{username}]`
 - `GET/POST/DELETE /api/admin/agents[/{id}]`
-- `GET/PUT /api/admin/agents/{id}/prompt` — editor de prompts
+- `GET/PUT /api/admin/agents/{id}/prompt` — prompt editor
 - `GET /api/admin/memory` + `POST /api/admin/memory/refresh`
 - `GET /api/admin/conversations?user=X&limit=N`
-- `POST /api/admin/chat/stream` — chat del admin con `save_behavior` tool
+- `POST /api/admin/chat/stream` — admin chat with `save_behavior` tool
 
----
+## Codebase conventions
 
-## Convenciones del codebase
+### SSE streaming format
 
-### Streaming SSE
 ```
 data: {"type": "text", "text": "..."}\n\n
 data: {"type": "thinking", "tool": "catalog_search", "query": "...", "status": "done", "count": 10, "total": 50}\n\n
 data: {"type": "done"}\n\n
 ```
 
-El frontend usa `readSSE(res, onEvent)` (helper en `index.html`).
+The frontend uses `readSSE(res, onEvent)` (helper in `index.html`).
 
 ### Agentic loop
-- Max **12 iteraciones** por consulta (`settings.max_agent_iterations`)
-- Si `verify_pdf_url` o `fetch_product_data` devuelven una URL bloqueada por SSRF, el agente la descarta
-- Si `generate_datasheet_pdf`, se sirve en `/datasheets/cortex_<id>.pdf`
+
+- Max 12 iterations per query (`settings.max_agent_iterations`)
+- If `verify_pdf_url` or `fetch_product_data` return a URL blocked by SSRF, the agent discards it
+- If `generate_datasheet_pdf` is called, the file is served at `/datasheets/cortex_<id>.pdf`
 
 ### Frontend
-- Un solo archivo `static/index.html` con React vía CDN + Babel standalone
-- **NO usar comentarios JSX (`{/* ... */}`) después de cerrar tags al final del return** — Babel standalone los rechaza
-- Design tokens en `:root` CSS vars
-- Dark mode con `data-theme="dark"` en `<html>`
-- Mobile responsive con sidebar off-canvas en `<720px`
 
-### Logging y privacidad
-- Conversaciones se loguean a `conversations_log.jsonl` (truncado a 600+1200 chars)
-- Audit log inmutable en `audit_log.jsonl`
-- Sanitización de passwords/tokens antes de loguear errores
-- Rotación automática de log a 5MB
+- Single file `static/index.html` with React via CDN + Babel standalone
+- **Do not use JSX comments** (`{/* ... */}`) after closing tags at the end of a `return` — Babel standalone rejects them
+- Design tokens in `:root` CSS vars
+- Dark mode via `data-theme="dark"` on `<html>`
+- Mobile responsive with off-canvas sidebar at < 720px
 
----
+### Logging and privacy
 
-## Para Claude Code
+- Conversations logged to `conversations_log.jsonl` (truncated to 600+1200 chars)
+- Immutable audit log in `audit_log.jsonl`
+- Password/token sanitization before logging errors
+- Automatic log rotation at 5 MB
 
-Cuando una IA Claude lea este repo para implementar/modificar:
+## For Claude Code
 
-1. **Verificá Python 3.11+** y dependencias instaladas
-2. **No leas `.env`** con `Read` si tiene secrets reales
-3. **No reemplaces `stock.csv`** sin avisar al admin (es el catálogo del cliente)
-4. **No commitees** sin confirmar — el repo tiene `.gitignore` pero igual revisá
-5. **Antes de tocar `app/security/`**, leé el blueprint y entendé qué hace cada capa
-6. **Tests siempre**: corré `python -m pytest tests/` antes de cualquier cambio
-7. **Después de cambios**: corré los tests y verificá `/api/health`
+When an AI Claude reads this repo to implement or modify:
 
----
+1. Verify Python 3.11+ and dependencies are installed
+2. Do not read `.env` with Read if it contains real secrets
+3. Do not replace `stock.csv` without notifying the admin (it's the client's catalog)
+4. Do not commit without confirming — the repo has `.gitignore` but still review
+5. Before touching `app/security/`, read the blueprint and understand each security layer
+6. Always run tests: `python -m pytest tests/` before any change
+7. After changes: run tests and verify `/api/health`
 
-## Comandos útiles
+## Useful commands
 
-```powershell
-# Dev con auto-reload
+```bash
+# Dev with auto-reload
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 # Tests
 python -m pytest tests/ -v
 
-# Probar login
-curl -X POST http://localhost:8000/api/login -H "Content-Type: application/json" -d "{\"username\":\"demo\",\"password\":\"demo1234\"}"
+# Test login
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"demo","password":"demo1234"}'
 
-# Setup acceso LAN (necesita admin)
+# LAN access setup (requires admin)
 powershell -ExecutionPolicy Bypass -File setup_lan.ps1
 
-# Instalar como Windows Service (necesita admin)
+# Install as Windows Service (requires admin)
 install_service.bat
 ```
