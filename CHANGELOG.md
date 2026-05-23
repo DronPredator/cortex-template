@@ -11,10 +11,10 @@ SemVer: `MAJOR.MINOR.PATCH`.
 
 ## [2.0.0] — 2026-05-21
 
-Sync masivo desde el despliegue de referencia (Fidemar Cortex) que llevamos
+Sync masivo desde el despliegue de referencia que llevamos
 de v1.0 → v1.4.1 con muchas mejoras de seguridad, UX y estabilidad. Esta
 release importa **todas las mejoras genéricas** al blueprint, dejando
-afuera lo específico del cliente Fidemar.
+afuera lo específico de la instancia de referencia.
 
 ### Added — Seguridad
 
@@ -163,12 +163,12 @@ afuera lo específico del cliente Fidemar.
 - `scripts/test_reasoning.py`: smoke test que verifica si un modelo
   Gemini emite thoughts con `include_thoughts=True`.
 
-### Lo que NO se importó (específico Fidemar)
+### Lo que NO se importó (específico de la instancia de referencia)
 
 - Agente "Generador de Informes" + tool `generate_service_report_pdf`
   + módulo `report_generators.py` — específico del cliente.
-- Knowledge files de los agentes Fidemar (Kunkle, Reglamento GV2024).
-- Logo Fidemar en `static/branding/`.
+- Knowledge files específicos de los agentes de la instancia de referencia.
+- Logo y branding del cliente en `static/branding/`.
 - Router específico de Steamy (`classify_task_tier_steamy`).
 - Catálogo BIT real.
 - Scripts `inspect_docx.py` y `extract_logo.py` (eran para reverse-
