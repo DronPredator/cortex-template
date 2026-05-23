@@ -62,22 +62,22 @@ def generate_memory() -> dict:
 
         convs_text = "\n\n".join(
             [
-                f"[{e.get('ts','')[:10]}] Usuario: {e.get('user','')}\nAgente: {e.get('assistant','')[:300]}"
+                f"[{e.get('ts','')[:10]}] User: {e.get('user','')}\nAgent: {e.get('assistant','')[:300]}"
                 for e in entries
             ]
         )
 
         analysis_prompt = (
-            f"Analizá estas {len(entries)} conversaciones recientes del chatbot de Fidemar S.A. "
-            "y generá un resumen de memoria estructurado en español:\n\n"
+            f"Analyze these {len(entries)} recent conversations from the Cortex chatbot "
+            "and produce a structured memory summary:\n\n"
             f"{convs_text}\n\n"
-            "Generá un análisis con estas secciones:\n"
-            "## Temas más consultados\n"
-            "## Marcas y productos más buscados\n"
-            "## Patrones de uso detectados\n"
-            "## Observaciones del período\n"
-            "## Sugerencias para mejorar el agente\n\n"
-            "Sé conciso, directo y útil. Formato markdown."
+            "Produce an analysis with these sections:\n"
+            "## Most-asked topics\n"
+            "## Most-searched brands and products\n"
+            "## Detected usage patterns\n"
+            "## Period observations\n"
+            "## Suggestions to improve the agent\n\n"
+            "Be concise, direct, and useful. Markdown format."
         )
 
         content = ""

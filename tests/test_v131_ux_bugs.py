@@ -20,13 +20,13 @@ def test_safe_filename_strips_accents():
     """
     from office_generators import _safe_filename
 
-    fn = _safe_filename("fidemar", "Informe de Servicio Técnico", "docx")
+    fn = _safe_filename("cortex", "Informe de Servicio Técnico", "docx")
     # No debe contener caracteres no-ASCII
     assert fn.encode("ascii"), f"Filename con no-ASCII: {fn!r}"
     # Las tildes se reemplazan con _
     assert "é" not in fn and "ó" not in fn
     # Pero el filename sigue siendo descriptivo y único
-    assert fn.startswith("fidemar_")
+    assert fn.startswith("cortex_")
     assert fn.endswith(".docx")
     assert "Servicio" in fn
 
@@ -35,7 +35,7 @@ def test_safe_filename_handles_all_spanish_chars():
     """Verifica que ñ, ü, ¿, ¡ y otros también se filtran."""
     from office_generators import _safe_filename
 
-    fn = _safe_filename("fidemar", "¡Acción! cumplió piña Düsseldorf", "docx")
+    fn = _safe_filename("cortex", "¡Acción! cumplió piña Düsseldorf", "docx")
     fn.encode("ascii")  # no debe lanzar UnicodeEncodeError
 
 
@@ -54,7 +54,7 @@ def test_word_filename_passes_security_filter():
         "¡Atención! Reporte urgente",
     ]
     for title in titles:
-        fn = _safe_filename("fidemar", title, "docx")
+        fn = _safe_filename("cortex", title, "docx")
         cleaned = safe_filename(fn)
         assert cleaned == fn, (
             f"Filename {fn!r} se modifica al pasar por safe_filename → {cleaned!r}. "
@@ -64,7 +64,7 @@ def test_word_filename_passes_security_filter():
 
 # ── Fix #2 — Directiva de idioma configurable (Cortex template) ───────
 #
-# En Fidemar la directiva está hardcoded a español rioplatense (porque
+# En Cortex la directiva está hardcoded a español rioplatense (porque
 # es deploy en Uruguay). En el TEMPLATE genérico, la directiva es
 # configurable via env var `LANGUAGE_DIRECTIVE` y por default vacía
 # (el modelo elige idioma según el contexto).
@@ -124,7 +124,7 @@ def _unused_test_gemini_engine_prepends_spanish_directive(monkeypatch):
         gen = gemini_engine.stream_chat(
             api_key="test_key",
             model="gemini-flash",
-            system="Sos FIDI, consultor de stock.",
+            system="Sos Demo Assistant, consultor de stock.",
             messages=[{"role": "user", "content": "hola"}],
         )
         async for _ in gen:
@@ -142,7 +142,7 @@ def _unused_test_gemini_engine_prepends_spanish_directive(monkeypatch):
     assert "español" in system.lower()
     assert "rioplatense" in system.lower()
     # El prompt original sigue ahí después
-    assert "FIDI" in system
+    assert "Demo Assistant" in system
 
 
 def _unused_test_gemini_engine_directive_works_with_empty_system(monkeypatch):

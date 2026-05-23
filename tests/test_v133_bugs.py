@@ -100,7 +100,7 @@ def test_admin_prompt_editor_uses_viewport_height():
 
 
 def _unused_test_generador_informes_no_broken_icon_url():
-    """[DESACTIVADO en template] Test específico de un agente de Fidemar
+    """[DESACTIVADO en template] Test específico de un agente de Cortex
     que no existe en el template. El cubrimiento equivalente lo da
     `test_all_agent_icon_urls_point_to_existing_files` (que recorre
     todos los agentes del registry, no uno específico)."""

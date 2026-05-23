@@ -1,4 +1,4 @@
-"""Generadores de Word (.docx) y Excel (.xlsx) con branding Fidemar S.A.
+"""Generadores de Word (.docx) y Excel (.xlsx) con branding Cortex
 
 Ambas funciones reciben datos estructurados (sections/sheets) y devuelven
 {filename, url, size_bytes}. Diseñados para ser tolerantes a entradas malformadas
@@ -17,7 +17,7 @@ BRAND_HEX  = "1A4EA0"
 BRAND_RGB  = (0x1A, 0x4E, 0xA0)
 TEXT_HEX   = "1D1D1F"
 SUBT_HEX   = "515154"
-COMPANY    = "Fidemar S.A."
+COMPANY    = "Cortex"
 
 
 def _safe_filename(prefix: str, title: str, ext: str) -> str:
@@ -26,7 +26,7 @@ def _safe_filename(prefix: str, title: str, ext: str) -> str:
 
     BUG-FIX (v1.3.1): antes usábamos `c.isalnum()` que en Python con strings
     Unicode acepta tildes y eñes como alfanumeric. Eso producía filenames
-    tipo `fidemar_Informe_Técnico_a1b2c3.docx` que el endpoint
+    tipo `cortex_Informe_Técnico_a1b2c3.docx` que el endpoint
     `/documents/{filename}` rechazaba con 400 porque su `safe_filename()`
     normaliza NFKD y la `é` se descomponía a `e + ́` (combining acute),
     rompiendo la igualdad `clean == filename`.
@@ -307,7 +307,7 @@ def generate_word_document(
     rf.font.color.rgb = RGBColor(0x86, 0x86, 0x8B)
     rf.italic = True
 
-    filename = _safe_filename("fidemar", title, "docx")
+    filename = _safe_filename("cortex", title, "docx")
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / filename
     doc.save(out_path)
@@ -406,7 +406,7 @@ def generate_excel_spreadsheet(
                     max_len = max(max_len, min(40, len(str(r[ci-1]))))
             ws.column_dimensions[letter].width = max_len + 2
 
-    filename = _safe_filename("fidemar", title, "xlsx")
+    filename = _safe_filename("cortex", title, "xlsx")
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / filename
     wb.save(out_path)
